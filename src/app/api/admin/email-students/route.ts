@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 import { createClient as createServiceClient } from "@supabase/supabase-js";
 import { sendEmail } from "@/lib/send-email";
-import { wrapInLayout, mergeVariables } from "@/lib/email-templates";
+import { SmsAdapter } from "@/lib/sms-adapter";
+import { wrapInLayout } from "@/lib/email-templates";
 
 /**
  * POST /api/admin/email-students
@@ -41,7 +42,7 @@ export async function POST(request: NextRequest) {
         const serviceSupabase = createServiceClient(supabaseUrl, supabaseServiceKey);
         const { data: paidApps, error } = await serviceSupabase
             .from("applications")
-            .select("email, first_name")
+            .select("email, first_name, phone")
             .eq("payment_status", "PAID")
             .not("email", "is", null);
 
@@ -55,11 +56,15 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({
                 ok: true,
                 sent: 0,
+                smsSent: 0,
                 message: "No paid students to email.",
             });
         }
 
         let sent = 0;
+        let smsSent = 0;
+        const smsNotice = "You have a new message from Remote Work Hub - check your email.";
+
         for (const r of recipients) {
             const firstName = r.first_name || "Student";
             const personalizedBody = htmlBody.replace(/\{\{first_name\}\}/g, firstName);
@@ -75,13 +80,19 @@ export async function POST(request: NextRequest) {
                 html: wrappedHtml,
             });
             if (result.success) sent++;
+
+            if (r.phone?.trim()) {
+                const smsResult = await SmsAdapter.send({ to: r.phone, message: smsNotice });
+                if (smsResult.success) smsSent++;
+            }
         }
 
         return NextResponse.json({
             ok: true,
             sent,
+            smsSent,
             total: recipients.length,
-            message: `Emailed ${sent} of ${recipients.length} paid students.`,
+            message: `Emailed ${sent} and sent ${smsSent} SMS to paid students.`,
         });
     } catch (e) {
         console.error("[Email Students] Error:", e);

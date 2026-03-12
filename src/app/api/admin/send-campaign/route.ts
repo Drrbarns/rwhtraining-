@@ -179,6 +179,10 @@ export async function POST(request: NextRequest) {
           }
           if (result.success) totalSent++;
           else totalFailed++;
+          // SMS as well: notify to check email (no extra totalSent count)
+          if (recipient.phone?.trim()) {
+            await SmsAdapter.send({ to: recipient.phone, message: "You have a new message from Remote Work Hub - check your email." });
+          }
         } else if (channel === "sms" && recipient.phone) {
           const smsResult = await SmsAdapter.send({ to: recipient.phone, message: mergedBody });
 

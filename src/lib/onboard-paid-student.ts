@@ -1,6 +1,7 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 import { sendEmail } from "@/lib/send-email";
-import { EMAIL_TEMPLATES, mergeVariables } from "@/lib/email-templates";
+import { SmsAdapter } from "@/lib/sms-adapter";
+import { EMAIL_TEMPLATES, SMS_TEMPLATES, mergeVariables } from "@/lib/email-templates";
 
 function generateSecurePassword() {
     const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
@@ -19,6 +20,7 @@ export type ApplicationRow = {
     phone?: string | null;
     city?: string | null;
     amount_ghs: number;
+    tier?: string | null;
     cohort_id: string;
     user_id?: string | null;
 };
@@ -58,6 +60,7 @@ export async function onboardPaidStudent(
                 if (existing) {
                     await ensureProfileAndEnrollment(supabase, appData, existing.id);
                     const emailSent = await sendWelcomeExistingEmail(appData.email, appData.first_name);
+                    await sendWelcomeSms(appData.first_name, appData.phone);
                     return { ok: true, emailSent };
                 }
             }
@@ -92,6 +95,8 @@ export async function onboardPaidStudent(
             appData.first_name,
             appData.last_name
         );
+        await sendPaymentConfirmationSms(appData.first_name, appData.amount_ghs, appData.tier, appData.phone);
+        await sendWelcomeSms(appData.first_name, appData.phone);
         return { ok: true, emailSent };
     } catch (e) {
         console.error("[Onboard] Error:", e);
@@ -174,4 +179,30 @@ async function sendCredentialsEmail(
         console.log(`[Onboard] Emailed credentials to ${email}`);
     }
     return result.success;
+}
+
+async function sendPaymentConfirmationSms(
+    firstName: string,
+    amount: number,
+    tier: string | null | undefined,
+    phone: string | null | undefined
+): Promise<void> {
+    if (!phone?.trim()) return;
+    const tierLabel = tier ? `${tier}%` : "your";
+    const message = mergeVariables(SMS_TEMPLATES.payment_confirmation.body, {
+        first_name: firstName,
+        amount: String(amount),
+        tier: tierLabel,
+    });
+    const result = await SmsAdapter.send({ to: phone, message });
+    if (result.success) console.log(`[Onboard] Payment confirmation SMS sent to ${phone}`);
+    else console.warn(`[Onboard] Payment confirmation SMS failed:`, result.error);
+}
+
+async function sendWelcomeSms(firstName: string, phone: string | null | undefined): Promise<void> {
+    if (!phone?.trim()) return;
+    const message = mergeVariables(SMS_TEMPLATES.welcome_sms.body, { first_name: firstName });
+    const result = await SmsAdapter.send({ to: phone, message });
+    if (result.success) console.log(`[Onboard] Welcome SMS sent to ${phone}`);
+    else console.warn(`[Onboard] Welcome SMS failed:`, result.error);
 }

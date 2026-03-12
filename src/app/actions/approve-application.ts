@@ -127,6 +127,7 @@ export async function approveApplicationAction(id: string) {
             phone: app.phone,
             city: app.city,
             amount_ghs: app.amount_ghs || 0,
+            tier: app.tier,
             cohort_id: cohortId,
             user_id: app.user_id,
         });
