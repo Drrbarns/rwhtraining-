@@ -473,7 +473,7 @@ export default function MasterpieceHomepage() {
               },
               {
                 q: "Is the training online or offline?",
-                a: "The masterclass is fully offline and in-person at our training facility on TIT Newtown Road, Accra, Ghana. This ensures hands-on mentorship, peer collaboration, and zero distractions."
+                a: "The masterclass is fully offline and in-person at our training facility at 111 Newtown RD, Accra Newtown. This ensures hands-on mentorship, peer collaboration, and zero distractions."
               },
               {
                 q: "What is the 100K in 2 Weeks Challenge?",
@@ -602,7 +602,7 @@ export default function MasterpieceHomepage() {
                 </li>
                 <li className="flex items-start gap-3 text-sm">
                   <MapPin className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
-                  <span>TIT Newtown Road,<br /> Accra, Ghana</span>
+                  <span>111 Newtown RD,<br /> Accra Newtown</span>
                 </li>
               </ul>
             </div>

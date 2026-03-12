@@ -5,14 +5,12 @@ import { usePathname } from "next/navigation";
 import { LayoutDashboard, Users, CreditCard, Settings as SettingsIcon, LogOut, ChevronRight, Menu, Bell, Loader2, ShieldCheck, ArrowUpRight, AlertCircle, GraduationCap, X, Megaphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
-import { createClient, User } from "@supabase/supabase-js";
+import { type User } from "@supabase/supabase-js";
+import { createClient } from "@/utils/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+const supabase = createClient();
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();

@@ -13,12 +13,16 @@ export async function POST(request: NextRequest) {
 
         console.log("[Moolre Webhook] Received callback:", JSON.stringify(body, null, 2));
 
-        // Extract relevant fields from Moolre's callback payload
-        const reference = body.reference || body.ref || body.transaction_reference;
-        const status = body.status; // 1 = success, 0 = failure
-        const transactionId = body.transaction_id || body.id;
-        const amount = body.amount;
-        const message = body.message || "";
+        // Moolre sends payload with nested data: { status, message, data: { externalref, transactionid, txstatus, ... } }
+        const data = body.data || body;
+        const reference =
+            body.reference || body.ref || body.transaction_reference
+            || data.externalref || data.reference || data.ref;
+        const status = body.status ?? data.txstatus ?? data.status; // 1 = success, 0 = failure
+        const transactionId =
+            body.transaction_id || body.id || data.transactionid || data.transaction_id;
+        const amount = body.amount ?? data.amount ?? data.value;
+        const message = body.message || data.message || "";
 
         if (!reference) {
             console.error("[Moolre Webhook] No reference found in callback body");

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -26,6 +27,7 @@ type Payment = {
 const PAGE_SIZE = 15;
 
 export function PaymentsClient({ payments }: { payments: Payment[] }) {
+    const router = useRouter();
     const [search, setSearch] = useState("");
     const [statusFilter, setStatusFilter] = useState<string>("ALL");
     const [gatewayFilter, setGatewayFilter] = useState<string>("ALL");
@@ -48,12 +50,25 @@ export function PaymentsClient({ payments }: { payments: Payment[] }) {
     const handleReconcile = async () => {
         setReconciling(true);
         try {
-            const res = await fetch("/api/admin/reconcile-moolre-payments", { method: "POST" });
-            const data = await res.json();
-            if (res.ok) {
-                toast.success(data.message || "Reconciliation complete");
+            const [moolreRes, paystackRes] = await Promise.all([
+                fetch("/api/admin/reconcile-moolre-payments", { method: "POST" }),
+                fetch("/api/admin/reconcile-paystack-payments", { method: "POST" }),
+            ]);
+            const moolreData = await moolreRes.json();
+            const paystackData = await paystackRes.json();
+            const moolreOk = moolreRes.ok;
+            const paystackOk = paystackRes.ok;
+            const updated = (moolreOk ? moolreData.updated ?? 0 : 0) + (paystackOk ? paystackData.updated ?? 0 : 0);
+            if (moolreOk && paystackOk) {
+                if (updated > 0) {
+                    toast.success(`Reconciliation complete: ${updated} payment(s) marked as paid.`);
+                    router.refresh();
+                } else {
+                    toast.success(moolreData.message && paystackData.message ? "No pending payments to reconcile." : "Reconciliation complete.");
+                }
             } else {
-                toast.error(data.error || "Reconciliation failed");
+                const err = !moolreOk ? moolreData.error : paystackData.error;
+                toast.error(err || "Reconciliation failed");
             }
         } catch {
             toast.error("Reconciliation request failed");

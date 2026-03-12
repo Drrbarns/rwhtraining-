@@ -26,8 +26,8 @@ const organizationSchema = {
   },
   address: {
     "@type": "PostalAddress",
-    streetAddress: "TIT Newtown Road",
-    addressLocality: "Accra",
+    streetAddress: "111 Newtown RD",
+    addressLocality: "Accra Newtown",
     addressCountry: "GH",
   },
 };
@@ -73,8 +73,8 @@ const courseSchema = {
       name: "Doctor Barns Tech HQ",
       address: {
         "@type": "PostalAddress",
-        streetAddress: "TIT Newtown Road",
-        addressLocality: "Accra",
+        streetAddress: "111 Newtown RD",
+        addressLocality: "Accra Newtown",
         addressCountry: "GH",
       },
     },
@@ -173,7 +173,7 @@ const faqSchema = {
       name: "Is the training online or offline?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "The masterclass is fully offline and in-person at our training facility on TIT Newtown Road, Accra, Ghana. This ensures hands-on mentorship, peer collaboration, and zero distractions.",
+        text: "The masterclass is fully offline and in-person at our training facility at 111 Newtown RD, Accra Newtown. This ensures hands-on mentorship, peer collaboration, and zero distractions.",
       },
     },
     {
@@ -227,8 +227,8 @@ const eventSchema = {
     name: "Doctor Barns Tech HQ",
     address: {
       "@type": "PostalAddress",
-      streetAddress: "TIT Newtown Road",
-      addressLocality: "Accra",
+      streetAddress: "111 Newtown RD",
+      addressLocality: "Accra Newtown",
       addressCountry: "GH",
     },
   },
