@@ -1,6 +1,6 @@
 "use client";
 
-import { X, Mail, Phone, MapPin, Briefcase, BookOpen, FileText, CreditCard, Clock, Trash2, Loader2, CheckCircle2, ShieldCheck } from "lucide-react";
+import { X, Mail, Phone, MapPin, Briefcase, BookOpen, FileText, CreditCard, Clock, Trash2, Loader2, CheckCircle2, ShieldCheck, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect, useCallback } from "react";
 import { deleteApplicationAction } from "@/app/actions/delete-application";
@@ -13,6 +13,7 @@ export type ApplicationRecord = {
   last_name?: string | null;
   email?: string | null;
   phone?: string | null;
+  age?: number | null;
   city?: string | null;
   occupation?: string | null;
   experience?: string | null;
@@ -193,6 +194,7 @@ export function ApplicationDetailModal({ application, onClose }: ApplicationDeta
             <div className="space-y-1">
               <DetailRow icon={Mail} label="Email" value={application.email} />
               <DetailRow icon={Phone} label="Phone / WhatsApp" value={application.phone} />
+              <DetailRow icon={User} label="Age" value={application.age != null ? `${application.age} years old` : null} />
               <DetailRow icon={MapPin} label="City / Location" value={application.city} />
             </div>
           </section>

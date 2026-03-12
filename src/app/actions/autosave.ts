@@ -12,11 +12,13 @@ export async function autosaveApplicationAction(formData: FormData, applicationI
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
+    const ageRaw = formData.get("age");
     const data: any = {
         first_name: formData.get("firstName") as string || "",
         last_name: formData.get("lastName") as string || "",
         email: formData.get("email") as string || "",
         phone: formData.get("phone") as string || "",
+        age: ageRaw ? Number(ageRaw) : null,
         city: formData.get("city") as string || "",
         occupation: formData.get("occupation") as string || "",
         experience: formData.get("experience") as string || "",

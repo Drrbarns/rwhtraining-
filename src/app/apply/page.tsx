@@ -229,10 +229,16 @@ export default function ApplyPage() {
                                     <Input id="phone" name="phone" type="tel" placeholder="+233 5X XXX XXXX" className="relative z-10 h-14 bg-[#121212] border-white/10 rounded-2xl px-5 text-base focus:border-[#2563EB]/40 focus:ring-1 focus:ring-[#2563EB]/20 text-gray-200 placeholder:text-gray-600 shadow-[0_4px_20px_rgba(0,0,0,0.1)] transition-all" required />
                                 </div>
                                 <div className="space-y-3 relative group">
-                                    <Label htmlFor="city" className="text-gray-400 font-bold uppercase tracking-widest text-xs transition-colors group-focus-within:text-[#2563EB]">City / Location</Label>
+                                    <Label htmlFor="age" className="text-gray-400 font-bold uppercase tracking-widest text-xs transition-colors group-focus-within:text-[#2563EB]">Age</Label>
                                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 w-full h-1/2 bg-[#2563EB]/5 blur-[20px] opacity-0 group-focus-within:opacity-100 transition-opacity duration-1000 pointer-events-none rounded-full" />
-                                    <Input id="city" name="city" placeholder="e.g. Accra, Ghana" className="relative z-10 h-14 bg-[#121212] border-white/10 rounded-2xl px-5 text-base focus:border-[#2563EB]/40 focus:ring-1 focus:ring-[#2563EB]/20 text-gray-200 placeholder:text-gray-600 shadow-[0_4px_20px_rgba(0,0,0,0.1)] transition-all" required />
+                                    <Input id="age" name="age" type="number" min="14" max="99" placeholder="e.g. 24" className="relative z-10 h-14 bg-[#121212] border-white/10 rounded-2xl px-5 text-base focus:border-[#2563EB]/40 focus:ring-1 focus:ring-[#2563EB]/20 text-gray-200 placeholder:text-gray-600 shadow-[0_4px_20px_rgba(0,0,0,0.1)] transition-all" required />
                                 </div>
+                            </div>
+
+                            <div className="space-y-3 relative group">
+                                <Label htmlFor="city" className="text-gray-400 font-bold uppercase tracking-widest text-xs transition-colors group-focus-within:text-[#2563EB]">City / Location</Label>
+                                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 w-full h-1/2 bg-[#2563EB]/5 blur-[20px] opacity-0 group-focus-within:opacity-100 transition-opacity duration-1000 pointer-events-none rounded-full" />
+                                <Input id="city" name="city" placeholder="e.g. Accra, Ghana" className="relative z-10 h-14 bg-[#121212] border-white/10 rounded-2xl px-5 text-base focus:border-[#2563EB]/40 focus:ring-1 focus:ring-[#2563EB]/20 text-gray-200 placeholder:text-gray-600 shadow-[0_4px_20px_rgba(0,0,0,0.1)] transition-all" required />
                             </div>
                         </div>
 

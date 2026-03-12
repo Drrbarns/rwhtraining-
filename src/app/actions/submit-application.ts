@@ -12,6 +12,7 @@ export async function submitApplicationAction(formData: FormData) {
         lastName: (formData.get("lastName") as string) || "",
         email: (formData.get("email") as string) || "",
         phone: (formData.get("phone") as string) || "",
+        age: formData.get("age") ? Number(formData.get("age")) : undefined,
         city: (formData.get("city") as string) || "",
         occupation: (formData.get("occupation") as string) || "",
         experience: (formData.get("experience") as string) || "",
@@ -28,7 +29,7 @@ export async function submitApplicationAction(formData: FormData) {
         return { success: false, error: firstError, redirect_url: null };
     }
 
-    const { firstName, lastName, email, phone, city, occupation, experience, reason, tier, paymentMethod, network, momoNumber, applicationId } = parsed.data;
+    const { firstName, lastName, email, phone, age, city, occupation, experience, reason, tier, paymentMethod, network, momoNumber, applicationId } = parsed.data;
     const usePaystack = paymentMethod === "paystack";
 
     if (!usePaystack && !momoNumber) {
@@ -60,6 +61,7 @@ export async function submitApplicationAction(formData: FormData) {
             last_name: lastName,
             email,
             phone,
+            age: age || null,
             city,
             occupation,
             experience,

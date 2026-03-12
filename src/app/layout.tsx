@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { Inter, Plus_Jakarta_Sans, Playfair_Display } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Toaster } from "@/components/ui/toaster";
 import { StructuredData } from "@/components/StructuredData";
+import { PageViewTracker } from "@/components/PageViewTracker";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -110,7 +113,10 @@ export default function RootLayout({
       </head>
       <body className={`${inter.variable} ${jakarta.variable} ${playfair.variable} antialiased font-sans bg-[#0A0A0A] text-gray-100`}>
         {children}
+        <PageViewTracker />
         <Toaster />
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

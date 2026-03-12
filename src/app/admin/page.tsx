@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Users, AlertCircle, Banknote, ArrowUpRight, TrendingUp, TrendingDown, UserPlus, GraduationCap, CreditCard, Activity, Clock, ArrowRight, Zap, Target } from "lucide-react";
+import { Users, AlertCircle, Banknote, ArrowUpRight, TrendingUp, TrendingDown, UserPlus, GraduationCap, CreditCard, Activity, Clock, ArrowRight, Zap, Target, Eye } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { createClient } from "@supabase/supabase-js";
 import { ExportReportButton, OpenRegistrationsButton } from "./ClientButtons";
@@ -86,12 +86,38 @@ async function getAdminData() {
         type: app.is_unfinished ? "draft" : app.payment_status === "PAID" ? "paid" : "submitted",
     }));
 
+    // Page view analytics
+    const now = new Date();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+    const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
+
+    const [todayViewsRes, weekViewsRes, totalViewsRes, topPagesRes] = await Promise.all([
+        supabase.from("page_views").select("id", { count: "exact", head: true }).gte("created_at", todayStart),
+        supabase.from("page_views").select("id", { count: "exact", head: true }).gte("created_at", weekAgo),
+        supabase.from("page_views").select("id", { count: "exact", head: true }),
+        supabase.from("page_views").select("path").gte("created_at", weekAgo),
+    ]);
+
+    const todayViews = todayViewsRes.count || 0;
+    const weekViews = weekViewsRes.count || 0;
+    const totalViews = totalViewsRes.count || 0;
+
+    const pathCounts = new Map<string, number>();
+    (topPagesRes.data || []).forEach((row: any) => {
+        pathCounts.set(row.path, (pathCounts.get(row.path) || 0) + 1);
+    });
+    const topPages = Array.from(pathCounts.entries())
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5)
+        .map(([path, views]) => ({ path, views }));
+
     return {
         applications, unfinishedApps, enrollments, students, payments,
         totalRevenue, pendingPayments, filledSeats, totalCapacity, totalWhoStarted,
         conversionRate, completionRate, outstandingBalance,
         revenueByDay, tierBreakdown, gatewayBreakdown, funnelData, recentActivity,
-        paidCount: paidApps.length, cohort
+        paidCount: paidApps.length, cohort,
+        analytics: { todayViews, weekViews, totalViews, topPages },
     };
 }
 
@@ -101,9 +127,9 @@ export default async function AdminDashboardPage() {
     if (!data) return <div className="p-10 text-slate-900 font-bold">Error: Supabase config missing.</div>;
 
     const kpis = [
+        { title: "Site Visitors", value: data.analytics.totalViews.toLocaleString(), desc: `${data.analytics.todayViews} today · ${data.analytics.weekViews} this week`, icon: Eye, color: "text-violet-600", bg: "bg-violet-50/50", border: "border-violet-100/50", trend: "up" },
         { title: "Total Leads", value: data.totalWhoStarted.toString(), desc: "All who started", icon: Users, color: "text-blue-600", bg: "bg-blue-50/50", border: "border-blue-100/50", trend: null },
         { title: "Completed", value: data.applications.length.toString(), desc: `${data.completionRate}% completion rate`, icon: Target, color: "text-indigo-600", bg: "bg-indigo-50/50", border: "border-indigo-100/50", trend: "up" },
-        { title: "Abandoned", value: data.unfinishedApps.length.toString(), desc: "Did not finish", icon: AlertCircle, color: "text-red-500", bg: "bg-red-50/50", border: "border-red-100/50", trend: "down" },
         { title: "Enrolled", value: `${data.filledSeats} / ${data.totalCapacity}`, desc: `${data.totalCapacity - data.filledSeats} seats left`, icon: GraduationCap, color: "text-amber-600", bg: "bg-amber-50/50", border: "border-amber-100/50", trend: "up" },
         { title: "Revenue", value: `GHS ${data.totalRevenue.toLocaleString()}`, desc: `${data.paidCount} paid students`, icon: Banknote, color: "text-emerald-600", bg: "bg-emerald-50/50", border: "border-emerald-100/50", trend: "up" },
     ];
@@ -309,7 +335,8 @@ export default async function AdminDashboardPage() {
                     </CardContent>
                 </Card>
 
-                <Card className="lg:col-span-2 border-slate-200/60 bg-white shadow-[0_2px_10px_-3px_rgba(0,0,0,0.02)] rounded-2xl overflow-hidden h-fit">
+                <div className="lg:col-span-2 space-y-6">
+                <Card className="border-slate-200/60 bg-white shadow-[0_2px_10px_-3px_rgba(0,0,0,0.02)] rounded-2xl overflow-hidden h-fit">
                     <CardHeader className="px-6 pt-6 pb-4 border-b border-slate-100 bg-slate-50/50">
                         <CardTitle className="text-lg font-extrabold text-slate-900">Quick Actions</CardTitle>
                     </CardHeader>
@@ -337,6 +364,33 @@ export default async function AdminDashboardPage() {
                         <SendMessageToStudents paidCount={data.paidCount} />
                     </CardContent>
                 </Card>
+
+                {/* Top Pages This Week */}
+                <Card className="border-slate-200/60 bg-white shadow-[0_2px_10px_-3px_rgba(0,0,0,0.02)] rounded-2xl overflow-hidden h-fit">
+                    <CardHeader className="px-6 pt-6 pb-4 border-b border-slate-100 bg-violet-50/50">
+                        <CardTitle className="text-[15px] font-extrabold text-slate-900 flex items-center gap-2">
+                            <div className="p-1.5 rounded-lg bg-violet-50 text-violet-600"><Eye className="w-4 h-4" /></div>
+                            Top Pages This Week
+                        </CardTitle>
+                        <CardDescription className="text-[12px] text-slate-500 font-medium">{data.analytics.weekViews.toLocaleString()} total views · {data.analytics.todayViews} today</CardDescription>
+                    </CardHeader>
+                    <CardContent className="p-0">
+                        <div className="divide-y divide-slate-100/80">
+                            {data.analytics.topPages.length > 0 ? data.analytics.topPages.map((page: any, i: number) => (
+                                <div key={i} className="flex items-center justify-between px-6 py-3.5 hover:bg-slate-50/50 transition-colors">
+                                    <div className="flex items-center gap-3">
+                                        <span className="text-[11px] font-extrabold text-slate-400 w-5">{i + 1}.</span>
+                                        <span className="text-[13px] font-bold text-slate-900 font-mono">{page.path}</span>
+                                    </div>
+                                    <span className="text-[12px] font-extrabold text-violet-600 bg-violet-50 px-2.5 py-1 rounded-md">{page.views}</span>
+                                </div>
+                            )) : (
+                                <div className="text-center py-8 text-[13px] text-slate-400 font-medium">No page views tracked yet</div>
+                            )}
+                        </div>
+                    </CardContent>
+                </Card>
+                </div>
             </div>
         </div>
     );
