@@ -11,7 +11,7 @@ export async function approveApplicationAction(id: string) {
     }
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseServiceKey = process.env.NEXT_PUBLIC_SUPABASE_SERVICE_KEY;
+    const supabaseServiceKey = process.env.NEXT_PUBLIC_SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
 
     if (!supabaseUrl || !supabaseServiceKey) {
         return { success: false, error: "Supabase config missing" };
@@ -82,16 +82,39 @@ export async function approveApplicationAction(id: string) {
         return { success: false, error: updateError.message };
     }
 
-    // Update or create payment record
+    // Update or create payment record so Finance & Payments cards and ledger stay correct
+    const paidAt = new Date().toISOString();
     if (app.payment_reference) {
         await supabase
             .from("payments")
             .update({
                 status: "PAID",
-                paid_at: new Date().toISOString(),
-                updated_at: new Date().toISOString(),
+                paid_at: paidAt,
+                updated_at: paidAt,
             })
             .eq("reference", app.payment_reference);
+    } else {
+        // Manual approve with no payment row: create one so Total Collected and ledger update
+        const manualRef = `MANUAL-${app.id}`;
+        await supabase.from("payments").insert({
+            reference: manualRef,
+            email: app.email,
+            phone: app.phone || "",
+            first_name: app.first_name,
+            last_name: app.last_name,
+            network: "MANUAL",
+            amount_ghs: app.amount_ghs ?? 500,
+            tier: app.tier || "50",
+            gateway: "manual",
+            status: "PAID",
+            paid_at: paidAt,
+            created_at: paidAt,
+            updated_at: paidAt,
+        });
+        await supabase
+            .from("applications")
+            .update({ payment_reference: manualRef, updated_at: paidAt })
+            .eq("id", id);
     }
 
     // Run onboarding (create user, profile, enrollment, send credentials)
