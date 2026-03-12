@@ -1,0 +1,122 @@
+"use server";
+
+import { createClient } from "@supabase/supabase-js";
+import { createClient as createServerSupabase } from "@/utils/supabase/server";
+import { revalidatePath } from "next/cache";
+import { onboardPaidStudent } from "@/lib/onboard-paid-student";
+
+export async function approveApplicationAction(id: string) {
+    if (!id || typeof id !== "string") {
+        return { success: false, error: "Invalid application ID" };
+    }
+
+    const serverClient = await createServerSupabase();
+    const { data: { user } } = await serverClient.auth.getUser();
+
+    if (!user) {
+        return { success: false, error: "Authentication required" };
+    }
+
+    const { data: profile } = await serverClient
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .single();
+
+    if (!profile || !["ADMIN", "SUPER_ADMIN"].includes(profile.role)) {
+        return { success: false, error: "Unauthorized: Admin access required" };
+    }
+
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseServiceKey = process.env.NEXT_PUBLIC_SUPABASE_SERVICE_KEY;
+
+    if (!supabaseUrl || !supabaseServiceKey) {
+        return { success: false, error: "Supabase config missing" };
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    const { data: app, error: fetchError } = await supabase
+        .from("applications")
+        .select("*")
+        .eq("id", id)
+        .single();
+
+    if (fetchError || !app) {
+        return { success: false, error: fetchError?.message || "Application not found" };
+    }
+
+    if (app.payment_status === "PAID" && app.status === "APPROVED") {
+        return { success: false, error: "Application is already approved and paid" };
+    }
+
+    // Get active cohort
+    const { data: cohort } = await supabase
+        .from("cohorts")
+        .select("id")
+        .eq("is_active", true)
+        .single();
+
+    const cohortId = cohort?.id || app.cohort_id;
+
+    // Update application
+    const { error: updateError } = await supabase
+        .from("applications")
+        .update({
+            payment_status: "PAID",
+            status: "APPROVED",
+            cohort_id: cohortId,
+            is_unfinished: false,
+            updated_at: new Date().toISOString(),
+        })
+        .eq("id", id);
+
+    if (updateError) {
+        return { success: false, error: updateError.message };
+    }
+
+    // Update or create payment record
+    if (app.payment_reference) {
+        await supabase
+            .from("payments")
+            .update({
+                status: "PAID",
+                paid_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+            })
+            .eq("reference", app.payment_reference);
+    }
+
+    // Run onboarding (create user, profile, enrollment, send credentials)
+    if (app.email) {
+        const onboardResult = await onboardPaidStudent(supabase, {
+            id: app.id,
+            email: app.email,
+            first_name: app.first_name || "",
+            last_name: app.last_name || "",
+            phone: app.phone,
+            city: app.city,
+            amount_ghs: app.amount_ghs || 0,
+            cohort_id: cohortId,
+            user_id: app.user_id,
+        });
+
+        if (!onboardResult.ok) {
+            console.error("[Approve] Onboarding partial failure:", onboardResult.error);
+            revalidatePath("/admin");
+            revalidatePath("/admin/applications");
+            revalidatePath("/admin/students");
+            return {
+                success: true,
+                warning: `Approved & marked paid, but onboarding had an issue: ${onboardResult.error}. The student may need manual account setup.`,
+            };
+        }
+    }
+
+    revalidatePath("/admin");
+    revalidatePath("/admin/applications");
+    revalidatePath("/admin/drafts");
+    revalidatePath("/admin/students");
+    revalidatePath("/admin/payments");
+    return { success: true };
+}

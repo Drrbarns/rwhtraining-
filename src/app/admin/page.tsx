@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Users, AlertCircle, Banknote, ArrowUpRight, TrendingUp, UserPlus, GraduationCap } from "lucide-react";
+import { Users, AlertCircle, Banknote, ArrowUpRight, TrendingUp, TrendingDown, UserPlus, GraduationCap, CreditCard, Activity, Clock, ArrowRight, Zap, Target } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { createClient } from "@supabase/supabase-js";
 import { ExportReportButton, OpenRegistrationsButton } from "./ClientButtons";
 import { SendMessageToStudents } from "./components/SendMessageToStudents";
+import { RevenueChart, TierPieChart, GatewayPieChart, FunnelChart } from "./components/DashboardCharts";
 
-export const revalidate = 0; // Dynamic rendering
+export const revalidate = 0;
 
 async function getAdminData() {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -15,23 +16,83 @@ async function getAdminData() {
     if (!supabaseUrl || !supabaseServiceKey) return null;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const [appsRes, enrollmentsRes, profilesRes] = await Promise.all([
+    const [appsRes, enrollmentsRes, profilesRes, paymentsRes, cohortsRes] = await Promise.all([
         supabase.from("applications").select("*").order("created_at", { ascending: false }),
         supabase.from("enrollments").select("*, applications(*)"),
-        supabase.from("profiles").select("*").eq("role", "STUDENT")
+        supabase.from("profiles").select("*").eq("role", "STUDENT"),
+        supabase.from("payments").select("*").order("created_at", { ascending: false }),
+        supabase.from("cohorts").select("*").eq("is_active", true).limit(1).single()
     ]);
 
-    const applications = (appsRes.data || []).filter((a: any) => !a.is_unfinished);
-    const unfinishedApps = (appsRes.data || []).filter((a: any) => a.is_unfinished);
+    const allApps = appsRes.data || [];
+    const applications = allApps.filter((a: any) => !a.is_unfinished);
+    const unfinishedApps = allApps.filter((a: any) => a.is_unfinished);
     const enrollments = enrollmentsRes.data || [];
     const students = profilesRes.data || [];
+    const payments = paymentsRes.data || [];
+    const cohort = cohortsRes.data;
 
-    const totalRevenue = applications.filter((a: any) => a.payment_status === "PAID").reduce((acc: number, curr: any) => acc + Number(curr.amount_ghs || 0), 0);
-    const pendingInvoices = applications.filter((a: any) => a.payment_status !== "PAID" && a.status === "APPROVED").reduce((acc: number, curr: any) => acc + Number(curr.amount_ghs || 0), 0);
+    const paidApps = applications.filter((a: any) => a.payment_status === "PAID");
+    const totalRevenue = paidApps.reduce((acc: number, curr: any) => acc + Number(curr.amount_ghs || 0), 0);
+    const pendingPayments = applications.filter((a: any) => a.payment_status === "PENDING").length;
     const filledSeats = enrollments.length;
+    const totalCapacity = cohort?.capacity || 10;
     const totalWhoStarted = applications.length + unfinishedApps.length;
 
-    return { applications, unfinishedApps, enrollments, students, totalRevenue, pendingInvoices, filledSeats, totalWhoStarted };
+    const conversionRate = totalWhoStarted > 0 ? ((paidApps.length / totalWhoStarted) * 100).toFixed(1) : "0";
+    const completionRate = totalWhoStarted > 0 ? ((applications.length / totalWhoStarted) * 100).toFixed(1) : "0";
+
+    const outstandingBalance = enrollments.reduce((acc: number, e: any) => acc + Number(e.balance_due || 0), 0);
+
+    const revenueByDay: { date: string; amount: number }[] = [];
+    const paidPayments = payments.filter((p: any) => p.status === "PAID" || p.status === "SUCCESS");
+    const dayMap = new Map<string, number>();
+    paidPayments.forEach((p: any) => {
+        const date = new Date(p.paid_at || p.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+        dayMap.set(date, (dayMap.get(date) || 0) + Number(p.amount_ghs || 0));
+    });
+    dayMap.forEach((amount, date) => revenueByDay.push({ date, amount }));
+    revenueByDay.reverse();
+
+    const tier20 = paidApps.filter((a: any) => a.tier === "20");
+    const tier50 = paidApps.filter((a: any) => a.tier === "50");
+    const tier100 = paidApps.filter((a: any) => a.tier === "100");
+    const tierBreakdown = [
+        { name: "20% Deposit (GHS 200)", value: tier20.length, amount: tier20.reduce((s: number, a: any) => s + Number(a.amount_ghs || 0), 0) },
+        { name: "50% Deposit (GHS 500)", value: tier50.length, amount: tier50.reduce((s: number, a: any) => s + Number(a.amount_ghs || 0), 0) },
+        { name: "Full Payment (GHS 1000)", value: tier100.length, amount: tier100.reduce((s: number, a: any) => s + Number(a.amount_ghs || 0), 0) },
+    ];
+
+    const moolrePayments = paidPayments.filter((p: any) => p.gateway === "moolre").length;
+    const paystackPayments = paidPayments.filter((p: any) => p.gateway === "paystack").length;
+    const gatewayBreakdown = [
+        { name: "Moolre (MoMo)", value: moolrePayments },
+        { name: "Paystack (Card)", value: paystackPayments },
+    ];
+
+    const funnelData = [
+        { stage: "Started Application", count: totalWhoStarted, color: "#94A3B8" },
+        { stage: "Completed Form", count: applications.length, color: "#3B82F6" },
+        { stage: "Payment Initiated", count: applications.filter((a: any) => a.payment_reference).length, color: "#8B5CF6" },
+        { stage: "Payment Confirmed", count: paidApps.length, color: "#10B981" },
+        { stage: "Enrolled & Active", count: enrollments.length, color: "#059669" },
+    ];
+
+    const recentActivity = allApps.slice(0, 8).map((app: any) => ({
+        name: `${app.first_name || "Guest"} ${app.last_name || ""}`.trim(),
+        email: app.email || "No email",
+        action: app.is_unfinished ? "Started application" : app.payment_status === "PAID" ? "Payment confirmed" : "Submitted application",
+        time: app.updated_at || app.created_at,
+        type: app.is_unfinished ? "draft" : app.payment_status === "PAID" ? "paid" : "submitted",
+    }));
+
+    return {
+        applications, unfinishedApps, enrollments, students, payments,
+        totalRevenue, pendingPayments, filledSeats, totalCapacity, totalWhoStarted,
+        conversionRate, completionRate, outstandingBalance,
+        revenueByDay, tierBreakdown, gatewayBreakdown, funnelData, recentActivity,
+        paidCount: paidApps.length, cohort
+    };
 }
 
 export default async function AdminDashboardPage() {
@@ -39,20 +100,28 @@ export default async function AdminDashboardPage() {
 
     if (!data) return <div className="p-10 text-slate-900 font-bold">Error: Supabase config missing.</div>;
 
-    return (
-        <div className="space-y-10 animate-in slide-in-from-bottom-6 duration-1000">
+    const kpis = [
+        { title: "Total Leads", value: data.totalWhoStarted.toString(), desc: "All who started", icon: Users, color: "text-blue-600", bg: "bg-blue-50/50", border: "border-blue-100/50", trend: null },
+        { title: "Completed", value: data.applications.length.toString(), desc: `${data.completionRate}% completion rate`, icon: Target, color: "text-indigo-600", bg: "bg-indigo-50/50", border: "border-indigo-100/50", trend: "up" },
+        { title: "Abandoned", value: data.unfinishedApps.length.toString(), desc: "Did not finish", icon: AlertCircle, color: "text-red-500", bg: "bg-red-50/50", border: "border-red-100/50", trend: "down" },
+        { title: "Enrolled", value: `${data.filledSeats} / ${data.totalCapacity}`, desc: `${data.totalCapacity - data.filledSeats} seats left`, icon: GraduationCap, color: "text-amber-600", bg: "bg-amber-50/50", border: "border-amber-100/50", trend: "up" },
+        { title: "Revenue", value: `GHS ${data.totalRevenue.toLocaleString()}`, desc: `${data.paidCount} paid students`, icon: Banknote, color: "text-emerald-600", bg: "bg-emerald-50/50", border: "border-emerald-100/50", trend: "up" },
+    ];
 
-            {/* Header Area */}
+    return (
+        <div className="space-y-8 animate-in slide-in-from-bottom-6 duration-1000">
+
+            {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-slate-200/60 pb-8">
                 <div className="space-y-3">
                     <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-slate-200/60 shadow-[0_2px_8px_-3px_rgba(0,0,0,0.05)]">
-                        <div className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
+                        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                         <span className="text-[11px] font-bold text-slate-600 uppercase tracking-widest">
-                            Cohort 2026 Admin
+                            {data.cohort?.name || "Cohort 2026"} — Live
                         </span>
                     </div>
                     <h1 className="text-3xl md:text-[42px] font-extrabold tracking-tight text-slate-900 leading-none">Mission Control</h1>
-                    <p className="text-slate-500 text-[15px] font-medium">Real-time statistics and student management for the Masterclass.</p>
+                    <p className="text-slate-500 text-[15px] font-medium max-w-lg">Real-time analytics, student pipeline, and revenue intelligence.</p>
                 </div>
                 <div className="flex items-center gap-3">
                     <ExportReportButton applications={data.applications} />
@@ -60,26 +129,21 @@ export default async function AdminDashboardPage() {
                 </div>
             </div>
 
-            {/* Primary KPI Top Row */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5">
-                {[
-                    { title: "Total Who Started", value: data.totalWhoStarted.toString(), desc: "All intents (completed + abandoned)", icon: Users, color: "text-blue-600", bg: "bg-blue-50/50", border: "border-blue-100/50" },
-                    { title: "Completed Applications", value: data.applications.length.toString(), desc: "Fully submitted forms", icon: Users, color: "text-indigo-600", bg: "bg-indigo-50/50", border: "border-indigo-100/50" },
-                    { title: "Abandoned Drafts", value: data.unfinishedApps.length.toString(), desc: "Started but did not finish", icon: AlertCircle, color: "text-red-500", bg: "bg-red-50/50", border: "border-red-100/50" },
-                    { title: "Seats Confirmed", value: `${data.filledSeats} / 10`, desc: `${10 - data.filledSeats} seats remaining`, icon: UserPlus, color: "text-amber-600", bg: "bg-amber-50/50", border: "border-amber-100/50" },
-                    { title: "Total Revenue", value: `GHS ${data.totalRevenue.toLocaleString()}`, desc: "Collected deposits & full", icon: Banknote, color: "text-emerald-600", bg: "bg-emerald-50/50", border: "border-emerald-100/50" },
-                ].map((kpi, idx) => (
+            {/* KPI Row */}
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                {kpis.map((kpi, idx) => (
                     <Card key={idx} className="bg-white border-slate-200/60 hover:border-slate-300/80 transition-all duration-300 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.04)] hover:-translate-y-0.5 rounded-2xl overflow-hidden group">
                         <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0 px-5 pt-5">
-                            <CardTitle className="text-[13px] font-bold text-slate-500">{kpi.title}</CardTitle>
+                            <CardTitle className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">{kpi.title}</CardTitle>
                             <div className={`p-2 rounded-xl ${kpi.bg} ${kpi.border} border transition-colors group-hover:bg-white`}>
                                 <kpi.icon className={`h-4 w-4 ${kpi.color}`} />
                             </div>
                         </CardHeader>
                         <CardContent className="px-5 pb-5">
-                            <div className="text-3xl font-extrabold text-slate-900 mt-1 tracking-tight">{kpi.value}</div>
-                            <p className="text-[11px] font-semibold mt-3 text-slate-400 flex items-center">
-                                <TrendingUp className="w-3 h-3 mr-1.5 text-emerald-500" />
+                            <div className="text-2xl md:text-3xl font-extrabold text-slate-900 mt-1 tracking-tight">{kpi.value}</div>
+                            <p className="text-[11px] font-semibold mt-2 text-slate-400 flex items-center gap-1">
+                                {kpi.trend === "up" && <TrendingUp className="w-3 h-3 text-emerald-500" />}
+                                {kpi.trend === "down" && <TrendingDown className="w-3 h-3 text-red-400" />}
                                 {kpi.desc}
                             </p>
                         </CardContent>
@@ -87,93 +151,193 @@ export default async function AdminDashboardPage() {
                 ))}
             </div>
 
-            {/* Main Sections Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-
-                {/* Left Column: Stats & Activity */}
-                <div className="col-span-1 border-slate-200 space-y-8">
-                    {/* Seats Progress */}
-                    <Card className="border-slate-200/60 bg-white shadow-[0_2px_10px_-3px_rgba(0,0,0,0.02)] rounded-2xl overflow-hidden relative">
-                        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-600 to-indigo-600" />
-                        <CardHeader className="px-6 pt-6 pb-4">
-                            <CardTitle className="text-lg font-extrabold text-slate-900 flex items-center gap-2.5">
-                                <div className="p-1.5 rounded-lg bg-blue-50 text-blue-600">
-                                    <AlertCircle className="w-4 h-4" />
-                                </div>
-                                Cohort Capacity
-                            </CardTitle>
-                            <CardDescription className="text-slate-500 text-[13px] font-medium">Current fill rate based on cleared payments.</CardDescription>
-                        </CardHeader>
-                        <CardContent className="px-6 pb-6">
-                            <div className="flex justify-between text-[13px] font-bold text-slate-900 mb-3">
-                                <span className="text-slate-400">0%</span>
-                                <span className="text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md">{data.filledSeats * 10}% Filled</span>
-                                <span className="text-slate-400">100%</span>
-                            </div>
-                            <Progress value={data.filledSeats * 10} className="h-3 bg-slate-100 [&>div]:bg-gradient-to-r [&>div]:from-blue-600 [&>div]:to-indigo-600 rounded-full" />
-                            <div className="mt-8 space-y-4">
-                                <div className="flex justify-between items-center text-[13px] border-b border-slate-100 pb-3">
-                                    <span className="text-slate-500 font-medium">Confirmed Students</span>
-                                    <span className="font-extrabold text-slate-900 bg-slate-50 px-3 py-1 rounded-lg border border-slate-200/60">{data.filledSeats} / 10</span>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </div>
-                
-                {/* Right Column: Quick Links */}
-                <div className="col-span-1 space-y-8">
-                    <Card className="border-slate-200/60 bg-white shadow-[0_2px_10px_-3px_rgba(0,0,0,0.02)] rounded-2xl overflow-hidden h-full">
-                        <CardHeader className="px-6 pt-6 pb-4 border-b border-slate-100 bg-slate-50/50">
-                            <CardTitle className="text-lg font-extrabold text-slate-900 flex items-center gap-2.5">
-                                Quick Actions
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="p-6 grid grid-cols-1 gap-4">
-                            <Link href="/admin/applications" className="flex items-center justify-between p-4 rounded-xl border border-slate-200/60 hover:border-blue-200 hover:bg-blue-50/30 transition-all group">
-                                <div className="flex items-center gap-3">
-                                    <div className="p-2 rounded-lg bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                                        <Users className="w-5 h-5" />
-                                    </div>
-                                    <div>
-                                        <h4 className="font-bold text-slate-900">View Applications</h4>
-                                        <p className="text-xs text-slate-500 font-medium">Review submitted forms</p>
-                                    </div>
-                                </div>
-                                <ArrowUpRight className="w-4 h-4 text-slate-400 group-hover:text-blue-600 transition-colors" />
-                            </Link>
-                            
-                            <Link href="/admin/drafts" className="flex items-center justify-between p-4 rounded-xl border border-slate-200/60 hover:border-red-200 hover:bg-red-50/30 transition-all group">
-                                <div className="flex items-center gap-3">
-                                    <div className="p-2 rounded-lg bg-red-50 text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors">
-                                        <AlertCircle className="w-5 h-5" />
-                                    </div>
-                                    <div>
-                                        <h4 className="font-bold text-slate-900">Abandoned Drafts</h4>
-                                        <p className="text-xs text-slate-500 font-medium">Follow up with leads</p>
-                                    </div>
-                                </div>
-                                <ArrowUpRight className="w-4 h-4 text-slate-400 group-hover:text-red-600 transition-colors" />
-                            </Link>
-                            
-                            <Link href="/admin/students" className="flex items-center justify-between p-4 rounded-xl border border-slate-200/60 hover:border-amber-200 hover:bg-amber-50/30 transition-all group">
-                                <div className="flex items-center gap-3">
-                                    <div className="p-2 rounded-lg bg-amber-50 text-amber-600 group-hover:bg-amber-600 group-hover:text-white transition-colors">
-                                        <GraduationCap className="w-5 h-5" />
-                                    </div>
-                                    <div>
-                                        <h4 className="font-bold text-slate-900">Active Students</h4>
-                                        <p className="text-xs text-slate-500 font-medium">Manage enrolled cohort</p>
-                                    </div>
-                                </div>
-                                <ArrowUpRight className="w-4 h-4 text-slate-400 group-hover:text-amber-600 transition-colors" />
-                            </Link>
-
-                            <SendMessageToStudents paidCount={data.applications.filter((a: any) => a.payment_status === "PAID").length} />
-                        </CardContent>
-                    </Card>
-                </div>
+            {/* Conversion + Outstanding Balance row */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Card className="bg-gradient-to-br from-blue-600 to-indigo-700 border-0 rounded-2xl overflow-hidden text-white shadow-[0_8px_30px_-4px_rgba(37,99,235,0.3)]">
+                    <CardContent className="p-6 flex flex-col justify-between h-full">
+                        <div className="flex items-center gap-2 mb-4">
+                            <Zap className="w-5 h-5 text-blue-200" />
+                            <span className="text-[11px] font-bold uppercase tracking-widest text-blue-200">Conversion Rate</span>
+                        </div>
+                        <div className="text-4xl font-extrabold tracking-tight">{data.conversionRate}%</div>
+                        <p className="text-[12px] font-medium text-blue-200 mt-2">Started → Paid conversion</p>
+                    </CardContent>
+                </Card>
+                <Card className="bg-gradient-to-br from-amber-500 to-orange-600 border-0 rounded-2xl overflow-hidden text-white shadow-[0_8px_30px_-4px_rgba(245,158,11,0.3)]">
+                    <CardContent className="p-6 flex flex-col justify-between h-full">
+                        <div className="flex items-center gap-2 mb-4">
+                            <CreditCard className="w-5 h-5 text-amber-200" />
+                            <span className="text-[11px] font-bold uppercase tracking-widest text-amber-200">Outstanding Balance</span>
+                        </div>
+                        <div className="text-4xl font-extrabold tracking-tight">GHS {data.outstandingBalance.toLocaleString()}</div>
+                        <p className="text-[12px] font-medium text-amber-200 mt-2">From partial payment students</p>
+                    </CardContent>
+                </Card>
+                <Card className="bg-gradient-to-br from-emerald-500 to-teal-600 border-0 rounded-2xl overflow-hidden text-white shadow-[0_8px_30px_-4px_rgba(16,185,129,0.3)]">
+                    <CardContent className="p-6 flex flex-col justify-between h-full">
+                        <div className="flex items-center gap-2 mb-4">
+                            <Activity className="w-5 h-5 text-emerald-200" />
+                            <span className="text-[11px] font-bold uppercase tracking-widest text-emerald-200">Pending Payments</span>
+                        </div>
+                        <div className="text-4xl font-extrabold tracking-tight">{data.pendingPayments}</div>
+                        <p className="text-[12px] font-medium text-emerald-200 mt-2">Awaiting payment confirmation</p>
+                    </CardContent>
+                </Card>
             </div>
-        </div >
+
+            {/* Revenue Chart + Funnel */}
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                <Card className="lg:col-span-3 border-slate-200/60 bg-white shadow-[0_2px_10px_-3px_rgba(0,0,0,0.02)] rounded-2xl overflow-hidden relative">
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-600 to-indigo-600" />
+                    <CardHeader className="px-6 pt-6 pb-2">
+                        <CardTitle className="text-lg font-extrabold text-slate-900 flex items-center gap-2.5">
+                            <div className="p-1.5 rounded-lg bg-blue-50 text-blue-600"><Banknote className="w-4 h-4" /></div>
+                            Revenue Over Time
+                        </CardTitle>
+                        <CardDescription className="text-slate-500 text-[13px] font-medium">Daily revenue from confirmed payments</CardDescription>
+                    </CardHeader>
+                    <CardContent className="px-6 pb-6">
+                        <RevenueChart data={data.revenueByDay} />
+                    </CardContent>
+                </Card>
+
+                <Card className="lg:col-span-2 border-slate-200/60 bg-white shadow-[0_2px_10px_-3px_rgba(0,0,0,0.02)] rounded-2xl overflow-hidden relative">
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 to-pink-500" />
+                    <CardHeader className="px-6 pt-6 pb-2">
+                        <CardTitle className="text-lg font-extrabold text-slate-900 flex items-center gap-2.5">
+                            <div className="p-1.5 rounded-lg bg-purple-50 text-purple-600"><Target className="w-4 h-4" /></div>
+                            Application Funnel
+                        </CardTitle>
+                        <CardDescription className="text-slate-500 text-[13px] font-medium">Drop-off at each stage</CardDescription>
+                    </CardHeader>
+                    <CardContent className="px-6 pb-6">
+                        <FunnelChart data={data.funnelData} />
+                    </CardContent>
+                </Card>
+            </div>
+
+            {/* Tier Breakdown + Gateway + Capacity */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <Card className="border-slate-200/60 bg-white shadow-[0_2px_10px_-3px_rgba(0,0,0,0.02)] rounded-2xl overflow-hidden">
+                    <CardHeader className="px-6 pt-6 pb-2">
+                        <CardTitle className="text-[15px] font-extrabold text-slate-900">Revenue by Tier</CardTitle>
+                        <CardDescription className="text-[12px] text-slate-500 font-medium">Tier distribution of paid students</CardDescription>
+                    </CardHeader>
+                    <CardContent className="px-6 pb-6">
+                        <TierPieChart data={data.tierBreakdown} />
+                    </CardContent>
+                </Card>
+
+                <Card className="border-slate-200/60 bg-white shadow-[0_2px_10px_-3px_rgba(0,0,0,0.02)] rounded-2xl overflow-hidden">
+                    <CardHeader className="px-6 pt-6 pb-2">
+                        <CardTitle className="text-[15px] font-extrabold text-slate-900">Payment Gateway Split</CardTitle>
+                        <CardDescription className="text-[12px] text-slate-500 font-medium">Moolre vs Paystack usage</CardDescription>
+                    </CardHeader>
+                    <CardContent className="px-6 pb-6">
+                        <GatewayPieChart data={data.gatewayBreakdown} />
+                    </CardContent>
+                </Card>
+
+                <Card className="border-slate-200/60 bg-white shadow-[0_2px_10px_-3px_rgba(0,0,0,0.02)] rounded-2xl overflow-hidden relative">
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-500 to-orange-500" />
+                    <CardHeader className="px-6 pt-6 pb-4">
+                        <CardTitle className="text-[15px] font-extrabold text-slate-900 flex items-center gap-2">
+                            <div className="p-1.5 rounded-lg bg-amber-50 text-amber-600"><UserPlus className="w-4 h-4" /></div>
+                            Cohort Capacity
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="px-6 pb-6">
+                        <div className="flex justify-between text-[13px] font-bold text-slate-900 mb-3">
+                            <span className="text-slate-400">0</span>
+                            <span className="text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md">{Math.round((data.filledSeats / data.totalCapacity) * 100)}% Full</span>
+                            <span className="text-slate-400">{data.totalCapacity}</span>
+                        </div>
+                        <Progress value={(data.filledSeats / data.totalCapacity) * 100} className="h-4 bg-slate-100 [&>div]:bg-gradient-to-r [&>div]:from-amber-500 [&>div]:to-orange-500 rounded-full" />
+                        <div className="mt-6 space-y-3">
+                            <div className="flex justify-between items-center text-[13px] border-b border-slate-100 pb-3">
+                                <span className="text-slate-500 font-medium">Confirmed</span>
+                                <span className="font-extrabold text-slate-900">{data.filledSeats}</span>
+                            </div>
+                            <div className="flex justify-between items-center text-[13px] border-b border-slate-100 pb-3">
+                                <span className="text-slate-500 font-medium">Remaining</span>
+                                <span className="font-extrabold text-amber-600">{data.totalCapacity - data.filledSeats}</span>
+                            </div>
+                            <div className="flex justify-between items-center text-[13px]">
+                                <span className="text-slate-500 font-medium">Capacity</span>
+                                <span className="font-extrabold text-slate-900">{data.totalCapacity}</span>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+
+            {/* Activity Feed + Quick Actions */}
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                <Card className="lg:col-span-3 border-slate-200/60 bg-white shadow-[0_2px_10px_-3px_rgba(0,0,0,0.02)] rounded-2xl overflow-hidden">
+                    <CardHeader className="px-6 pt-6 pb-4 border-b border-slate-100 bg-slate-50/50">
+                        <CardTitle className="text-lg font-extrabold text-slate-900 flex items-center gap-2.5">
+                            <div className="p-1.5 rounded-lg bg-slate-100"><Activity className="w-4 h-4 text-slate-600" /></div>
+                            Recent Activity
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-0">
+                        <div className="divide-y divide-slate-100/80">
+                            {data.recentActivity.length > 0 ? data.recentActivity.map((item: any, i: number) => (
+                                <div key={i} className="flex items-center justify-between px-6 py-4 hover:bg-slate-50/50 transition-colors">
+                                    <div className="flex items-center gap-3.5">
+                                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-[11px] font-extrabold border ${
+                                            item.type === "paid" ? "bg-emerald-50 text-emerald-700 border-emerald-200/60" :
+                                            item.type === "draft" ? "bg-red-50 text-red-600 border-red-200/60" :
+                                            "bg-blue-50 text-blue-600 border-blue-200/60"
+                                        }`}>
+                                            {item.name.split(" ").map((n: string) => n[0]).join("").slice(0, 2)}
+                                        </div>
+                                        <div>
+                                            <p className="text-[13px] font-bold text-slate-900">{item.name}</p>
+                                            <p className="text-[11px] text-slate-400 font-medium">{item.action}</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-1.5 text-[11px] text-slate-400 font-medium">
+                                        <Clock className="w-3 h-3" />
+                                        {item.time ? new Date(item.time).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) : "—"}
+                                    </div>
+                                </div>
+                            )) : (
+                                <div className="text-center py-12 text-[13px] text-slate-400 font-medium">No recent activity</div>
+                            )}
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Card className="lg:col-span-2 border-slate-200/60 bg-white shadow-[0_2px_10px_-3px_rgba(0,0,0,0.02)] rounded-2xl overflow-hidden h-fit">
+                    <CardHeader className="px-6 pt-6 pb-4 border-b border-slate-100 bg-slate-50/50">
+                        <CardTitle className="text-lg font-extrabold text-slate-900">Quick Actions</CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-4 space-y-3">
+                        {[
+                            { href: "/admin/applications", label: "Applications", desc: `${data.applications.length} submitted`, icon: Users, color: "blue" },
+                            { href: "/admin/drafts", label: "Abandoned Drafts", desc: `${data.unfinishedApps.length} leads`, icon: AlertCircle, color: "red" },
+                            { href: "/admin/students", label: "Active Students", desc: `${data.filledSeats} enrolled`, icon: GraduationCap, color: "amber" },
+                            { href: "/admin/payments", label: "Payment Ledger", desc: `${data.payments.length} transactions`, icon: CreditCard, color: "emerald" },
+                        ].map((action) => (
+                            <Link key={action.href} href={action.href} className={`flex items-center justify-between p-4 rounded-xl border border-slate-200/60 hover:border-${action.color}-200 hover:bg-${action.color}-50/30 transition-all group`}>
+                                <div className="flex items-center gap-3">
+                                    <div className={`p-2 rounded-lg bg-${action.color}-50 text-${action.color}-600 group-hover:bg-${action.color}-600 group-hover:text-white transition-colors`}>
+                                        <action.icon className="w-5 h-5" />
+                                    </div>
+                                    <div>
+                                        <h4 className="font-bold text-slate-900 text-[13px]">{action.label}</h4>
+                                        <p className="text-[11px] text-slate-500 font-medium">{action.desc}</p>
+                                    </div>
+                                </div>
+                                <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-slate-600 transition-colors" />
+                            </Link>
+                        ))}
+
+                        <SendMessageToStudents paidCount={data.paidCount} />
+                    </CardContent>
+                </Card>
+            </div>
+        </div>
     );
 }

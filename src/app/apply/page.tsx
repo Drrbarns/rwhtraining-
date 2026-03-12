@@ -150,15 +150,15 @@ export default function ApplyPage() {
             <div className="w-full md:w-[60%] lg:w-[65%] flex flex-col min-h-screen">
 
                 {/* Mobile Header Elements */}
-                <div className="md:hidden p-6 border-b border-white/5 bg-[#121212]">
-                    <Link href="/" className="inline-flex items-center text-gray-400 font-medium text-sm mb-4 tracking-wide">
+                <div className="md:hidden p-4 sm:p-6 border-b border-white/5 bg-[#121212]">
+                    <Link href="/" className="inline-flex items-center text-gray-400 font-medium text-sm mb-3 tracking-wide">
                         <ArrowLeft className="w-4 h-4 mr-2" /> Return
                     </Link>
-                    <h2 className="text-xl font-bold tracking-tight">Application Portal</h2>
+                    <h2 className="text-lg sm:text-xl font-bold tracking-tight">Application Portal</h2>
                 </div>
 
                 {/* Progress Bar & Frame Container */}
-                <div className="flex-grow flex flex-col justify-center max-w-2xl px-8 py-12 mx-auto w-full relative">
+                <div className="flex-grow flex flex-col justify-center max-w-2xl px-4 sm:px-8 py-8 sm:py-12 mx-auto w-full relative">
 
                     <div className="mb-14 relative">
                         <div className="flex items-end justify-between mb-5">
@@ -199,8 +199,8 @@ export default function ApplyPage() {
                         {/* Step 1: Basics */}
                         <div id="step-1" className={`space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 ${step === 1 ? 'block' : 'hidden'}`}>
                             <div>
-                                <h2 className="text-3xl md:text-4xl font-serif font-bold mb-3 tracking-tight text-white">Who are you?</h2>
-                                <p className="text-gray-400 text-lg leading-relaxed">Basic identification to secure your position in the upcoming cohort.</p>
+                                <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold mb-2 sm:mb-3 tracking-tight text-white">Who are you?</h2>
+                                <p className="text-gray-400 text-base sm:text-lg leading-relaxed">Basic identification to secure your position in the upcoming cohort.</p>
                             </div>
 
                             <div className="grid md:grid-cols-2 gap-6">
@@ -239,8 +239,8 @@ export default function ApplyPage() {
                         {/* Step 2: Background */}
                         <div id="step-2" className={`space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 ${step === 2 ? 'block' : 'hidden'}`}>
                             <div>
-                                <h2 className="text-3xl md:text-4xl font-serif font-bold mb-3 tracking-tight text-white">Your Background.</h2>
-                                <p className="text-gray-400 text-lg leading-relaxed">We accept absolute beginners, but we strictly require professionals with a high action threshold.</p>
+                                <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold mb-2 sm:mb-3 tracking-tight text-white">Your Background.</h2>
+                                <p className="text-gray-400 text-base sm:text-lg leading-relaxed">We accept absolute beginners, but we strictly require professionals with a high action threshold.</p>
                             </div>
 
                             <div className="space-y-4">
@@ -299,8 +299,8 @@ export default function ApplyPage() {
                         {/* Step 3: Motivation */}
                         <div id="step-3" className={`space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 ${step === 3 ? 'block' : 'hidden'}`}>
                             <div>
-                                <h2 className="text-3xl md:text-4xl font-serif font-bold mb-3 tracking-tight text-white">Your Drive.</h2>
-                                <p className="text-gray-400 text-lg leading-relaxed">We don't do theoretical padding. Prove your ambition to claim a seat.</p>
+                                <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold mb-2 sm:mb-3 tracking-tight text-white">Your Drive.</h2>
+                                <p className="text-gray-400 text-base sm:text-lg leading-relaxed">We don't do theoretical padding. Prove your ambition to claim a seat.</p>
                             </div>
 
                             <div className="space-y-4">
@@ -337,8 +337,8 @@ export default function ApplyPage() {
                         {/* Step 4: Payment Target */}
                         <div id="step-4" className={`space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 ${step === 4 ? 'block' : 'hidden'}`}>
                             <div>
-                                <h2 className="text-3xl md:text-4xl font-serif font-bold mb-3 tracking-tight text-white">Final Step: Secure Seat.</h2>
-                                <p className="text-gray-400 text-lg leading-relaxed">How would you like to handle your enrollment fee today? Completing this blocks your seat out of the 10 available.</p>
+                                <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold mb-2 sm:mb-3 tracking-tight text-white">Final Step: Secure Seat.</h2>
+                                <p className="text-gray-400 text-base sm:text-lg leading-relaxed">How would you like to handle your enrollment fee today? Completing this blocks your seat out of the 10 available.</p>
                             </div>
 
                             <div className="space-y-4">
@@ -492,21 +492,21 @@ export default function ApplyPage() {
                         </div>
 
                         {/* Navigation Buttons footer */}
-                        <div className="pt-8 border-t border-white/5 flex items-center justify-between">
-                            <Button type="button" variant="ghost" onClick={handleBack} disabled={step === 1} className="group flex items-center gap-3 text-gray-400 hover:text-white hover:bg-transparent px-2 font-semibold tracking-wide disabled:opacity-30 transition-all">
-                                <div className="w-10 h-10 rounded-full border border-gray-600 flex items-center justify-center group-hover:border-transparent group-hover:bg-white/10 transition-all">
+                        <div className="pt-6 sm:pt-8 border-t border-white/5 flex items-center justify-between gap-3">
+                            <Button type="button" variant="ghost" onClick={handleBack} disabled={step === 1} className="group flex items-center gap-2 sm:gap-3 text-gray-400 hover:text-white hover:bg-transparent px-1 sm:px-2 font-semibold tracking-wide disabled:opacity-30 transition-all shrink-0">
+                                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-gray-600 flex items-center justify-center group-hover:border-transparent group-hover:bg-white/10 transition-all">
                                     <ArrowLeft className="w-4 h-4" />
                                 </div>
-                                Go Back
+                                <span className="hidden sm:inline">Go Back</span>
                             </Button>
 
                             {step < totalSteps ? (
-                                <Button type="button" onClick={handleNext} className="bg-white hover:bg-gray-200 text-black rounded-full px-8 h-12 font-bold tracking-wide shadow-lg shadow-white/5">
-                                    Continue Form
+                                <Button type="button" onClick={handleNext} className="bg-white hover:bg-gray-200 text-black rounded-full px-6 sm:px-8 h-11 sm:h-12 font-bold tracking-wide shadow-lg shadow-white/5 text-sm sm:text-base">
+                                    Continue
                                 </Button>
                             ) : (
-                                <Button type="submit" disabled={isSubmitting} className="bg-[#D4AF37] hover:bg-[#B5952F] text-black rounded-full px-10 h-14 text-lg font-bold tracking-wide shadow-[0_0_40px_-10px_rgba(212,175,55,0.4)] disabled:opacity-50">
-                                    {isSubmitting ? "Processing..." : "Proceed to Checkout"}
+                                <Button type="submit" disabled={isSubmitting} className="bg-[#D4AF37] hover:bg-[#B5952F] text-black rounded-full px-6 sm:px-10 h-12 sm:h-14 text-base sm:text-lg font-bold tracking-wide shadow-[0_0_40px_-10px_rgba(212,175,55,0.4)] disabled:opacity-50">
+                                    {isSubmitting ? "Processing..." : "Checkout"}
                                     {!isSubmitting && <ArrowRight className="ml-2 w-5 h-5" />}
                                 </Button>
                             )}

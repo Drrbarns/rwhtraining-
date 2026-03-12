@@ -1,9 +1,31 @@
 "use server";
 
 import { createClient } from "@supabase/supabase-js";
+import { createClient as createServerSupabase } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 
 export async function deleteApplicationAction(id: string) {
+    if (!id || typeof id !== "string") {
+        return { success: false, error: "Invalid application ID" };
+    }
+
+    const serverClient = await createServerSupabase();
+    const { data: { user } } = await serverClient.auth.getUser();
+
+    if (!user) {
+        return { success: false, error: "Authentication required" };
+    }
+
+    const { data: profile } = await serverClient
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .single();
+
+    if (!profile || !["ADMIN", "SUPER_ADMIN"].includes(profile.role)) {
+        return { success: false, error: "Unauthorized: Admin access required" };
+    }
+
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseServiceKey = process.env.NEXT_PUBLIC_SUPABASE_SERVICE_KEY;
 

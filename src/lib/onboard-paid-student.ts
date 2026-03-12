@@ -1,7 +1,6 @@
-import { createClient, SupabaseClient } from "@supabase/supabase-js";
-import { Resend } from "resend";
-
-const resend = new Resend(process.env.RESEND_API_KEY || "re_dummy");
+import { SupabaseClient } from "@supabase/supabase-js";
+import { sendEmail } from "@/lib/send-email";
+import { EMAIL_TEMPLATES, mergeVariables } from "@/lib/email-templates";
 
 function generateSecurePassword() {
     const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
@@ -33,7 +32,6 @@ export async function onboardPaidStudent(
     appData: ApplicationRow
 ): Promise<{ ok: boolean; emailSent?: boolean; error?: string }> {
     try {
-        // If application already has user_id, user was created — only resend email if needed
         const { data: existingEnrollment } = await supabase
             .from("enrollments")
             .select("id")
@@ -41,7 +39,6 @@ export async function onboardPaidStudent(
             .single();
 
         if (existingEnrollment && appData.user_id) {
-            // User already onboarded; optionally could resend credentials here
             return { ok: true };
         }
 
@@ -56,13 +53,12 @@ export async function onboardPaidStudent(
 
         if (authError) {
             if (authError.message.includes("already been registered")) {
-                // User exists — ensure profile/enrollment exist, send welcome (no password)
                 const { data: existingUsers } = await supabase.auth.admin.listUsers();
                 const existing = existingUsers?.users?.find((u) => u.email === appData.email);
                 if (existing) {
                     await ensureProfileAndEnrollment(supabase, appData, existing.id);
-                    await sendWelcomeEmailNoPassword(appData.email, appData.first_name);
-                    return { ok: true, emailSent: true };
+                    const emailSent = await sendWelcomeExistingEmail(appData.email, appData.first_name);
+                    return { ok: true, emailSent };
                 }
             }
             console.error("[Onboard] Auth error:", authError);
@@ -136,27 +132,20 @@ async function ensureProfileAndEnrollment(
     await supabase.from("applications").update({ user_id: userId }).eq("id", appData.id);
 }
 
-async function sendWelcomeEmailNoPassword(email: string, firstName: string): Promise<boolean> {
-    if (!process.env.RESEND_API_KEY) return false;
-    try {
-        await resend.emails.send({
-            from: process.env.EMAIL_FROM
-                ? `${process.env.EMAIL_FROM.split("@")[0]} <${process.env.EMAIL_FROM}>`
-                : "Masterclass Admissions <onboarding@resend.dev>",
-            to: email,
-            subject: "Welcome to the Masterclass — You're In!",
-            html: `
-                <h2>Welcome to the Elite Web Development Masterclass!</h2>
-                <p>Hi ${firstName}, your payment has been successfully processed.</p>
-                <p>Your student account is ready. Log in with your existing credentials:</p>
-                <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://remoteworkhub.org"}/student" style="background: #2563EB; color: #fff; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block; margin-top: 12px;">Login to Dashboard</a>
-            `,
-        });
-        return true;
-    } catch (e) {
-        console.error("[Onboard] Welcome email error:", e);
-        return false;
-    }
+async function sendWelcomeExistingEmail(email: string, firstName: string): Promise<boolean> {
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://remoteworkhub.org";
+    const template = EMAIL_TEMPLATES.welcome_existing;
+    const html = mergeVariables(template.body, {
+        first_name: firstName,
+        login_url: `${appUrl}/student`,
+    });
+
+    const result = await sendEmail({
+        to: email,
+        subject: mergeVariables(template.subject, { first_name: firstName }),
+        html,
+    });
+    return result.success;
 }
 
 async function sendCredentialsEmail(
@@ -165,34 +154,24 @@ async function sendCredentialsEmail(
     firstName: string,
     lastName: string
 ): Promise<boolean> {
-    if (!process.env.RESEND_API_KEY) {
-        console.log("[Onboard] RESEND_API_KEY missing, skipping credentials email");
-        return false;
-    }
-    try {
-        await resend.emails.send({
-            from: process.env.EMAIL_FROM
-                ? `${process.env.EMAIL_FROM.split("@")[0]} <${process.env.EMAIL_FROM}>`
-                : "Masterclass Admissions <onboarding@resend.dev>",
-            to: email,
-            subject: "Your Masterclass Student Credentials",
-            html: `
-                <h2>Welcome to the Elite Web Development Masterclass!</h2>
-                <p>Hi ${firstName}, your payment has been successfully processed.</p>
-                <p>Your student account has been provisioned. You can log into your student dashboard using the following credentials:</p>
-                <div style="background: #f4f4f5; padding: 15px; border-radius: 8px; margin: 20px 0;">
-                    <p style="margin: 0; font-family: monospace;"><strong>Email:</strong> ${email}</p>
-                    <p style="margin: 8px 0 0 0; font-family: monospace;"><strong>Password:</strong> ${password}</p>
-                </div>
-                <p>Please log in and update your password immediately.</p>
-                <br />
-                <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://remoteworkhub.org"}/student" style="background: #2563EB; color: #fff; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">Login to Dashboard</a>
-            `,
-        });
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://remoteworkhub.org";
+    const template = EMAIL_TEMPLATES.credentials;
+    const html = mergeVariables(template.body, {
+        first_name: firstName,
+        last_name: lastName,
+        email,
+        password,
+        login_url: `${appUrl}/student`,
+    });
+
+    const result = await sendEmail({
+        to: email,
+        subject: mergeVariables(template.subject, { first_name: firstName }),
+        html,
+    });
+
+    if (result.success) {
         console.log(`[Onboard] Emailed credentials to ${email}`);
-        return true;
-    } catch (e) {
-        console.error("[Onboard] Email error:", e);
-        return false;
     }
+    return result.success;
 }

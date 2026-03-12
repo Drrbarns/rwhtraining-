@@ -1,9 +1,11 @@
 "use client";
 
-import { X, Mail, Phone, MapPin, Briefcase, BookOpen, FileText, CreditCard, Clock, Trash2, Loader2 } from "lucide-react";
+import { X, Mail, Phone, MapPin, Briefcase, BookOpen, FileText, CreditCard, Clock, Trash2, Loader2, CheckCircle2, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { deleteApplicationAction } from "@/app/actions/delete-application";
+import { approveApplicationAction } from "@/app/actions/approve-application";
+import { toast } from "sonner";
 
 export type ApplicationRecord = {
   id: string;
@@ -32,11 +34,76 @@ interface ApplicationDetailModalProps {
 
 export function ApplicationDetailModal({ application, onClose }: ApplicationDetailModalProps) {
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isApproving, setIsApproving] = useState(false);
+
+  const handleEscapeKey = useCallback((e: KeyboardEvent) => {
+    if (e.key === "Escape") onClose();
+  }, [onClose]);
+
+  useEffect(() => {
+    if (!application) return;
+    document.addEventListener("keydown", handleEscapeKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", handleEscapeKey);
+      document.body.style.overflow = "";
+    };
+  }, [application, handleEscapeKey]);
 
   if (!application) return null;
 
   const fullName = [application.first_name, application.last_name].filter(Boolean).join(" ") || "Unknown";
   const isDraft = application.is_unfinished === true;
+
+  const handleDelete = async () => {
+    if (!confirm(`Are you sure you want to permanently delete this ${isDraft ? 'draft' : 'application'}? This action cannot be undone.`)) {
+      return;
+    }
+
+    setIsDeleting(true);
+    try {
+      const res = await deleteApplicationAction(application.id);
+      if (res.success) {
+        toast.success(`${isDraft ? 'Draft' : 'Application'} deleted successfully.`);
+        onClose();
+      } else {
+        toast.error(`Failed to delete: ${res.error}`);
+      }
+    } catch (error) {
+      console.error("Delete failed:", error);
+      toast.error("An unexpected error occurred while deleting.");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleApprove = async () => {
+    if (!confirm(`Approve this application and mark as PAID?\n\nThis will:\n• Set payment status to PAID\n• Set status to APPROVED\n• Create a student account\n• Send login credentials via email\n\nProceed?`)) {
+      return;
+    }
+
+    setIsApproving(true);
+    try {
+      const res = await approveApplicationAction(application.id);
+      if (res.success) {
+        if ('warning' in res && res.warning) {
+          toast.warning(res.warning);
+        } else {
+          toast.success("Application approved! Student account created and credentials sent.");
+        }
+        onClose();
+      } else {
+        toast.error(`Failed: ${res.error}`);
+      }
+    } catch (error) {
+      console.error("Approve failed:", error);
+      toast.error("An unexpected error occurred.");
+    } finally {
+      setIsApproving(false);
+    }
+  };
+
+  const isAlreadyApproved = application.payment_status === "PAID" && application.status === "APPROVED";
 
   const DetailRow = ({ icon: Icon, label, value }: { icon: React.ElementType; label: string; value?: string | null }) => {
     if (value == null || value === "") return null;
@@ -51,27 +118,6 @@ export function ApplicationDetailModal({ application, onClose }: ApplicationDeta
         </div>
       </div>
     );
-  };
-
-  const handleDelete = async () => {
-    if (!confirm(`Are you sure you want to permanently delete this ${isDraft ? 'draft' : 'application'}? This action cannot be undone.`)) {
-      return;
-    }
-
-    setIsDeleting(true);
-    try {
-      const res = await deleteApplicationAction(application.id);
-      if (res.success) {
-        onClose();
-      } else {
-        alert(`Failed to delete: ${res.error}`);
-      }
-    } catch (error) {
-      console.error("Delete failed:", error);
-      alert("An unexpected error occurred while deleting.");
-    } finally {
-      setIsDeleting(false);
-    }
   };
 
   return (
@@ -102,6 +148,27 @@ export function ApplicationDetailModal({ application, onClose }: ApplicationDeta
             </div>
           </div>
           <div className="flex items-center gap-2">
+            {!isAlreadyApproved && (
+              <Button
+                onClick={handleApprove}
+                disabled={isApproving}
+                className="rounded-xl h-9 px-4 text-[12px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm transition-all gap-1.5"
+                title="Approve & Mark as Paid"
+              >
+                {isApproving ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                )}
+                {isApproving ? "Approving..." : "Approve & Mark Paid"}
+              </Button>
+            )}
+            {isAlreadyApproved && (
+              <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 text-[11px] font-extrabold border border-emerald-200/60">
+                <ShieldCheck className="w-3.5 h-3.5" />
+                Approved & Paid
+              </span>
+            )}
             <Button 
               variant="ghost" 
               size="icon" 

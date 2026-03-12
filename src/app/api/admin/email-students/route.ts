@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 import { createClient as createServiceClient } from "@supabase/supabase-js";
-import { Resend } from "resend";
-
-const resend = new Resend(process.env.RESEND_API_KEY);
+import { sendEmail } from "@/lib/send-email";
+import { wrapInLayout, mergeVariables } from "@/lib/email-templates";
 
 /**
  * POST /api/admin/email-students
- * Sends an email to all students who have registered and paid.
+ * Sends a beautifully-branded email to all paid students.
  * Requires admin session.
  */
 export async function POST(request: NextRequest) {
@@ -60,26 +59,22 @@ export async function POST(request: NextRequest) {
             });
         }
 
-        if (!process.env.RESEND_API_KEY) {
-            return NextResponse.json({ error: "Email service not configured (RESEND_API_KEY)" }, { status: 500 });
-        }
-
-        const fromEmail = process.env.EMAIL_FROM || "onboarding@resend.dev";
-        const fromName = process.env.EMAIL_FROM
-            ? (process.env.EMAIL_FROM.split("@")[0] || "Masterclass")
-            : "Masterclass Admissions";
-
         let sent = 0;
         for (const r of recipients) {
             const firstName = r.first_name || "Student";
-            const personalizedHtml = htmlBody.replace(/\{\{first_name\}\}/g, firstName);
-            const { error: sendError } = await resend.emails.send({
-                from: `${fromName} <${fromEmail}>`,
+            const personalizedBody = htmlBody.replace(/\{\{first_name\}\}/g, firstName);
+
+            const wrappedHtml = wrapInLayout(
+                `<h2>Hey ${firstName},</h2>${personalizedBody}`,
+                subject
+            );
+
+            const result = await sendEmail({
                 to: r.email,
                 subject,
-                html: personalizedHtml,
+                html: wrappedHtml,
             });
-            if (!sendError) sent++;
+            if (result.success) sent++;
         }
 
         return NextResponse.json({

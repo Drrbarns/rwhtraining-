@@ -3,47 +3,57 @@
 import { MoolreAdapter, type PaymentTier, type MomoNetwork, type TransactionPayload } from "@/lib/moolre-adapter";
 import { PaystackAdapter } from "@/lib/paystack-adapter";
 import { createClient } from "@supabase/supabase-js";
+import { applicationSchema } from "@/lib/validations";
 
 export async function submitApplicationAction(formData: FormData) {
-    // 1. Gather all data from form
-    const applicationId = formData.get("applicationId") as string || ""; // ID if they started as a draft
-    const firstName = (formData.get("firstName") as string) || "";
-    const lastName = (formData.get("lastName") as string) || "";
-    const email = (formData.get("email") as string) || "";
-    const phone = (formData.get("phone") as string) || "";
-    const city = (formData.get("city") as string) || "";
-    const occupation = (formData.get("occupation") as string) || "";
-    const experience = (formData.get("experience") as string) || "";
-    const reason = (formData.get("reason") as string) || "";
-    const tier = (formData.get("tier") as PaymentTier) || "50";
-    const paymentMethod = (formData.get("paymentMethod") as string) || "moolre";
-    const network = (formData.get("network") as MomoNetwork) || "MTN";
-    const momoNumber = (formData.get("momoNumber") as string) || phone;
+    const raw = {
+        applicationId: (formData.get("applicationId") as string) || "",
+        firstName: (formData.get("firstName") as string) || "",
+        lastName: (formData.get("lastName") as string) || "",
+        email: (formData.get("email") as string) || "",
+        phone: (formData.get("phone") as string) || "",
+        city: (formData.get("city") as string) || "",
+        occupation: (formData.get("occupation") as string) || "",
+        experience: (formData.get("experience") as string) || "",
+        reason: (formData.get("reason") as string) || "",
+        tier: (formData.get("tier") as string) || "50",
+        paymentMethod: (formData.get("paymentMethod") as string) || "moolre",
+        network: (formData.get("network") as string) || "MTN",
+        momoNumber: (formData.get("momoNumber") as string) || (formData.get("phone") as string) || "",
+    };
 
-    const usePaystack = paymentMethod === "paystack";
-
-    let amount_ghs = 500;
-    if (tier === "20") amount_ghs = 200;
-    if (tier === "100") amount_ghs = 1000;
-
-    // 2. Validate minimum required fields
-    if (!firstName || !lastName || !email) {
-        return { success: false, error: "Missing required fields", redirect_url: null };
+    const parsed = applicationSchema.safeParse(raw);
+    if (!parsed.success) {
+        const firstError = parsed.error.issues[0]?.message || "Invalid form data";
+        return { success: false, error: firstError, redirect_url: null };
     }
+
+    const { firstName, lastName, email, phone, city, occupation, experience, reason, tier, paymentMethod, network, momoNumber, applicationId } = parsed.data;
+    const usePaystack = paymentMethod === "paystack";
 
     if (!usePaystack && !momoNumber) {
         return { success: false, error: "Mobile money number is required for Mobile Money payments", redirect_url: null };
     }
 
-    // 3. Generate unique payment reference
+    let amount_ghs = 500;
+    if (tier === "20") amount_ghs = 200;
+    if (tier === "100") amount_ghs = 1000;
+
     const reference = MoolreAdapter.generateReference();
 
-    // 4. Save application and payment to Supabase
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseServiceKey = process.env.NEXT_PUBLIC_SUPABASE_SERVICE_KEY;
 
     if (supabaseUrl && supabaseServiceKey) {
         const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+        const { data: activeCohort } = await supabase
+            .from("cohorts")
+            .select("id")
+            .eq("is_active", true)
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .single();
 
         const applicationData = {
             first_name: firstName,
@@ -59,19 +69,18 @@ export async function submitApplicationAction(formData: FormData) {
             payment_reference: reference,
             payment_status: "PENDING",
             status: "PENDING_REVIEW",
-            is_unfinished: false, // Mark as final
+            is_unfinished: false,
+            cohort_id: activeCohort?.id || null,
             updated_at: new Date().toISOString(),
         };
 
         let appError;
         if (applicationId) {
-            // Update the existing draft application record
             const { error } = await supabase.from("applications")
                 .update(applicationData)
                 .eq("id", applicationId);
             appError = error;
         } else {
-            // Insert a new application record if no draft ID provided
             const { error } = await supabase.from("applications").insert({
                 ...applicationData,
                 created_at: new Date().toISOString(),
@@ -83,7 +92,6 @@ export async function submitApplicationAction(formData: FormData) {
             console.error("[RWH] Failed to save application:", appError);
         }
 
-        // Insert the payment record
         const { error: payError } = await supabase.from("payments").insert({
             reference,
             email,
@@ -104,7 +112,6 @@ export async function submitApplicationAction(formData: FormData) {
         }
     }
 
-    // 5. Call payment gateway (Moolre or Paystack)
     let gatewayRes;
 
     if (usePaystack) {
@@ -115,28 +122,18 @@ export async function submitApplicationAction(formData: FormData) {
             last_name: lastName,
             reference,
         });
-        console.log("[RWH] Paystack response:", {
-            reference: gatewayRes.reference,
-            status: gatewayRes.status,
-            message: gatewayRes.message,
-        });
     } else {
         const transactionPayload: TransactionPayload = {
             email,
             amount_ghs,
-            tier,
+            tier: tier as PaymentTier,
             phone: momoNumber,
-            network,
+            network: network as MomoNetwork,
             first_name: firstName,
             last_name: lastName,
             reference,
         };
         gatewayRes = await MoolreAdapter.initializeTransaction(transactionPayload);
-        console.log("[RWH] Moolre response:", {
-            reference: gatewayRes.reference,
-            status: gatewayRes.status,
-            message: gatewayRes.message,
-        });
     }
 
     return {
