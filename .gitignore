@@ -39,3 +39,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+.vercel
+
+# local reference only (not part of project; copy to other projects)
+MOOLRE_REFERENCE.md
