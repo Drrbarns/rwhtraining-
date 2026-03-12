@@ -5,13 +5,13 @@
  * Moolre SMS (Ghana):
  *   SMS_PROVIDER      = "moolre"
  *   MOOLRE_SMS_VASKEY = your X-API-VASKEY from Moolre dashboard
- *   SMS_SENDER_ID     = approved sender ID (must be registered with Moolre)
+ *   SMS_SENDER_ID     = approved sender ID (e.g. "Remote Work Hub", must be registered with Moolre)
  *
  * Other providers:
  *   SMS_PROVIDER    = "hubtel" | "arkesel" | "generic"
  *   SMS_API_KEY     = your API key
  *   SMS_API_SECRET  = your API secret (Hubtel)
- *   SMS_SENDER_ID   = sender name (e.g. "RWH")
+ *   SMS_SENDER_ID   = sender name (e.g. "Remote Work Hub")
  *   SMS_BASE_URL    = base URL for generic provider
  */
 
@@ -44,7 +44,7 @@ export class SmsAdapter {
   }
 
   private static get senderId() {
-    return process.env.SMS_SENDER_ID || "RWH";
+    return process.env.SMS_SENDER_ID || "Remote Work Hub";
   }
 
   /** Moolre SMS: X-API-VASKEY from Moolre dashboard (SMS / VAS product) */

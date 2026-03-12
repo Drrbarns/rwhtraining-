@@ -3,7 +3,7 @@ import type { MetadataRoute } from "next";
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Remote Work Hub — Elite Web Development Masterclass",
-    short_name: "RWH Masterclass",
+    short_name: "Remote Work Hub",
     description:
       "Become a professional web developer in 30 days. Paid internship, first client guaranteed, top 2 get hired by Doctor Barns Tech.",
     start_url: "/",

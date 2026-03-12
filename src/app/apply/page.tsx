@@ -136,7 +136,7 @@ export default function ApplyPage() {
                     </div>
 
                     <div className="mt-auto pt-8 flex items-end justify-between border-t border-white/5">
-                        <span className="text-[10px] text-gray-600 tracking-widest uppercase font-bold">© 2026 RWH</span>
+                        <span className="text-[10px] text-gray-600 tracking-widest uppercase font-bold">© 2026 Remote Work Hub</span>
                         <div className="flex items-center gap-2">
                             <div className="w-1.5 h-1.5 rounded-full bg-[#2563EB] animate-pulse" />
                             <span className="text-[10px] text-[#2563EB] tracking-widest uppercase font-bold">Secure Portal</span>
