@@ -30,9 +30,9 @@ export async function POST(request: NextRequest) {
         }
 
         const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-        const supabaseServiceKey = process.env.NEXT_PUBLIC_SUPABASE_SERVICE_KEY;
+        const supabaseServiceKey = process.env.NEXT_PUBLIC_SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
         if (!supabaseUrl || !supabaseServiceKey) {
-            return NextResponse.json({ error: "Server misconfiguration" }, { status: 500 });
+            return NextResponse.json({ error: "Server misconfiguration: missing Supabase URL or service key" }, { status: 500 });
         }
 
         const serviceSupabase = createServiceClient(supabaseUrl, supabaseServiceKey);
@@ -44,8 +44,9 @@ export async function POST(request: NextRequest) {
             .eq("status", "PENDING");
 
         if (fetchError) {
-            console.error("[Reconcile] Fetch error:", fetchError);
-            return NextResponse.json({ error: "Failed to fetch payments" }, { status: 500 });
+            console.error("[Reconcile Moolre] Fetch error:", fetchError);
+            const message = fetchError.message ? `Failed to fetch payments: ${fetchError.message}` : "Failed to fetch payments";
+            return NextResponse.json({ error: message }, { status: 500 });
         }
 
         // Only reconcile Moolre payments (gateway null/moolre; skip paystack)

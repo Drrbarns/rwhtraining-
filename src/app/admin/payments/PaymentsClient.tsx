@@ -51,8 +51,8 @@ export function PaymentsClient({ payments }: { payments: Payment[] }) {
         setReconciling(true);
         try {
             const [moolreRes, paystackRes] = await Promise.all([
-                fetch("/api/admin/reconcile-moolre-payments", { method: "POST" }),
-                fetch("/api/admin/reconcile-paystack-payments", { method: "POST" }),
+                fetch("/api/admin/reconcile-moolre-payments", { method: "POST", credentials: "same-origin" }),
+                fetch("/api/admin/reconcile-paystack-payments", { method: "POST", credentials: "same-origin" }),
             ]);
             const moolreData = await moolreRes.json();
             const paystackData = await paystackRes.json();
@@ -67,8 +67,10 @@ export function PaymentsClient({ payments }: { payments: Payment[] }) {
                     toast.success(moolreData.message && paystackData.message ? "No pending payments to reconcile." : "Reconciliation complete.");
                 }
             } else {
-                const err = !moolreOk ? moolreData.error : paystackData.error;
-                toast.error(err || "Reconciliation failed");
+                const moolreErr = !moolreOk ? moolreData.error : null;
+                const paystackErr = !paystackOk ? paystackData.error : null;
+                const err = [moolreErr, paystackErr].filter(Boolean).join("; ") || "Reconciliation failed";
+                toast.error(err);
             }
         } catch {
             toast.error("Reconciliation request failed");
