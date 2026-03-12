@@ -19,8 +19,6 @@ export async function submitApplicationAction(formData: FormData) {
         reason: (formData.get("reason") as string) || "",
         tier: (formData.get("tier") as string) || "50",
         paymentMethod: (formData.get("paymentMethod") as string) || "moolre",
-        network: (formData.get("network") as string) || "MTN",
-        momoNumber: (formData.get("momoNumber") as string) || (formData.get("phone") as string) || "",
     };
 
     const parsed = applicationSchema.safeParse(raw);
@@ -29,12 +27,8 @@ export async function submitApplicationAction(formData: FormData) {
         return { success: false, error: firstError, redirect_url: null };
     }
 
-    const { firstName, lastName, email, phone, age, city, occupation, experience, reason, tier, paymentMethod, network, momoNumber, applicationId } = parsed.data;
+    const { firstName, lastName, email, phone, age, city, occupation, experience, reason, tier, paymentMethod, applicationId } = parsed.data;
     const usePaystack = paymentMethod === "paystack";
-
-    if (!usePaystack && !momoNumber) {
-        return { success: false, error: "Mobile money number is required for Mobile Money payments", redirect_url: null };
-    }
 
     let amount_ghs = 500;
     if (tier === "20") amount_ghs = 200;
@@ -97,8 +91,8 @@ export async function submitApplicationAction(formData: FormData) {
         const { error: payError } = await supabase.from("payments").insert({
             reference,
             email,
-            phone: usePaystack ? phone : momoNumber,
-            network: usePaystack ? "CARD" : network,
+            phone,
+            network: usePaystack ? "CARD" : "MOMO",
             amount_ghs,
             tier,
             first_name: firstName,
@@ -129,8 +123,8 @@ export async function submitApplicationAction(formData: FormData) {
             email,
             amount_ghs,
             tier: tier as PaymentTier,
-            phone: momoNumber,
-            network: network as MomoNetwork,
+            phone: phone,
+            network: "MTN",
             first_name: firstName,
             last_name: lastName,
             reference,

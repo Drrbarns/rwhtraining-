@@ -12,8 +12,6 @@ export const applicationSchema = z.object({
   reason: z.string().max(2000).optional().default(""),
   tier: z.enum(["20", "50", "100"]).default("50"),
   paymentMethod: z.enum(["moolre", "paystack"]).default("moolre"),
-  network: z.enum(["MTN", "TELECEL", "AIRTELTIGO"]).optional().default("MTN"),
-  momoNumber: z.string().max(20).optional().default(""),
   applicationId: z.string().optional().default(""),
 });
 

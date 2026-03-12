@@ -16,7 +16,6 @@ export default function ApplyPage() {
     const [step, setStep] = useState(1);
     const [applicationId, setApplicationId] = useState<string | null>(null);
     const [selectedTier, setSelectedTier] = useState("50");
-    const [selectedNetwork, setSelectedNetwork] = useState("MTN");
     const [paymentMethod, setPaymentMethod] = useState<"moolre" | "paystack">("moolre");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const totalSteps = 4;
@@ -328,15 +327,6 @@ export default function ApplyPage() {
                                     </div>
                                 </div>
 
-                                {/* Refund Card */}
-                                <div className="flex items-start gap-4 p-5 rounded-2xl border border-red-500/10 bg-red-500/5 hover:border-red-500/20 hover:bg-red-500/10 transition-all duration-500 shadow-sm relative overflow-hidden group">
-                                    <div className="absolute top-0 left-0 w-1 p-0 h-full bg-red-500/50 scale-y-0 group-hover:scale-y-100 transition-transform duration-500 origin-bottom" />
-                                    <Checkbox id="refund" name="refund" className="mt-1 w-5 h-5 border-red-500/40 data-[state=checked]:bg-red-500 data-[state=checked]:border-red-500 data-[state=checked]:text-white shrink-0 transition-colors" required />
-                                    <div className="space-y-1.5 pt-0.5 w-full">
-                                        <Label htmlFor="refund" className="cursor-pointer text-[15px] font-bold text-red-300 block">Strictly Non-Refundable</Label>
-                                        <Label htmlFor="refund" className="cursor-pointer text-sm text-red-200/60 leading-relaxed font-medium block">I have explicitly read and accepted that all reservation deposits and tuition payments are final once a slot is secured.</Label>
-                                    </div>
-                                </div>
                             </div>
                         </div>
 
@@ -452,49 +442,6 @@ export default function ApplyPage() {
                                 <input type="hidden" name="paymentMethod" value={paymentMethod} />
                             </div>
 
-                            {/* Mobile Money Payment Details — only when Moolre selected */}
-                            {paymentMethod === "moolre" && (
-                            <div className="mt-6 pt-6 border-t border-white/10 space-y-6">
-                                <div>
-                                    <h3 className="text-lg font-bold text-white mb-1">Mobile Money Details</h3>
-                                    <p className="text-gray-500 text-sm">Enter the number that will receive the payment prompt.</p>
-                                </div>
-
-                                <div className="space-y-4">
-                                    <Label htmlFor="network" className="text-gray-300 font-bold uppercase tracking-widest text-[#2563EB] text-xs">Network Provider</Label>
-                                    <div className="grid grid-cols-3 gap-3">
-                                        {[
-                                            { value: "MTN", label: "MTN MoMo", activeColor: "border-yellow-500 bg-yellow-500/20 text-yellow-300 shadow-[0_0_20px_rgba(234,179,8,0.15)]", color: "border-yellow-500/20 bg-yellow-500/5 text-yellow-400 hover:bg-yellow-500/10" },
-                                            { value: "TELECEL", label: "Telecel Cash", activeColor: "border-red-500 bg-red-500/20 text-red-300 shadow-[0_0_20px_rgba(239,68,68,0.15)]", color: "border-red-500/20 bg-red-500/5 text-red-400 hover:bg-red-500/10" },
-                                            { value: "AIRTELTIGO", label: "AT Money", activeColor: "border-blue-500 bg-blue-500/20 text-blue-300 shadow-[0_0_20px_rgba(59,130,246,0.15)]", color: "border-blue-500/20 bg-blue-500/5 text-blue-400 hover:bg-blue-500/10" },
-                                        ].map((net) => (
-                                            <button
-                                                key={net.value}
-                                                type="button"
-                                                onClick={() => setSelectedNetwork(net.value)}
-                                                className={`p-4 rounded-xl border text-center font-bold text-sm transition-all ${selectedNetwork === net.value ? net.activeColor : net.color}`}
-                                            >
-                                                {net.label}
-                                            </button>
-                                        ))}
-                                    </div>
-                                    <input type="hidden" name="network" value={selectedNetwork} />
-                                </div>
-
-                                <div className="space-y-3">
-                                    <Label htmlFor="momoNumber" className="text-gray-300 font-bold uppercase tracking-widest text-[#2563EB] text-xs">Mobile Money Number</Label>
-                                    <Input
-                                        id="momoNumber"
-                                        name="momoNumber"
-                                        type="tel"
-                                        placeholder="0241234567"
-                                        className="bg-[#121212] border-white/10 rounded-2xl p-6 text-[15px] focus:border-[#2563EB]/40 focus:ring-1 focus:ring-[#2563EB]/20 text-gray-200 placeholder:text-gray-600 transition-all shadow-[0_4px_20px_rgba(0,0,0,0.2)] h-14"
-                                        required
-                                    />
-                                    <p className="text-gray-600 text-xs">This number will receive a payment prompt from Moolre. Make sure it matches your selected network.</p>
-                                </div>
-                            </div>
-                            )}
                         </div>
 
                         {/* Navigation Buttons footer */}
