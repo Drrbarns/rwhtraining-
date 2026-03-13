@@ -31,41 +31,34 @@ export default function StudentPortal() {
 
     useEffect(() => {
         if (!supabase) return;
-        checkUser();
-        const { data: authListener } = supabase.auth.onAuthStateChange(
-            async (_event, session) => {
-                setUser(session?.user || null);
-                if (session?.user) {
-                    setLoading(false);
-                    await fetchDashboardData(session.user.id);
-                }
+        // Restore session from localStorage on mount
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            if (session?.user) {
+                setUser(session.user);
+                fetchDashboardData(session.user.id, supabase);
+            } else {
+                setLoading(false);
             }
-        );
+        });
+        // Only listen for SIGNED_OUT to clear state
+        const { data: authListener } = supabase.auth.onAuthStateChange((event) => {
+            if (event === "SIGNED_OUT") {
+                setUser(null);
+                setDashboardData(null);
+                setLoading(false);
+            }
+        });
         return () => { authListener.subscription.unsubscribe(); };
     }, [supabase]);
 
-    async function checkUser() {
-        if (!supabase) return;
-        setLoading(true);
-        const { data: { session } } = await supabase.auth.getSession();
-        setUser(session?.user || null);
-        if (session?.user) {
-            await fetchDashboardData(session.user.id);
-        } else {
-            setLoading(false);
-        }
-    }
-
-    async function fetchDashboardData(userId: string) {
-        if (!supabase) return;
+    async function fetchDashboardData(userId: string, client: SupabaseClient) {
         setLoading(true);
         try {
             const [profileRes, enrollRes, appRes] = await Promise.all([
-                supabase.from("profiles").select("*").eq("id", userId).single(),
-                supabase.from("enrollments").select("*").eq("user_id", userId).single(),
-                supabase.from("applications").select("*").eq("user_id", userId).order("created_at", { ascending: false }).limit(1).single()
+                client.from("profiles").select("*").eq("id", userId).single(),
+                client.from("enrollments").select("*").eq("user_id", userId).single(),
+                client.from("applications").select("*").eq("user_id", userId).order("created_at", { ascending: false }).limit(1).single()
             ]);
-
             setDashboardData({
                 profile: profileRes.data,
                 enrollment: enrollRes.data,
@@ -82,20 +75,21 @@ export default function StudentPortal() {
         if (!supabase) return;
         setLoading(true);
         setAuthError("");
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) {
             setAuthError(error.message);
             setLoading(false);
+        } else if (data?.user) {
+            // Set user directly from sign-in response — no reliance on onAuthStateChange
+            setUser(data.user);
+            await fetchDashboardData(data.user.id, supabase);
         }
     }
 
     async function handleLogout() {
         if (!supabase) return;
-        setLoading(true);
         await supabase.auth.signOut();
-        setUser(null);
-        setDashboardData(null);
-        setLoading(false);
+        // onAuthStateChange SIGNED_OUT will clear state
     }
 
     if (!supabase || (loading && !user && !authError)) {
