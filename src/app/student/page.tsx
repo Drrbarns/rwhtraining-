@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { createClient, User } from "@supabase/supabase-js";
+import { type User } from "@supabase/supabase-js";
+import { type SupabaseClient } from "@supabase/supabase-js";
+import { createClient } from "@/utils/supabase/client";
 import { LogOut, BookOpen, Clock, Loader2, ShieldCheck, ArrowRight, Play, FileText, Settings, Trophy, CreditCard, Mail, Phone, MapPin, Lock, ChevronRight, User as UserIcon, Banknote, Calendar, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,14 +12,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Progress } from "@/components/ui/progress";
 import Link from "next/link";
 
-const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
-
 type Tab = "dashboard" | "curriculum" | "profile" | "payments";
 
 export default function StudentPortal() {
+    const [supabase, setSupabase] = useState<SupabaseClient | null>(null);
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
     const [email, setEmail] = useState("");
@@ -27,6 +25,11 @@ export default function StudentPortal() {
     const [activeTab, setActiveTab] = useState<Tab>("dashboard");
 
     useEffect(() => {
+        setSupabase(createClient());
+    }, []);
+
+    useEffect(() => {
+        if (!supabase) return;
         checkUser();
         const { data: authListener } = supabase.auth.onAuthStateChange(
             async (_event, session) => {
@@ -35,9 +38,10 @@ export default function StudentPortal() {
             }
         );
         return () => { authListener.subscription.unsubscribe(); };
-    }, []);
+    }, [supabase]);
 
     async function checkUser() {
+        if (!supabase) return;
         setLoading(true);
         const { data: { session } } = await supabase.auth.getSession();
         setUser(session?.user || null);
@@ -49,6 +53,7 @@ export default function StudentPortal() {
     }
 
     async function fetchDashboardData(userId: string) {
+        if (!supabase) return;
         setLoading(true);
         try {
             const [profileRes, enrollRes, appRes] = await Promise.all([
@@ -70,6 +75,7 @@ export default function StudentPortal() {
 
     async function handleLogin(e: React.FormEvent) {
         e.preventDefault();
+        if (!supabase) return;
         setLoading(true);
         setAuthError("");
         const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -80,6 +86,7 @@ export default function StudentPortal() {
     }
 
     async function handleLogout() {
+        if (!supabase) return;
         setLoading(true);
         await supabase.auth.signOut();
         setUser(null);
@@ -87,7 +94,7 @@ export default function StudentPortal() {
         setLoading(false);
     }
 
-    if (loading && !user && !authError) {
+    if (!supabase || (loading && !user && !authError)) {
         return (
             <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
                 <div className="flex flex-col items-center gap-4">
