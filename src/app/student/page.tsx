@@ -31,7 +31,7 @@ export default function StudentPortal() {
 
     useEffect(() => {
         if (!supabase) return;
-        // Restore session from localStorage on mount
+        // Restore session from localStorage on mount — no onAuthStateChange to avoid spurious events
         supabase.auth.getSession().then(({ data: { session } }) => {
             if (session?.user) {
                 setUser(session.user);
@@ -40,15 +40,6 @@ export default function StudentPortal() {
                 setLoading(false);
             }
         });
-        // Only listen for SIGNED_OUT to clear state
-        const { data: authListener } = supabase.auth.onAuthStateChange((event) => {
-            if (event === "SIGNED_OUT") {
-                setUser(null);
-                setDashboardData(null);
-                setLoading(false);
-            }
-        });
-        return () => { authListener.subscription.unsubscribe(); };
     }, [supabase]);
 
     async function fetchDashboardData(userId: string, client: SupabaseClient) {
@@ -89,7 +80,9 @@ export default function StudentPortal() {
     async function handleLogout() {
         if (!supabase) return;
         await supabase.auth.signOut();
-        // onAuthStateChange SIGNED_OUT will clear state
+        setUser(null);
+        setDashboardData(null);
+        setLoading(false);
     }
 
     if (!supabase || (loading && !user && !authError)) {
