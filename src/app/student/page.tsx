@@ -1,9 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { type User } from "@supabase/supabase-js";
-import { type SupabaseClient } from "@supabase/supabase-js";
-import { createClient } from "@/utils/supabase/client";
+import { createClient as createSupabaseBrowser, type User, type SupabaseClient } from "@supabase/supabase-js";
 import { LogOut, BookOpen, Clock, Loader2, ShieldCheck, ArrowRight, Play, FileText, Settings, Trophy, CreditCard, Mail, Phone, MapPin, Lock, ChevronRight, User as UserIcon, Banknote, Calendar, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,7 +23,10 @@ export default function StudentPortal() {
     const [activeTab, setActiveTab] = useState<Tab>("dashboard");
 
     useEffect(() => {
-        setSupabase(createClient());
+        setSupabase(createSupabaseBrowser(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+        ));
     }, []);
 
     useEffect(() => {
@@ -34,7 +35,10 @@ export default function StudentPortal() {
         const { data: authListener } = supabase.auth.onAuthStateChange(
             async (_event, session) => {
                 setUser(session?.user || null);
-                if (session?.user) await fetchDashboardData(session.user.id);
+                if (session?.user) {
+                    setLoading(false);
+                    await fetchDashboardData(session.user.id);
+                }
             }
         );
         return () => { authListener.subscription.unsubscribe(); };
