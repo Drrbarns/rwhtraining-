@@ -1,7 +1,7 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 import { sendEmail } from "@/lib/send-email";
 import { SmsAdapter } from "@/lib/sms-adapter";
-import { EMAIL_TEMPLATES, SMS_TEMPLATES, mergeVariables } from "@/lib/email-templates";
+import { EMAIL_TEMPLATES, SMS_TEMPLATES, COHORT_WHATSAPP_LINK, mergeVariables } from "@/lib/email-templates";
 
 function generateSecurePassword() {
     const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
@@ -193,6 +193,7 @@ async function sendPaymentConfirmationSms(
         first_name: firstName,
         amount: String(amount),
         tier: tierLabel,
+        whatsapp_link: COHORT_WHATSAPP_LINK,
     });
     const result = await SmsAdapter.send({ to: phone, message });
     if (result.success) console.log(`[Onboard] Payment confirmation SMS sent to ${phone}`);
@@ -201,7 +202,10 @@ async function sendPaymentConfirmationSms(
 
 async function sendWelcomeSms(firstName: string, phone: string | null | undefined): Promise<void> {
     if (!phone?.trim()) return;
-    const message = mergeVariables(SMS_TEMPLATES.welcome_sms.body, { first_name: firstName });
+    const message = mergeVariables(SMS_TEMPLATES.welcome_sms.body, {
+        first_name: firstName,
+        whatsapp_link: COHORT_WHATSAPP_LINK,
+    });
     const result = await SmsAdapter.send({ to: phone, message });
     if (result.success) console.log(`[Onboard] Welcome SMS sent to ${phone}`);
     else console.warn(`[Onboard] Welcome SMS failed:`, result.error);

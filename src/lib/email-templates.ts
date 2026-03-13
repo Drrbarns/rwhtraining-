@@ -645,12 +645,15 @@ export const EMAIL_TEMPLATES = {
   },
 };
 
+/** Cohort WhatsApp group invite - included in payment & welcome SMS */
+export const COHORT_WHATSAPP_LINK = "https://chat.whatsapp.com/HI1MK05kBGA2wqxz3TA1s9?mode=gi_t";
+
 export const SMS_TEMPLATES = {
   payment_confirmation: {
     name: "Payment Confirmation SMS",
     category: "payment",
-    variables: ["first_name", "amount", "tier"],
-    body: `Hi {{first_name}}! Your payment of GHS {{amount}} ({{tier}}% tier) for the Remote Work Hub Masterclass has been confirmed. Your seat is secured! Check your email for login details. - Remote Work Hub`,
+    variables: ["first_name", "amount", "tier", "whatsapp_link"],
+    body: `Hi {{first_name}}! Your payment of GHS {{amount}} ({{tier}}% tier) for the Remote Work Hub Masterclass has been confirmed. Your seat is secured! Check your email for login details. Join our cohort WhatsApp group: {{whatsapp_link}} - Remote Work Hub`,
   },
   balance_reminder: {
     name: "Balance Reminder SMS",
@@ -673,8 +676,8 @@ export const SMS_TEMPLATES = {
   welcome_sms: {
     name: "Welcome SMS",
     category: "welcome",
-    variables: ["first_name"],
-    body: `Welcome to the Remote Work Hub Masterclass, {{first_name}}! Your seat is secured. Check your email for login credentials and next steps. We start March 16! - Remote Work Hub`,
+    variables: ["first_name", "whatsapp_link"],
+    body: `Welcome to the Remote Work Hub Masterclass, {{first_name}}! Your seat is secured. Check your email for login credentials. Join our cohort WhatsApp group: {{whatsapp_link}} - Remote Work Hub`,
   },
   general_announcement: {
     name: "General Announcement SMS",
