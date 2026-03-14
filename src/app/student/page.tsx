@@ -21,7 +21,9 @@ export default function StudentPortal() {
     const [authError, setAuthError] = useState("");
     const [dashboardData, setDashboardData] = useState<any>(null);
     const [activeTab, setActiveTab] = useState<Tab>("dashboard");
+    const [showPayModal, setShowPayModal] = useState(false);
     const [payingBalance, setPayingBalance] = useState(false);
+    const [payingGateway, setPayingGateway] = useState<"moolre" | "paystack" | null>(null);
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [passwordMsg, setPasswordMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
@@ -82,15 +84,18 @@ export default function StudentPortal() {
         }
     }
 
-    async function handlePayBalance() {
+    async function handlePayBalance(gateway: "moolre" | "paystack") {
         if (!supabase || !user) return;
+        setPayingGateway(gateway);
         setPayingBalance(true);
+        setShowPayModal(false);
         try {
             const { data: { session } } = await supabase.auth.getSession();
-            if (!session?.access_token) { setPayingBalance(false); return; }
+            if (!session?.access_token) { setPayingBalance(false); setPayingGateway(null); return; }
             const res = await fetch("/api/student/pay-balance", {
                 method: "POST",
-                headers: { Authorization: `Bearer ${session.access_token}` },
+                headers: { Authorization: `Bearer ${session.access_token}`, "Content-Type": "application/json" },
+                body: JSON.stringify({ gateway }),
             });
             const data = await res.json();
             if (res.ok && data.checkout_url) {
@@ -98,10 +103,12 @@ export default function StudentPortal() {
             } else {
                 alert(data.error || "Could not initiate payment. Please try again.");
                 setPayingBalance(false);
+                setPayingGateway(null);
             }
         } catch {
             alert("Network error. Please try again.");
             setPayingBalance(false);
+            setPayingGateway(null);
         }
     }
 
@@ -302,7 +309,7 @@ export default function StudentPortal() {
                                                     <h3 className="text-[15px] font-bold text-white">Payment Progress</h3>
                                                     <p className="text-[12px] text-gray-400 mt-0.5">GHS {totalPaid} of GHS {totalCost} paid</p>
                                                 </div>
-                                                <Button size="sm" onClick={handlePayBalance} disabled={payingBalance} className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-xl h-9 text-[12px] font-bold">
+                                                <Button size="sm" onClick={() => setShowPayModal(true)} disabled={payingBalance} className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-xl h-9 text-[12px] font-bold">
                                                     {payingBalance ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <>Pay Balance <ArrowRight className="w-3.5 h-3.5 ml-1.5" /></>}
                                                 </Button>
                                             </div>
@@ -437,7 +444,7 @@ export default function StudentPortal() {
                                                 <h3 className="text-[15px] font-bold text-white">Outstanding Balance</h3>
                                                 <p className="text-[13px] text-gray-400 mt-1">Complete your payment to unlock all benefits.</p>
                                             </div>
-                                            <Button onClick={handlePayBalance} disabled={payingBalance} className="bg-amber-500 hover:bg-amber-600 text-black font-bold rounded-xl h-11 px-6">
+                                            <Button onClick={() => setShowPayModal(true)} disabled={payingBalance} className="bg-amber-500 hover:bg-amber-600 text-black font-bold rounded-xl h-11 px-6">
                                                 {payingBalance ? <Loader2 className="w-4 h-4 animate-spin" /> : <>Pay GHS {balanceDue} <ArrowRight className="w-4 h-4 ml-2" /></>}
                                             </Button>
                                         </CardContent>
@@ -579,6 +586,59 @@ export default function StudentPortal() {
                     </>
                 )}
             </main>
+
+            {/* Payment Method Modal */}
+            {showPayModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setShowPayModal(false)}>
+                    <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+                    <div className="relative bg-[#121212] border border-white/10 rounded-3xl p-8 w-full max-w-md shadow-2xl animate-in fade-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
+                        <h3 className="text-[18px] font-extrabold text-white mb-2">Choose Payment Method</h3>
+                        <p className="text-[13px] text-gray-400 mb-6">Select how you'd like to pay your outstanding balance of <strong className="text-white">GHS {balanceDue}</strong>.</p>
+
+                        <div className="space-y-3">
+                            {/* Mobile Money */}
+                            <button
+                                onClick={() => handlePayBalance("moolre")}
+                                disabled={payingBalance}
+                                className="w-full flex items-center gap-4 p-5 rounded-2xl border border-white/10 bg-black/30 hover:border-amber-500/50 hover:bg-amber-500/5 transition-all group text-left"
+                            >
+                                <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0 text-2xl group-hover:bg-amber-500/20 transition-colors">
+                                    📱
+                                </div>
+                                <div className="flex-1">
+                                    <p className="text-[14px] font-bold text-white">Mobile Money</p>
+                                    <p className="text-[12px] text-gray-400 mt-0.5">MTN, Telecel, AirtelTigo — Ghana MoMo</p>
+                                </div>
+                                {payingBalance && payingGateway === "moolre"
+                                    ? <Loader2 className="w-4 h-4 animate-spin text-amber-400" />
+                                    : <ArrowRight className="w-4 h-4 text-gray-600 group-hover:text-amber-400 transition-colors" />}
+                            </button>
+
+                            {/* Card / Paystack */}
+                            <button
+                                onClick={() => handlePayBalance("paystack")}
+                                disabled={payingBalance}
+                                className="w-full flex items-center gap-4 p-5 rounded-2xl border border-white/10 bg-black/30 hover:border-[#2563EB]/50 hover:bg-[#2563EB]/5 transition-all group text-left"
+                            >
+                                <div className="w-12 h-12 rounded-xl bg-[#2563EB]/10 border border-[#2563EB]/20 flex items-center justify-center shrink-0 text-2xl group-hover:bg-[#2563EB]/20 transition-colors">
+                                    💳
+                                </div>
+                                <div className="flex-1">
+                                    <p className="text-[14px] font-bold text-white">Card Payment</p>
+                                    <p className="text-[12px] text-gray-400 mt-0.5">Visa, Mastercard, or bank transfer via Paystack</p>
+                                </div>
+                                {payingBalance && payingGateway === "paystack"
+                                    ? <Loader2 className="w-4 h-4 animate-spin text-[#2563EB]" />
+                                    : <ArrowRight className="w-4 h-4 text-gray-600 group-hover:text-[#2563EB] transition-colors" />}
+                            </button>
+                        </div>
+
+                        <button onClick={() => setShowPayModal(false)} className="mt-5 w-full py-3 text-[13px] font-semibold text-gray-500 hover:text-white transition-colors">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
