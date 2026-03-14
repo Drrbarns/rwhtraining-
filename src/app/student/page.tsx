@@ -24,6 +24,7 @@ export default function StudentPortal() {
     const [showPayModal, setShowPayModal] = useState(false);
     const [payingBalance, setPayingBalance] = useState(false);
     const [payingGateway, setPayingGateway] = useState<"moolre" | "paystack" | null>(null);
+    const [payError, setPayError] = useState<string | null>(null);
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [passwordMsg, setPasswordMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
@@ -88,7 +89,7 @@ export default function StudentPortal() {
         if (!supabase || !user) return;
         setPayingGateway(gateway);
         setPayingBalance(true);
-        setShowPayModal(false);
+        setPayError(null);
         try {
             const { data: { session } } = await supabase.auth.getSession();
             if (!session?.access_token) { setPayingBalance(false); setPayingGateway(null); return; }
@@ -101,14 +102,20 @@ export default function StudentPortal() {
             if (res.ok && data.checkout_url) {
                 window.location.href = data.checkout_url;
             } else {
-                alert(data.error || "Could not initiate payment. Please try again.");
+                const msg = data.error || "Could not initiate payment.";
+                const isKeyError = msg.toLowerCase().includes("invalid key") || msg.toLowerCase().includes("not configured");
+                setPayError(isKeyError
+                    ? "Card payment is not available right now. Please use Mobile Money instead."
+                    : msg);
                 setPayingBalance(false);
                 setPayingGateway(null);
+                setShowPayModal(true);
             }
         } catch {
-            alert("Network error. Please try again.");
+            setPayError("Network error. Please try again.");
             setPayingBalance(false);
             setPayingGateway(null);
+            setShowPayModal(true);
         }
     }
 
@@ -589,11 +596,16 @@ export default function StudentPortal() {
 
             {/* Payment Method Modal */}
             {showPayModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setShowPayModal(false)}>
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => { setShowPayModal(false); setPayError(null); }}>
                     <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
                     <div className="relative bg-[#121212] border border-white/10 rounded-3xl p-8 w-full max-w-md shadow-2xl animate-in fade-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
                         <h3 className="text-[18px] font-extrabold text-white mb-2">Choose Payment Method</h3>
-                        <p className="text-[13px] text-gray-400 mb-6">Select how you'd like to pay your outstanding balance of <strong className="text-white">GHS {balanceDue}</strong>.</p>
+                        <p className="text-[13px] text-gray-400 mb-4">Select how you'd like to pay your outstanding balance of <strong className="text-white">GHS {balanceDue}</strong>.</p>
+                        {payError && (
+                            <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-[13px] font-semibold">
+                                ⚠️ {payError}
+                            </div>
+                        )}
 
                         <div className="space-y-3">
                             {/* Mobile Money */}
@@ -633,7 +645,7 @@ export default function StudentPortal() {
                             </button>
                         </div>
 
-                        <button onClick={() => setShowPayModal(false)} className="mt-5 w-full py-3 text-[13px] font-semibold text-gray-500 hover:text-white transition-colors">
+                        <button onClick={() => { setShowPayModal(false); setPayError(null); }} className="mt-5 w-full py-3 text-[13px] font-semibold text-gray-500 hover:text-white transition-colors">
                             Cancel
                         </button>
                     </div>
