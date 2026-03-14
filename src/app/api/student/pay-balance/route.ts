@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { PaystackAdapter } from "@/lib/paystack-adapter";
+import { MoolreAdapter, type MomoNetwork, type PaymentTier } from "@/lib/moolre-adapter";
 
 /**
  * POST /api/student/pay-balance
@@ -56,19 +56,26 @@ export async function POST(request: NextRequest) {
         }
 
         const balanceDue = Number(enrollment.balance_due);
-        const reference = PaystackAdapter.generateReference();
+        const reference = MoolreAdapter.generateReference();
+        const phone = application.phone || "";
+
+        // Detect MoMo network from phone prefix (Ghana)
+        const cleanPhone = phone.replace(/\s+/g, "").replace(/^\+233/, "0").replace(/^233/, "0");
+        let network: MomoNetwork = "MTN";
+        if (cleanPhone.startsWith("020") || cleanPhone.startsWith("050")) network = "TELECEL";
+        else if (cleanPhone.startsWith("026") || cleanPhone.startsWith("056") || cleanPhone.startsWith("027") || cleanPhone.startsWith("057")) network = "AIRTELTIGO";
 
         // Save balance payment record
         await supabase.from("payments").insert({
             reference,
             email: user.email || application.email,
-            phone: application.phone || "",
+            phone,
             first_name: application.first_name || "",
             last_name: application.last_name || "",
-            network: "CARD",
+            network,
             amount_ghs: balanceDue,
             tier: application.tier || "50",
-            gateway: "paystack",
+            gateway: "moolre",
             payment_type: "balance",
             application_id: application.id,
             status: "PENDING",
@@ -76,17 +83,20 @@ export async function POST(request: NextRequest) {
             updated_at: new Date().toISOString(),
         });
 
-        // Initialize Paystack transaction
-        const gatewayRes = await PaystackAdapter.initializeTransaction({
+        // Initialize Moolre transaction (same as registration page)
+        const gatewayRes = await MoolreAdapter.initializeTransaction({
             email: user.email || application.email,
             amount_ghs: balanceDue,
+            tier: (application.tier || "50") as PaymentTier,
+            phone,
+            network,
             first_name: application.first_name || "",
             last_name: application.last_name || "",
             reference,
             returnPath: "/student",
         });
 
-        if (!gatewayRes.checkout_url) {
+        if (!gatewayRes.checkout_url || gatewayRes.status === "FAILED") {
             return NextResponse.json({ error: gatewayRes.message || "Payment initialization failed" }, { status: 500 });
         }
 

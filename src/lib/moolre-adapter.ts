@@ -11,6 +11,7 @@ export interface TransactionPayload {
     first_name: string;
     last_name: string;
     reference?: string;
+    returnPath?: string;
 }
 
 export interface GatewayResponse {
@@ -51,7 +52,8 @@ export class MoolreAdapter {
         const callbackUrl = `${appUrl}/api/moolre/webhook`;
 
         // Using checkout as a redirect so they hit our polling page to verify after paying
-        const redirectUrl = `${appUrl}/apply/checkout?ref=${reference}&amount=${payload.amount_ghs}&gateway=moolre`;
+        const returnSuffix = payload.returnPath ? `&returnPath=${encodeURIComponent(payload.returnPath)}` : "";
+        const redirectUrl = `${appUrl}/apply/checkout?ref=${reference}&amount=${payload.amount_ghs}&gateway=moolre${returnSuffix}`;
 
         const apiUser = process.env.MOOLRE_API_USER;
         const apiPubKey = process.env.MOOLRE_API_PUBKEY;
