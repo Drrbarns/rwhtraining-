@@ -3,14 +3,7 @@ import { sendEmail } from "@/lib/send-email";
 import { SmsAdapter } from "@/lib/sms-adapter";
 import { EMAIL_TEMPLATES, SMS_TEMPLATES, COHORT_WHATSAPP_LINK, mergeVariables } from "@/lib/email-templates";
 
-function generateSecurePassword() {
-    const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
-    let password = "";
-    for (let i = 0; i < 12; i++) {
-        password += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return password;
-}
+const DEFAULT_STUDENT_PASSWORD = "12345678";
 
 export type ApplicationRow = {
     id: string;
@@ -55,7 +48,7 @@ export async function onboardPaidStudent(
             return { ok: true };
         }
 
-        const tempPassword = generateSecurePassword();
+        const tempPassword = DEFAULT_STUDENT_PASSWORD;
 
         const { data: authData, error: authError } = await supabase.auth.admin.createUser({
             email: appData.email,
@@ -71,7 +64,7 @@ export async function onboardPaidStudent(
                 if (existing) {
                     await ensureProfileAndEnrollment(supabase, appData, existing.id);
                     const emailSent = await sendWelcomeExistingEmail(appData.email, appData.first_name);
-                    await sendWelcomeSms(appData.first_name, appData.phone);
+                    await sendWelcomeSms(appData.first_name, appData.email, DEFAULT_STUDENT_PASSWORD, appData.phone);
                     return { ok: true, emailSent };
                 }
             }
@@ -107,7 +100,7 @@ export async function onboardPaidStudent(
             appData.last_name
         );
         await sendPaymentConfirmationSms(appData.first_name, appData.amount_ghs, appData.tier, appData.phone);
-        await sendWelcomeSms(appData.first_name, appData.phone);
+        await sendWelcomeSms(appData.first_name, appData.email, tempPassword, appData.phone);
         return { ok: true, emailSent };
     } catch (e) {
         console.error("[Onboard] Error:", e);
@@ -211,10 +204,19 @@ async function sendPaymentConfirmationSms(
     else console.warn(`[Onboard] Payment confirmation SMS failed:`, result.error);
 }
 
-async function sendWelcomeSms(firstName: string, phone: string | null | undefined): Promise<void> {
+async function sendWelcomeSms(
+    firstName: string,
+    email: string,
+    password: string,
+    phone: string | null | undefined
+): Promise<void> {
     if (!phone?.trim()) return;
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://remoteworkhub.org";
     const message = mergeVariables(SMS_TEMPLATES.welcome_sms.body, {
         first_name: firstName,
+        email,
+        password,
+        login_url: `${appUrl}/student`,
         whatsapp_link: COHORT_WHATSAPP_LINK,
     });
     const result = await SmsAdapter.send({ to: phone, message });

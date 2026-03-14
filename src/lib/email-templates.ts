@@ -676,8 +676,8 @@ export const SMS_TEMPLATES = {
   welcome_sms: {
     name: "Welcome SMS",
     category: "welcome",
-    variables: ["first_name", "whatsapp_link"],
-    body: `Welcome to the Remote Work Hub Masterclass, {{first_name}}! Your seat is secured. Check your email for login credentials. Join our cohort WhatsApp group: {{whatsapp_link}} - Remote Work Hub`,
+    variables: ["first_name", "email", "password", "login_url", "whatsapp_link"],
+    body: `Welcome to the RWH Masterclass, {{first_name}}! Your account is ready.\nLogin: {{login_url}}\nEmail: {{email}}\nPassword: {{password}}\nChange your password after logging in.\nJoin WhatsApp: {{whatsapp_link}} - Remote Work Hub`,
   },
   general_announcement: {
     name: "General Announcement SMS",
