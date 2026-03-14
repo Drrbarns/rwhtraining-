@@ -21,6 +21,11 @@ export default function StudentPortal() {
     const [authError, setAuthError] = useState("");
     const [dashboardData, setDashboardData] = useState<any>(null);
     const [activeTab, setActiveTab] = useState<Tab>("dashboard");
+    const [payingBalance, setPayingBalance] = useState(false);
+    const [newPassword, setNewPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [passwordMsg, setPasswordMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
+    const [changingPassword, setChangingPassword] = useState(false);
 
     useEffect(() => {
         setSupabase(createSupabaseBrowser(
@@ -75,6 +80,53 @@ export default function StudentPortal() {
             setUser(data.user);
             await fetchDashboardData(data.user.id, supabase);
         }
+    }
+
+    async function handlePayBalance() {
+        if (!supabase || !user) return;
+        setPayingBalance(true);
+        try {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session?.access_token) { setPayingBalance(false); return; }
+            const res = await fetch("/api/student/pay-balance", {
+                method: "POST",
+                headers: { Authorization: `Bearer ${session.access_token}` },
+            });
+            const data = await res.json();
+            if (res.ok && data.checkout_url) {
+                window.location.href = data.checkout_url;
+            } else {
+                alert(data.error || "Could not initiate payment. Please try again.");
+                setPayingBalance(false);
+            }
+        } catch {
+            alert("Network error. Please try again.");
+            setPayingBalance(false);
+        }
+    }
+
+    async function handleChangePassword(e: React.FormEvent) {
+        e.preventDefault();
+        if (!supabase) return;
+        if (newPassword.length < 8) {
+            setPasswordMsg({ type: "error", text: "Password must be at least 8 characters." });
+            return;
+        }
+        if (newPassword !== confirmPassword) {
+            setPasswordMsg({ type: "error", text: "Passwords do not match." });
+            return;
+        }
+        setChangingPassword(true);
+        setPasswordMsg(null);
+        const { error } = await supabase.auth.updateUser({ password: newPassword });
+        if (error) {
+            setPasswordMsg({ type: "error", text: error.message });
+        } else {
+            setPasswordMsg({ type: "success", text: "Password updated successfully!" });
+            setNewPassword("");
+            setConfirmPassword("");
+        }
+        setChangingPassword(false);
     }
 
     async function handleLogout() {
@@ -250,8 +302,8 @@ export default function StudentPortal() {
                                                     <h3 className="text-[15px] font-bold text-white">Payment Progress</h3>
                                                     <p className="text-[12px] text-gray-400 mt-0.5">GHS {totalPaid} of GHS {totalCost} paid</p>
                                                 </div>
-                                                <Button size="sm" className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-xl h-9 text-[12px] font-bold">
-                                                    Pay Balance <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
+                                                <Button size="sm" onClick={handlePayBalance} disabled={payingBalance} className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-xl h-9 text-[12px] font-bold">
+                                                    {payingBalance ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <>Pay Balance <ArrowRight className="w-3.5 h-3.5 ml-1.5" /></>}
                                                 </Button>
                                             </div>
                                             <Progress value={paymentProgress} className="h-3 bg-white/10 [&>div]:bg-gradient-to-r [&>div]:from-[#2563EB] [&>div]:to-indigo-500 rounded-full" />
@@ -385,8 +437,8 @@ export default function StudentPortal() {
                                                 <h3 className="text-[15px] font-bold text-white">Outstanding Balance</h3>
                                                 <p className="text-[13px] text-gray-400 mt-1">Complete your payment to unlock all benefits.</p>
                                             </div>
-                                            <Button className="bg-amber-500 hover:bg-amber-600 text-black font-bold rounded-xl h-11 px-6">
-                                                Pay GHS {balanceDue} <ArrowRight className="w-4 h-4 ml-2" />
+                                            <Button onClick={handlePayBalance} disabled={payingBalance} className="bg-amber-500 hover:bg-amber-600 text-black font-bold rounded-xl h-11 px-6">
+                                                {payingBalance ? <Loader2 className="w-4 h-4 animate-spin" /> : <>Pay GHS {balanceDue} <ArrowRight className="w-4 h-4 ml-2" /></>}
                                             </Button>
                                         </CardContent>
                                     </Card>
@@ -478,6 +530,34 @@ export default function StudentPortal() {
                                         </CardContent>
                                     </Card>
                                 </div>
+
+                                {/* Change Password */}
+                                <Card className="bg-[#121212] border-white/5">
+                                    <CardHeader>
+                                        <CardTitle className="text-[15px] font-bold text-white flex items-center gap-2"><Lock className="w-4 h-4 text-[#2563EB]" /> Change Password</CardTitle>
+                                        <CardDescription className="text-[12px] text-gray-500">Update your student portal password</CardDescription>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <form onSubmit={handleChangePassword} className="space-y-4 max-w-md">
+                                            {passwordMsg && (
+                                                <div className={`p-3 rounded-xl text-[13px] font-semibold ${passwordMsg.type === "success" ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" : "bg-red-500/10 text-red-400 border border-red-500/20"}`}>
+                                                    {passwordMsg.text}
+                                                </div>
+                                            )}
+                                            <div className="space-y-2">
+                                                <Label className="text-gray-400 text-[11px] font-bold uppercase tracking-wider">New Password</Label>
+                                                <Input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} placeholder="Min. 8 characters" required minLength={8} className="bg-black/50 border-white/10 text-white placeholder:text-gray-600 rounded-xl h-11" />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label className="text-gray-400 text-[11px] font-bold uppercase tracking-wider">Confirm New Password</Label>
+                                                <Input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="Repeat password" required minLength={8} className="bg-black/50 border-white/10 text-white placeholder:text-gray-600 rounded-xl h-11" />
+                                            </div>
+                                            <Button type="submit" disabled={changingPassword} className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold rounded-xl h-11 px-6">
+                                                {changingPassword ? <Loader2 className="w-4 h-4 animate-spin" /> : "Update Password"}
+                                            </Button>
+                                        </form>
+                                    </CardContent>
+                                </Card>
 
                                 {/* Prep Materials */}
                                 <Card className="bg-[#121212] border-white/5">

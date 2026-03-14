@@ -13,6 +13,7 @@ function CheckoutDisplay() {
     const ref = searchParams.get("ref") || "";
     const gateway = searchParams.get("gateway") || "moolre";
     const initialStatus = searchParams.get("status") || "pending";
+    const returnPath = searchParams.get("returnPath") || "/";
     const isPaystack = gateway === "paystack";
 
     const [paymentStatus, setPaymentStatus] = useState(initialStatus);
@@ -132,9 +133,9 @@ function CheckoutDisplay() {
                         Your payment of <strong className="text-slate-900">GHS {amount}</strong> has been
                         confirmed. Your seat in the 2026 Elite Masterclass is now secured.
                     </p>
-                    <Link href="/">
+                    <Link href={returnPath}>
                         <Button className="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl px-8 h-14 text-base">
-                            Return to Homepage
+                            {returnPath === "/" ? "Return to Homepage" : "Return to Dashboard"}
                         </Button>
                     </Link>
                 </div>

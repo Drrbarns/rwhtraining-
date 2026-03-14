@@ -4,6 +4,7 @@ export interface PaystackTransactionPayload {
     first_name: string;
     last_name: string;
     reference?: string;
+    returnPath?: string;
 }
 
 export interface PaystackGatewayResponse {
@@ -41,7 +42,8 @@ export class PaystackAdapter {
     ): Promise<PaystackGatewayResponse> {
         const reference = payload.reference || this.generateReference();
         const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-        const callbackUrl = `${appUrl}/apply/checkout?ref=${reference}&amount=${payload.amount_ghs}&gateway=paystack`;
+        const returnSuffix = payload.returnPath ? `&returnPath=${encodeURIComponent(payload.returnPath)}` : "";
+        const callbackUrl = `${appUrl}/apply/checkout?ref=${reference}&amount=${payload.amount_ghs}&gateway=paystack${returnSuffix}`;
 
         const secretKey = process.env.PAYSTACK_SECRET_KEY;
 

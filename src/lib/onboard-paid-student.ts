@@ -36,11 +36,22 @@ export async function onboardPaidStudent(
     try {
         const { data: existingEnrollment } = await supabase
             .from("enrollments")
-            .select("id")
+            .select("id, total_paid, balance_due")
             .eq("application_id", appData.id)
             .single();
 
         if (existingEnrollment && appData.user_id) {
+            // Balance payment: update enrollment financials if there's still a balance
+            if (appData.amount_ghs > 0 && Number(existingEnrollment.balance_due) > 0) {
+                const newTotalPaid = Number(existingEnrollment.total_paid) + appData.amount_ghs;
+                const newBalanceDue = Math.max(0, Number(existingEnrollment.balance_due) - appData.amount_ghs);
+                await supabase.from("enrollments").update({
+                    total_paid: newTotalPaid,
+                    balance_due: newBalanceDue,
+                    updated_at: new Date().toISOString(),
+                }).eq("id", existingEnrollment.id);
+                console.log(`[Onboard] Updated enrollment balance: paid=${newTotalPaid}, due=${newBalanceDue}`);
+            }
             return { ok: true };
         }
 
