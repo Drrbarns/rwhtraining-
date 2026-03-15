@@ -652,8 +652,8 @@ export const SMS_TEMPLATES = {
   payment_confirmation: {
     name: "Payment Confirmation SMS",
     category: "payment",
-    variables: ["first_name", "amount", "tier", "whatsapp_link"],
-    body: `Hi {{first_name}}! Your payment of GHS {{amount}} ({{tier}}% tier) for the Remote Work Hub Masterclass has been confirmed. Your seat is secured! Check your email for login details. Join our cohort WhatsApp group: {{whatsapp_link}} - Remote Work Hub`,
+    variables: ["first_name", "amount", "tier"],
+    body: `Hi {{first_name}}! Your payment of GHS {{amount}} ({{tier}}% tier) for the Remote Work Hub Masterclass has been confirmed. Your seat is secured! Check your email for login details. - Remote Work Hub`,
   },
   balance_reminder: {
     name: "Balance Reminder SMS",
@@ -676,8 +676,8 @@ export const SMS_TEMPLATES = {
   welcome_sms: {
     name: "Welcome SMS",
     category: "welcome",
-    variables: ["first_name", "email", "password", "login_url", "whatsapp_link"],
-    body: `Welcome to the RWH Masterclass, {{first_name}}! Your account is ready.\nLogin: {{login_url}}\nEmail: {{email}}\nPassword: {{password}}\nChange your password after logging in.\nJoin WhatsApp: {{whatsapp_link}} - Remote Work Hub`,
+    variables: ["first_name", "email", "password", "login_url"],
+    body: `Welcome to the RWH Masterclass, {{first_name}}! Your account is ready.\nLogin: {{login_url}}\nEmail: {{email}}\nPassword: {{password}}\nChange your password after logging in. - Remote Work Hub`,
   },
   general_announcement: {
     name: "General Announcement SMS",

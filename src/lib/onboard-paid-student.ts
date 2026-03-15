@@ -1,7 +1,7 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 import { sendEmail } from "@/lib/send-email";
 import { SmsAdapter } from "@/lib/sms-adapter";
-import { EMAIL_TEMPLATES, SMS_TEMPLATES, COHORT_WHATSAPP_LINK, mergeVariables } from "@/lib/email-templates";
+import { EMAIL_TEMPLATES, SMS_TEMPLATES, mergeVariables } from "@/lib/email-templates";
 
 const DEFAULT_STUDENT_PASSWORD = "12345678";
 
@@ -197,7 +197,6 @@ async function sendPaymentConfirmationSms(
         first_name: firstName,
         amount: String(amount),
         tier: tierLabel,
-        whatsapp_link: COHORT_WHATSAPP_LINK,
     });
     const result = await SmsAdapter.send({ to: phone, message });
     if (result.success) console.log(`[Onboard] Payment confirmation SMS sent to ${phone}`);
@@ -217,7 +216,6 @@ async function sendWelcomeSms(
         email,
         password,
         login_url: `${appUrl}/student`,
-        whatsapp_link: COHORT_WHATSAPP_LINK,
     });
     const result = await SmsAdapter.send({ to: phone, message });
     if (result.success) console.log(`[Onboard] Welcome SMS sent to ${phone}`);

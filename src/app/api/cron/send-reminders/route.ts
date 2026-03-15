@@ -3,11 +3,9 @@ import { createClient } from "@supabase/supabase-js";
 import { SmsAdapter } from "@/lib/sms-adapter";
 import { sendEmail } from "@/lib/send-email";
 import { wrapInLayout, mergeVariables } from "@/lib/email-templates";
-import { COHORT_WHATSAPP_LINK } from "@/lib/email-templates";
-
 const CLASS_DATE = new Date("2026-03-16T08:00:00Z"); // Monday March 16, 8am GMT
 
-const WHATSAPP_SUFFIX = ` Join cohort WhatsApp: ${COHORT_WHATSAPP_LINK} - Remote Work Hub`;
+const SMS_SUFFIX = ` - Remote Work Hub`;
 
 /**
  * Escalating SMS messages based on days until class.
@@ -19,33 +17,33 @@ function getReminderSms(daysLeft: number, timeOfDay: "morning" | "evening", firs
 
   if (daysLeft >= 4) {
     if (timeOfDay === "morning") {
-      return `Good morning ${name}! The Remote Work Hub Elite Web Dev Masterclass starts in just ${daysLeft} days (Monday March 16). Seats are filling fast! Complete your application & secure your spot: remoteworkhub.org/apply` + WHATSAPP_SUFFIX;
+      return `Good morning ${name}! The Remote Work Hub Elite Web Dev Masterclass starts in just ${daysLeft} days (Monday March 16). Seats are filling fast! Complete your application & secure your spot: remoteworkhub.org/apply` + SMS_SUFFIX;
     }
-    return `Hey ${name}, only ${daysLeft} days until the Remote Work Hub Masterclass begins! This is your chance to learn web development, get a paid internship & land your first client. Don't miss out - apply now: remoteworkhub.org/apply` + WHATSAPP_SUFFIX;
+    return `Hey ${name}, only ${daysLeft} days until the Remote Work Hub Masterclass begins! This is your chance to learn web development, get a paid internship & land your first client. Don't miss out - apply now: remoteworkhub.org/apply` + SMS_SUFFIX;
   }
 
   if (daysLeft === 3) {
     if (timeOfDay === "morning") {
-      return `Good morning ${name}! 3 DAYS LEFT. The Remote Work Hub Masterclass starts Monday. In 30 days you could be building real apps & earning from tech. Start with just GHS 200. Apply: remoteworkhub.org/apply` + WHATSAPP_SUFFIX;
+      return `Good morning ${name}! 3 DAYS LEFT. The Remote Work Hub Masterclass starts Monday. In 30 days you could be building real apps & earning from tech. Start with just GHS 200. Apply: remoteworkhub.org/apply` + SMS_SUFFIX;
     }
-    return `${name}, the weekend is here but the clock is ticking! Only 3 days until the Masterclass starts. This could change your career forever. Complete your application NOW: remoteworkhub.org/apply` + WHATSAPP_SUFFIX;
+    return `${name}, the weekend is here but the clock is ticking! Only 3 days until the Masterclass starts. This could change your career forever. Complete your application NOW: remoteworkhub.org/apply` + SMS_SUFFIX;
   }
 
   if (daysLeft === 2) {
     if (timeOfDay === "morning") {
-      return `Good morning ${name}! 2 DAYS TO GO. Monday is almost here. The Remote Work Hub Masterclass is your shortcut to becoming a professional web developer. Secure your spot today: remoteworkhub.org/apply` + WHATSAPP_SUFFIX;
+      return `Good morning ${name}! 2 DAYS TO GO. Monday is almost here. The Remote Work Hub Masterclass is your shortcut to becoming a professional web developer. Secure your spot today: remoteworkhub.org/apply` + SMS_SUFFIX;
     }
-    return `${name}, ONLY 2 DAYS LEFT! The Elite Web Dev Masterclass kicks off Monday morning. Paid internship included. Don't let this opportunity pass you. Apply & pay now: remoteworkhub.org/apply` + WHATSAPP_SUFFIX;
+    return `${name}, ONLY 2 DAYS LEFT! The Elite Web Dev Masterclass kicks off Monday morning. Paid internship included. Don't let this opportunity pass you. Apply & pay now: remoteworkhub.org/apply` + SMS_SUFFIX;
   }
 
   if (daysLeft === 1) {
     if (timeOfDay === "morning") {
-      return `TOMORROW, ${name}! The Remote Work Hub Masterclass starts TOMORROW (Monday March 16). This is your LAST CHANCE to enroll. Complete your application and payment right now: remoteworkhub.org/apply` + WHATSAPP_SUFFIX;
+      return `TOMORROW, ${name}! The Remote Work Hub Masterclass starts TOMORROW (Monday March 16). This is your LAST CHANCE to enroll. Complete your application and payment right now: remoteworkhub.org/apply` + SMS_SUFFIX;
     }
-    return `FINAL REMINDER ${name}! The Masterclass starts TOMORROW MORNING. After tonight, enrollment closes. If you've been waiting, the time is NOW. Apply: remoteworkhub.org/apply` + WHATSAPP_SUFFIX;
+    return `FINAL REMINDER ${name}! The Masterclass starts TOMORROW MORNING. After tonight, enrollment closes. If you've been waiting, the time is NOW. Apply: remoteworkhub.org/apply` + SMS_SUFFIX;
   }
 
-  return `IT'S HERE, ${name}! The Remote Work Hub Elite Web Dev Masterclass starts TODAY! If you haven't enrolled yet, there's still time. Don't be left behind. Apply now: remoteworkhub.org/apply` + WHATSAPP_SUFFIX;
+  return `IT'S HERE, ${name}! The Remote Work Hub Elite Web Dev Masterclass starts TODAY! If you haven't enrolled yet, there's still time. Don't be left behind. Apply now: remoteworkhub.org/apply` + SMS_SUFFIX;
 }
 
 function getReminderEmail(daysLeft: number, timeOfDay: "morning" | "evening", firstName: string): { subject: string; html: string } {
