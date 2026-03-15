@@ -21,12 +21,16 @@ async function getPaymentsData() {
     const enrollments = enrollmentsRes.data || [];
 
     const paid = payments.filter((p: any) => p.status === "PAID" || p.status === "SUCCESS");
-    const pending = payments.filter((p: any) => p.status === "PENDING");
+    // Only count initial (not balance) PENDING payments — balance PENDING are abandoned button clicks
+    const pending = payments.filter((p: any) => p.status === "PENDING" && (!p.payment_type || p.payment_type === "initial"));
     const failed = payments.filter((p: any) => p.status === "FAILED" || p.status === "CANCELLED");
 
-    const totalCollected = paid.reduce((acc: number, p: any) => acc + Number(p.amount_ghs || 0), 0);
+    // Total Collected = what students have actually paid per enrollment records (source of truth)
+    // This includes manually approved students who paid outside the gateway
+    const realEnrollments = enrollments.filter((e: any) => e.applications?.email !== "teststudent@remoteworkhub.org");
+    const totalCollected = realEnrollments.reduce((acc: number, e: any) => acc + Number(e.total_paid || 0), 0);
     const totalPending = pending.reduce((acc: number, p: any) => acc + Number(p.amount_ghs || 0), 0);
-    const outstandingBalance = enrollments.reduce((acc: number, e: any) => acc + Number(e.balance_due || 0), 0);
+    const outstandingBalance = realEnrollments.reduce((acc: number, e: any) => acc + Number(e.balance_due || 0), 0);
 
     return {
         payments,
@@ -34,7 +38,7 @@ async function getPaymentsData() {
             totalCollected,
             totalPending,
             outstandingBalance,
-            paidCount: paid.length,
+            paidCount: realEnrollments.length,
             pendingCount: pending.length,
             failedCount: failed.length,
             totalTransactions: payments.length,
@@ -50,7 +54,7 @@ export default async function PaymentsPage() {
     }
 
     const statCards = [
-        { title: "Total Collected", value: `GHS ${data.stats.totalCollected.toLocaleString()}`, desc: `${data.stats.paidCount} successful payments`, icon: Banknote, color: "emerald" },
+        { title: "Total Collected", value: `GHS ${data.stats.totalCollected.toLocaleString()}`, desc: `${data.stats.paidCount} enrolled students`, icon: Banknote, color: "emerald" },
         { title: "Pending", value: `GHS ${data.stats.totalPending.toLocaleString()}`, desc: `${data.stats.pendingCount} awaiting confirmation`, icon: Clock, color: "amber" },
         { title: "Outstanding Balance", value: `GHS ${data.stats.outstandingBalance.toLocaleString()}`, desc: "From partial-payment students", icon: AlertTriangle, color: "orange" },
         { title: "Failed", value: data.stats.failedCount.toString(), desc: "Failed or cancelled", icon: XCircle, color: "red" },

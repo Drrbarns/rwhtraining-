@@ -33,7 +33,6 @@ async function getAdminData() {
     const cohort = cohortsRes.data;
 
     const paidApps = applications.filter((a: any) => a.payment_status === "PAID");
-    const totalRevenue = paidApps.reduce((acc: number, curr: any) => acc + Number(curr.amount_ghs || 0), 0);
     const pendingPayments = applications.filter((a: any) => a.payment_status === "PENDING").length;
     const filledSeats = enrollments.length;
     const totalCapacity = cohort?.capacity || 10;
@@ -42,7 +41,11 @@ async function getAdminData() {
     const conversionRate = totalWhoStarted > 0 ? ((paidApps.length / totalWhoStarted) * 100).toFixed(1) : "0";
     const completionRate = totalWhoStarted > 0 ? ((applications.length / totalWhoStarted) * 100).toFixed(1) : "0";
 
-    const outstandingBalance = enrollments.reduce((acc: number, e: any) => acc + Number(e.balance_due || 0), 0);
+    // Revenue = sum of what students have actually paid (from enrollments — source of truth)
+    // Excludes test student account
+    const realEnrollments = enrollments.filter((e: any) => e.applications?.email !== "teststudent@remoteworkhub.org");
+    const totalRevenue = realEnrollments.reduce((acc: number, e: any) => acc + Number(e.total_paid || 0), 0);
+    const outstandingBalance = realEnrollments.reduce((acc: number, e: any) => acc + Number(e.balance_due || 0), 0);
 
     const revenueByDay: { date: string; amount: number }[] = [];
     const paidPayments = payments.filter((p: any) => p.status === "PAID" || p.status === "SUCCESS");
