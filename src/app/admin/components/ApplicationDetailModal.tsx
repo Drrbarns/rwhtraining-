@@ -26,6 +26,8 @@ export type ApplicationRecord = {
   is_unfinished?: boolean | null;
   created_at?: string | null;
   updated_at?: string | null;
+  /** From enrollment when available; used to show full vs partial payment */
+  balance_due?: number | null;
 };
 
 interface ApplicationDetailModalProps {
@@ -142,8 +144,18 @@ export function ApplicationDetailModal({ application, onClose }: ApplicationDeta
                 </span>
               )}
               {!isDraft && application.payment_status && (
-                <span className={`text-[10px] font-extrabold px-2.5 py-1 rounded-md border uppercase tracking-widest shadow-sm ${application.payment_status === 'PAID' ? 'bg-emerald-50 text-emerald-700 border-emerald-200/60' : 'bg-amber-50 text-amber-700 border-amber-200/60'}`}>
-                  Payment: {application.payment_status}
+                <span className={`text-[10px] font-extrabold px-2.5 py-1 rounded-md border uppercase tracking-widest shadow-sm ${
+                  application.payment_status === "PAID"
+                    ? (application.balance_due != null && application.balance_due > 0)
+                      ? "bg-amber-50 text-amber-700 border-amber-200/60"
+                      : "bg-emerald-50 text-emerald-700 border-emerald-200/60"
+                    : "bg-amber-50 text-amber-700 border-amber-200/60"
+                }`}>
+                  Payment: {application.payment_status === "PAID"
+                    ? (application.balance_due != null && application.balance_due > 0)
+                      ? `Partial — GHS ${application.balance_due} due`
+                      : "PAID (full)"
+                    : application.payment_status}
                 </span>
               )}
             </div>

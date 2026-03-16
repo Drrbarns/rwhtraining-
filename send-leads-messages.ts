@@ -293,6 +293,17 @@ function scheduleAt(d: Date, label: string, fn: () => Promise<void>) {
 async function main() {
     if (!process.env.RESEND_API_KEY) { console.error("❌ Missing RESEND_API_KEY"); process.exit(1); }
 
+    const onlyWaves = process.env.ONLY_WAVES?.split(",").map((w) => parseInt(w.trim(), 10)).filter((n) => n >= 1 && n <= 5) ?? [];
+
+    if (onlyWaves.length > 0) {
+        console.log("\n🎯 RWH LEADS — Sending only Wave(s):", onlyWaves.join(", "));
+        console.log("====================================\n");
+        if (onlyWaves.includes(4)) await sendWave(4, msg4);
+        if (onlyWaves.includes(5)) await sendWave(5, msg5);
+        console.log("\n✅ Done.\n");
+        return;
+    }
+
     const now = new Date();
     const wave2Time = new Date(now.getTime() + 45 * 60 * 1000); // +45 min
 

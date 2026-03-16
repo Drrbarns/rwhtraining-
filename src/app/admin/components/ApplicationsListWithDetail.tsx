@@ -9,6 +9,7 @@ import { ApplicationDetailModal, type ApplicationRecord } from "./ApplicationDet
 interface ApplicationsListWithDetailProps {
   applications: ApplicationRecord[];
   unfinishedApps: ApplicationRecord[];
+  balanceDueByApplicationId?: Record<string, number>;
   ExportReportButton: React.ReactNode;
   ExportUnfinishedButton: React.ReactNode;
   hideDrafts?: boolean;
@@ -20,6 +21,7 @@ const PAGE_SIZE = 12;
 export function ApplicationsListWithDetail({
   applications,
   unfinishedApps,
+  balanceDueByApplicationId,
   ExportReportButton,
   ExportUnfinishedButton,
   hideDrafts = false,
@@ -142,7 +144,7 @@ export function ApplicationsListWithDetail({
                   {paginatedApps.length > 0 ? paginatedApps.map((app) => (
                     <tr
                       key={app.id}
-                      onClick={() => setSelectedApp(app)}
+                      onClick={() => setSelectedApp({ ...app, balance_due: app.id ? (balanceDueByApplicationId?.[app.id] ?? undefined) : undefined })}
                       className="hover:bg-blue-50/30 transition-colors cursor-pointer group"
                     >
                       <td className="px-6 py-4">
@@ -164,9 +166,31 @@ export function ApplicationsListWithDetail({
                         </span>
                       </td>
                       <td className="px-4 py-4 text-center">
-                        <span className={`text-[11px] font-extrabold uppercase tracking-wider ${paymentColor(app.payment_status)}`}>
-                          {app.payment_status || "—"}
-                        </span>
+                        {(() => {
+                          const balanceDue = app.id ? (balanceDueByApplicationId?.[app.id] ?? null) : null;
+                          const isPaid = app.payment_status === "PAID";
+                          const isFullyPaid = isPaid && (balanceDue === null || balanceDue === 0);
+                          const isPartial = isPaid && balanceDue != null && balanceDue > 0;
+                          if (isPartial) {
+                            return (
+                              <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-600" title={`GHS ${balanceDue} still due`}>
+                                Partial — GHS {balanceDue} due
+                              </span>
+                            );
+                          }
+                          if (isFullyPaid) {
+                            return (
+                              <span className="text-[11px] font-extrabold uppercase tracking-wider text-emerald-600">
+                                PAID (full)
+                              </span>
+                            );
+                          }
+                          return (
+                            <span className={`text-[11px] font-extrabold uppercase tracking-wider ${paymentColor(app.payment_status)}`}>
+                              {app.payment_status || "—"}
+                            </span>
+                          );
+                        })()}
                       </td>
                       <td className="px-6 py-4 text-right text-[12px] font-medium text-slate-400 flex items-center justify-end gap-1">
                         <Clock className="w-3 h-3" />
@@ -237,7 +261,7 @@ export function ApplicationsListWithDetail({
                   {paginatedDrafts.length > 0 ? paginatedDrafts.map((app) => (
                     <tr
                       key={app.id}
-                      onClick={() => setSelectedApp(app)}
+                      onClick={() => setSelectedApp({ ...app, balance_due: app.id ? (balanceDueByApplicationId?.[app.id] ?? undefined) : undefined })}
                       className="hover:bg-red-50/30 transition-colors cursor-pointer group"
                     >
                       <td className="px-6 py-4">

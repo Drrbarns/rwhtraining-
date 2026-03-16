@@ -133,9 +133,20 @@ export default async function ActiveStudentsPage() {
                                                     </span>
                                                 </td>
                                                 <td className="px-4 py-4 text-center">
-                                                    <span className="text-[10px] font-extrabold px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200/60 uppercase tracking-widest">
-                                                        Active
-                                                    </span>
+                                                    {balance > 0 ? (
+                                                        <div className="flex flex-col items-center gap-1">
+                                                            <span className="text-[10px] font-extrabold px-2.5 py-1 rounded-md bg-amber-50 text-amber-700 border border-amber-200/60 uppercase tracking-widest">
+                                                                Partial — GHS {balance.toLocaleString()} due
+                                                            </span>
+                                                            <a href="https://remoteworkhub.org/student" target="_blank" rel="noopener noreferrer" className="text-[10px] font-semibold text-blue-600 hover:underline">
+                                                                Pay at /student
+                                                            </a>
+                                                        </div>
+                                                    ) : (
+                                                        <span className="text-[10px] font-extrabold px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200/60 uppercase tracking-widest">
+                                                            Fully paid
+                                                        </span>
+                                                    )}
                                                 </td>
                                                 <td className="px-6 py-4 text-right text-[12px] font-medium text-slate-400 flex items-center justify-end gap-1">
                                                     <Clock className="w-3 h-3" />

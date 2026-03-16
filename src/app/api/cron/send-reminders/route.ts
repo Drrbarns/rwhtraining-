@@ -163,6 +163,11 @@ export async function GET(request: NextRequest) {
       return true;
     });
 
+    const smsConfigured = SmsAdapter.isConfigured();
+    if (!smsConfigured) {
+      console.warn("[Reminders] SMS is NOT configured (set MOOLRE_SMS_VASKEY and SMS_SENDER_ID in production). Only emails will be sent.");
+    }
+
     let smsSent = 0;
     let smsFailed = 0;
     let emailSent = 0;
@@ -207,10 +212,14 @@ export async function GET(request: NextRequest) {
       success: true,
       daysLeft,
       timeOfDay,
+      ghanaTime: now.toISOString(),
       recipients: recipients.length,
+      smsConfigured,
       sms: { sent: smsSent, failed: smsFailed },
       email: { sent: emailSent, failed: emailFailed },
-      message: `Reminders sent: ${smsSent} SMS + ${emailSent} emails (${daysLeft} days until class, ${timeOfDay} batch)`,
+      message: smsConfigured
+        ? `Reminders sent: ${smsSent} SMS + ${emailSent} emails (${daysLeft} days until class, ${timeOfDay} batch)`
+        : `SMS not configured in this environment. Emails only: ${emailSent} sent. Set MOOLRE_SMS_VASKEY and SMS_SENDER_ID on Vercel.`,
     };
 
     console.log("[Reminders]", summary);

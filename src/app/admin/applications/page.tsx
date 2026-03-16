@@ -11,18 +11,22 @@ async function getApplicationsData() {
     if (!supabaseUrl || !supabaseServiceKey) return null;
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
-    const { data, error } = await supabase
-        .from("applications")
-        .select("*")
-        .order("created_at", { ascending: false });
+    const [appsRes, enrollmentsRes] = await Promise.all([
+        supabase.from("applications").select("*").order("created_at", { ascending: false }),
+        supabase.from("enrollments").select("application_id, balance_due"),
+    ]);
 
-    if (error) return null;
+    if (appsRes.error) return null;
 
-    const all = data ?? [];
+    const all = appsRes.data ?? [];
     const applications = all.filter((a: any) => !a.is_unfinished);
     const unfinishedApps = all.filter((a: any) => a.is_unfinished);
+    const balanceDueByApplicationId: Record<string, number> = {};
+    (enrollmentsRes.data ?? []).forEach((e: any) => {
+        if (e.application_id) balanceDueByApplicationId[e.application_id] = Number(e.balance_due || 0);
+    });
 
-    return { applications, unfinishedApps };
+    return { applications, unfinishedApps, balanceDueByApplicationId };
 }
 
 export default async function ApplicationsPipelinePage() {
@@ -51,6 +55,7 @@ export default async function ApplicationsPipelinePage() {
                 <ApplicationsListWithDetail
                     applications={data.applications}
                     unfinishedApps={data.unfinishedApps}
+                    balanceDueByApplicationId={data.balanceDueByApplicationId}
                     ExportReportButton={<ExportReportButton applications={data.applications} />}
                     ExportUnfinishedButton={<ExportUnfinishedButton unfinishedApps={data.unfinishedApps} />}
                     hideDrafts={true}

@@ -2,6 +2,9 @@
  * Masterclass Day Messaging Scheduler
  * Sends 6 waves of SMS + Email to all enrolled students.
  *
+ * Set USE_DATABASE=1 to load students and leads from Supabase (recommended).
+ * Otherwise uses the hardcoded lists below.
+ *
  * Schedule (Ghana time = UTC+0):
  *   Message 1 — NOW          — Location & directions
  *   Message 2 — +30 min      — Bring your laptop
@@ -11,10 +14,12 @@
  *   Message 6 — 9:45 AM Mar 16 — Seated? Starting in 10 mins!
  *
  * Run: npx tsx send-day-messages.ts
+ *      USE_DATABASE=1 npx tsx send-day-messages.ts   ← use DB for students + leads
  */
 import dotenv from "dotenv";
 dotenv.config({ path: ".env.local" });
 
+import { createClient } from "@supabase/supabase-js";
 import { Resend } from "resend";
 import { SmsAdapter } from "./src/lib/sms-adapter";
 
@@ -22,7 +27,10 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM = `Remote Work Hub <${process.env.EMAIL_FROM || "onboarding@resend.dev"}>`;
 const LOGIN_URL = "https://remoteworkhub.org/student";
 
-const students = [
+type Contact = { first_name: string; email: string | null; phone: string };
+
+// Default (fallback) lists — used only when USE_DATABASE is not set
+const defaultStudents: Contact[] = [
     { first_name: "Dela", email: "delaamezah@gmail.com", phone: "0201322740" },
     { first_name: "Emmanuel", email: "anyimahemma.001@gmail.com", phone: "+233535029108" },
     { first_name: "Emmanuella", email: "airllarackon@icloud.com", phone: "0506640015" },
@@ -42,6 +50,157 @@ const students = [
     { first_name: "Susana", email: "suzannuella@gmail.com", phone: "0559591823" },
     { first_name: "Taufic", email: "Tauficbashir785@gmail.com", phone: "0598353266" },
 ];
+
+const defaultLeads: Contact[] = [
+    { first_name: "Abena", email: "abena37@gmail.com", phone: "0506254041" },
+    { first_name: "Ernest", email: "abenaetornam1@gmail.com", phone: "0544510928" },
+    { first_name: "Sarah", email: "adzahcorm@gmail.com", phone: "0543059843" },
+    { first_name: "Deborah", email: "agyapongd340@gmail.com", phone: "0535598662" },
+    { first_name: "Nana Yeboah", email: "boatengnanayeboah19@gmail.com", phone: "0200651326" },
+    { first_name: "Edward", email: "danquaheddie@gmail.com", phone: "0553848495" },
+    { first_name: "Donald", email: "donaldakpagana47@gmail.com", phone: "+233538730683" },
+    { first_name: "Timothy", email: "enusimpson@gmail.com", phone: "0239403322" },
+    { first_name: "Esther", email: "ey93202@gmail.com", phone: "0591060322" },
+    { first_name: "Christopher", email: "hitsonjason3@gmail.com", phone: "0539569336" },
+    { first_name: "Ida", email: "idahosa242@gmail.com", phone: "+233203386344" },
+    { first_name: "Joseph", email: "issakajoseph880@gmail.com", phone: "0594158528" },
+    { first_name: "Kingsford", email: "kingsfordkwakye66@gmail.com", phone: "+233549598881" },
+    { first_name: "Maxwell", email: null as string | null, phone: "+233593510263" },
+    { first_name: "Nathaniel", email: "Nathanielalexis37@gmail.com", phone: "0556454612" },
+    { first_name: "Emmanuel", email: "Opizarotech2006@gmail.com", phone: "0535653506" },
+    { first_name: "Tulasi", email: "pearltulasi123@gmail.com", phone: "+233593999741" },
+    { first_name: "Precious", email: "preciousopongyamfuaa@gmail.com", phone: "+233242641449" },
+    { first_name: "Isaac", email: "sasuisaac332@gmail.com", phone: "0535507304" },
+    { first_name: "Einstein", email: "stvintel@gmail.com", phone: "0547045441" },
+    { first_name: "Kelvin", email: "tenisinclair19@gmail.com", phone: "+233549883612" },
+];
+
+// Mutable lists — replaced from DB when USE_DATABASE=1
+let students: Contact[] = [...defaultStudents];
+let leads: Contact[] = [...defaultLeads];
+
+function normalizePhone(p: string): string {
+    const cleaned = p.replace(/\s+/g, "").replace(/[^0-9+]/g, "");
+    if (cleaned.startsWith("0")) return "233" + cleaned.slice(1);
+    if (!cleaned.startsWith("233")) return "233" + cleaned;
+    return cleaned;
+}
+
+function getEveryone(): Contact[] {
+    const seenEmail = new Set<string>();
+    const seenPhone = new Set<string>();
+    const out: Contact[] = [];
+    for (const c of [...students, ...leads]) {
+        const email = (c.email ?? "").trim().toLowerCase();
+        const phone = normalizePhone(c.phone ?? "");
+        if (email && seenEmail.has(email)) continue;
+        if (seenPhone.has(phone)) continue;
+        if (email) seenEmail.add(email);
+        seenPhone.add(phone);
+        out.push({ first_name: c.first_name.trim(), email: c.email ?? null, phone: c.phone });
+    }
+    return out;
+}
+
+/** Load enrolled students from DB (enrollments + applications). */
+async function getStudentsFromDb(): Promise<Contact[]> {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.NEXT_PUBLIC_SUPABASE_SERVICE_KEY;
+    if (!url || !key) return [...defaultStudents];
+    const supabase = createClient(url, key);
+    const { data, error } = await supabase.from("enrollments").select("*, applications(*)");
+    if (error) {
+        console.warn("[send-day-messages] Failed to load students from DB:", error.message);
+        return [...defaultStudents];
+    }
+    const out: Contact[] = [];
+    const seen = new Set<string>();
+    for (const e of data || []) {
+        const app = (e as any).applications;
+        if (!app) continue;
+        const email = (app.email ?? "").trim().toLowerCase();
+        if (email === "teststudent@remoteworkhub.org") continue;
+        const phone = normalizePhone(app.phone ?? "");
+        if (!email && !phone) continue;
+        if (seen.has(email || phone)) continue;
+        seen.add(email || phone);
+        out.push({
+            first_name: (app.first_name || "there").trim(),
+            email: app.email ?? null,
+            phone: app.phone || "",
+        });
+    }
+    return out;
+}
+
+/** Load leads (non-paid applications) from DB. Includes completed apps + drafts. */
+async function getLeadsFromDb(): Promise<Contact[]> {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.NEXT_PUBLIC_SUPABASE_SERVICE_KEY;
+    if (!url || !key) return [...defaultLeads];
+    const supabase = createClient(url, key);
+    const { data: enrolled } = await supabase.from("enrollments").select("application_id");
+    const enrolledIds = new Set((enrolled || []).map((e: any) => e.application_id).filter(Boolean));
+    const { data, error } = await supabase.from("applications").select("id, first_name, email, phone").or("payment_status.neq.PAID,payment_status.is.null");
+    if (error) {
+        console.warn("[send-day-messages] Failed to load leads from DB:", error.message);
+        return [...defaultLeads];
+    }
+    const out: Contact[] = [];
+    const seen = new Set<string>();
+    for (const a of data || []) {
+        if (enrolledIds.has(a.id)) continue; // already a student
+        const email = (a.email ?? "").trim().toLowerCase();
+        const phone = normalizePhone(a.phone ?? "");
+        if (!email && !phone) continue;
+        if (seen.has(email || phone)) continue;
+        seen.add(email || phone);
+        out.push({
+            first_name: (a.first_name || "there").trim(),
+            email: a.email ?? null,
+            phone: a.phone || "",
+        });
+    }
+    return out;
+}
+
+/**
+ * Load everyone we have data for: all applications with at least email or phone.
+ * Deduped by email/phone so each person gets one message. Excludes test account.
+ * Use this when you want to send day messages to every applied or tried-to-apply contact.
+ */
+async function getEveryoneFromDb(): Promise<Contact[]> {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.NEXT_PUBLIC_SUPABASE_SERVICE_KEY;
+    if (!url || !key) return getEveryone(); // fallback to hardcoded merge
+    const supabase = createClient(url, key);
+    const { data, error } = await supabase
+        .from("applications")
+        .select("first_name, email, phone");
+    if (error) {
+        console.warn("[send-day-messages] Failed to load everyone from DB:", error.message);
+        return getEveryone();
+    }
+    const out: Contact[] = [];
+    const seenEmail = new Set<string>();
+    const seenPhone = new Set<string>();
+    for (const a of data || []) {
+        const email = (a.email ?? "").trim().toLowerCase();
+        const phone = normalizePhone((a.phone ?? "").trim());
+        if (email === "teststudent@remoteworkhub.org") continue;
+        if (!email && !phone) continue;
+        if (email && seenEmail.has(email)) continue;
+        if (phone && seenPhone.has(phone)) continue;
+        if (email) seenEmail.add(email);
+        if (phone) seenPhone.add(phone);
+        out.push({
+            first_name: (a.first_name || "there").trim(),
+            email: a.email?.trim() || null,
+            phone: (a.phone ?? "").trim() || "",
+        });
+    }
+    return out;
+}
 
 // ─── Message Templates ───────────────────────────────────────────────────────
 
@@ -237,6 +396,9 @@ function makeEmail(name: string, headline: string, bodyContent: string): string 
 </table></td></tr></table></body></html>`;
 }
 
+// Recipient list: either students only or everyone (students + leads, deduped). Set by main().
+let recipients: Contact[] = students;
+
 // ─── Send a single wave ───────────────────────────────────────────────────────
 
 async function sendWave(
@@ -246,35 +408,41 @@ async function sendWave(
     const { subject } = getContent("Test");
     console.log(`\n${"=".repeat(60)}`);
     console.log(`📤 WAVE ${waveNum}: ${subject}`);
-    console.log(`   Sending to ${students.length} students at ${new Date().toLocaleTimeString("en-GH", { timeZone: "Africa/Accra" })}`);
+    console.log(`   Sending to ${recipients.length} recipients at ${new Date().toLocaleTimeString("en-GH", { timeZone: "Africa/Accra" })}`);
     console.log("=".repeat(60));
 
-    let emailOk = 0, emailFail = 0, smsOk = 0, smsFail = 0;
+    let emailOk = 0, emailSkip = 0, emailFail = 0, smsOk = 0, smsFail = 0;
 
-    for (const student of students) {
-        const { sms, email, subject } = getContent(student.first_name.trim());
-        process.stdout.write(`  ${student.first_name.trim().padEnd(18)} `);
+    for (const person of recipients) {
+        const { sms, email, subject } = getContent(person.first_name.trim());
+        process.stdout.write(`  ${person.first_name.trim().padEnd(18)} `);
 
-        // Email
-        try {
-            const { error } = await resend.emails.send({ from: FROM, to: student.email, subject, html: email });
-            if (error) throw new Error(error.message);
-            process.stdout.write("✅ email  ");
-            emailOk++;
-        } catch (e: any) {
-            process.stdout.write(`❌ email  `);
-            emailFail++;
+        // Email (skip if no email — e.g. some leads)
+        if (person.email) {
+            try {
+                const { error } = await resend.emails.send({ from: FROM, to: person.email, subject, html: email });
+                if (error) throw new Error(error.message);
+                process.stdout.write("✅ email  ");
+                emailOk++;
+            } catch (e: any) {
+                process.stdout.write(`❌ email  `);
+                emailFail++;
+            }
+            await delay(400);
+        } else {
+            process.stdout.write("⚠️  no email  ");
+            emailSkip++;
         }
-        await delay(400);
 
         // SMS
-        const res = await SmsAdapter.send({ to: student.phone, message: sms });
+        const res = await SmsAdapter.send({ to: person.phone, message: sms });
         if (res.success) { process.stdout.write("✅ sms\n"); smsOk++; }
         else { process.stdout.write(`❌ sms(${res.error?.slice(0,25)})\n`); smsFail++; }
         await delay(200);
     }
 
-    console.log(`\n  ✅ Wave ${waveNum} done → Email: ${emailOk}/${students.length}  SMS: ${smsOk}/${students.length}\n`);
+    const total = recipients.length;
+    console.log(`\n  ✅ Wave ${waveNum} done → Email: ${emailOk}/${total - emailSkip}  SMS: ${smsOk}/${total}\n`);
 }
 
 function delay(ms: number) { return new Promise(r => setTimeout(r, ms)); }
@@ -303,6 +471,40 @@ async function main() {
         console.error("❌ Missing RESEND_API_KEY"); process.exit(1);
     }
 
+    // When USE_DATABASE=1: load everyone who applied or tried to apply (all applications with email or phone, deduped)
+    if (process.env.USE_DATABASE === "1" || process.env.USE_DATABASE === "true") {
+        console.log("\n📂 Loading everyone from Supabase (all applications with email or phone)...");
+        recipients = await getEveryoneFromDb();
+        console.log(`   → ${recipients.length} recipients (enrolled + pending + drafts — everyone we have data for)\n`);
+    }
+
+    const onlyWaves = process.env.ONLY_WAVES?.split(",").map((w) => parseInt(w.trim(), 10)).filter((n) => n >= 1 && n <= 6) ?? [];
+    const sendToEveryone = process.env.SEND_TO_EVERYONE === "1" || process.env.SEND_TO_EVERYONE === "true";
+
+    if (onlyWaves.length > 0) {
+        if (!process.env.USE_DATABASE && sendToEveryone) {
+            recipients = getEveryone(); // hardcoded merge when not using DB
+        }
+        if (process.env.USE_DATABASE) {
+            console.log("\n🚀 RWH EVERYONE (from DB) — Sending only Wave(s):", onlyWaves.join(", "));
+            console.log(`   ${recipients.length} recipients\n`);
+        } else if (sendToEveryone) {
+            console.log("\n🚀 RWH EVERYONE (students + leads, unique) — Sending only Wave(s):", onlyWaves.join(", "));
+            console.log(`   ${recipients.length} recipients\n`);
+        } else {
+            console.log("\n🚀 RWH STUDENTS — Sending only Wave(s):", onlyWaves.join(", "));
+            console.log("======================================\n");
+        }
+        if (onlyWaves.includes(1)) await sendWave(1, msg1);
+        if (onlyWaves.includes(2)) await sendWave(2, msg2);
+        if (onlyWaves.includes(3)) await sendWave(3, msg3);
+        if (onlyWaves.includes(4)) await sendWave(4, msg4);
+        if (onlyWaves.includes(5)) await sendWave(5, msg5);
+        if (onlyWaves.includes(6)) await sendWave(6, msg6);
+        console.log("\n✅ Done.\n");
+        return;
+    }
+
     const now = new Date();
     const wave1Time = now; // Send now
     const wave2Time = new Date(now.getTime() + 30 * 60 * 1000);  // +30 min
@@ -323,7 +525,7 @@ async function main() {
     console.log(`  Wave 4 — 6:00AM  Mar 16 → Good morning`);
     console.log(`  Wave 5 — 8:00AM  Mar 16 → Are you on your way?`);
     console.log(`  Wave 6 — 9:45AM  Mar 16 → Seated? Starting in 10 mins`);
-    console.log(`\n${students.length} students will receive each wave via email + SMS.\n`);
+    console.log(`\n${recipients.length} recipients will receive each wave via email + SMS.\n`);
 
     // Send all waves (will block on wave 1 then schedule the rest)
     await sendWave(1, msg1);
