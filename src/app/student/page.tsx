@@ -377,6 +377,7 @@ export default function StudentPortal() {
                                             <h4 className="font-bold text-white text-[14px]">My Profile</h4>
                                             <p className="text-[12px] text-gray-500">View your details</p>
                                         </div>
+
                                         <ChevronRight className="w-4 h-4 text-gray-600 ml-auto group-hover:text-purple-500 transition-colors" />
                                     </button>
                                 </div>
@@ -576,6 +577,7 @@ export default function StudentPortal() {
                             </div>
                         )}
                     </>
+
                 )}
             </main>
 
