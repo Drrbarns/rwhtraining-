@@ -8,7 +8,7 @@ import { onboardPaidStudent } from "@/lib/onboard-paid-student";
 const COURSE_TOTAL_GHS = 1000;
 
 async function getServiceAndAdminId(): Promise<{
-    supabase: ReturnType<typeof createClient>;
+    supabase: any;
     adminId: string | null;
     error?: string;
 }> {
