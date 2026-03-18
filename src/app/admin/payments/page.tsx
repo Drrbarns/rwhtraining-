@@ -2,6 +2,7 @@ import { createClient } from "@supabase/supabase-js";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { CreditCard, Banknote, Clock, AlertTriangle, CheckCircle2, XCircle } from "lucide-react";
 import { PaymentsClient } from "./PaymentsClient";
+import { RecordCashPayment } from "./RecordCashPayment";
 
 export const revalidate = 0;
 
@@ -34,6 +35,7 @@ async function getPaymentsData() {
 
     return {
         payments,
+        enrollments: realEnrollments,
         stats: {
             totalCollected,
             totalPending,
@@ -86,6 +88,9 @@ export default async function PaymentsPage() {
                     </Card>
                 ))}
             </div>
+
+            {/* Record cash payment */}
+            <RecordCashPayment enrollments={data.enrollments} />
 
             {/* Payments Table */}
             <PaymentsClient payments={data.payments} />
