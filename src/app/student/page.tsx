@@ -353,7 +353,7 @@ export default function StudentPortal() {
                                         </div>
                                         <div>
                                             <h4 className="font-bold text-white text-[14px]">View Curriculum</h4>
-                                            <p className="text-[12px] text-gray-500">{curriculumResources.length} resources to explore</p>
+                                            <p className="text-[12px] text-gray-500">{curriculumCount} resources to explore</p>
                                         </div>
                                         <ChevronRight className="w-4 h-4 text-gray-600 ml-auto group-hover:text-[#2563EB] transition-colors" />
                                     </button>
@@ -383,50 +383,6 @@ export default function StudentPortal() {
 
                                 {/* Cursor IDE Login — fully paid only */}
                                 {balanceDue === 0 && <CursorLoginCard />}
-                            </div>
-                        )}
-
-                        {/* CURRICULUM TAB */}
-                        {activeTab === "curriculum" && (
-                            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                                <div>
-                                    <h1 className="text-3xl font-extrabold tracking-tight text-white mb-2">Course Resources</h1>
-                                    <p className="text-gray-400 text-[15px]">Master reference guide and weekly assignments from the Web Development Masterclass.</p>
-                                </div>
-
-                                <div className="space-y-4">
-                                    {curriculumResources.map((res, i) => (
-                                        <a key={i} href={res.url} target="_blank" rel="noopener noreferrer" className="block">
-                                            <Card className="bg-[#121212] border-white/5 hover:border-[#2563EB]/40 hover:bg-[#2563EB]/5 transition-all overflow-hidden group cursor-pointer">
-                                                <CardContent className="p-0">
-                                                    <div className="flex items-center gap-5 p-5">
-                                                        <div className="w-14 h-14 rounded-2xl border border-white/10 flex items-center justify-center bg-[#2563EB]/10 shrink-0 group-hover:bg-[#2563EB]/20 group-hover:border-[#2563EB]/30 transition-colors">
-                                                            <res.icon className="w-5 h-5 text-[#2563EB]" />
-                                                        </div>
-                                                        <div className="flex-1 min-w-0">
-                                                            <h4 className="font-bold text-white text-[15px] group-hover:text-[#2563EB] transition-colors">{res.title}</h4>
-                                                            <p className="text-[12px] text-gray-500 mt-1">{res.desc}</p>
-                                                            <div className="flex items-center gap-3 mt-2">
-                                                                <span className="text-[11px] font-semibold text-[#2563EB]/80 flex items-center gap-1"><ExternalLink className="w-3 h-3" /> Open resource</span>
-                                                            </div>
-                                                        </div>
-                                                        <div className="px-3 py-1.5 rounded-lg text-[10px] font-bold bg-[#2563EB]/20 text-[#2563EB] border border-[#2563EB]/30 uppercase tracking-wider shrink-0">
-                                                            View
-                                                        </div>
-                                                    </div>
-                                                </CardContent>
-                                            </Card>
-                                        </a>
-                                    ))}
-                                </div>
-
-                                <Card className="bg-[#2563EB]/10 border-[#2563EB]/20">
-                                    <CardContent className="p-6 text-center">
-                                        <BookOpen className="w-8 h-8 text-[#2563EB] mx-auto mb-3" />
-                                        <h3 className="text-[15px] font-bold text-white mb-1">All resources open in a new tab</h3>
-                                        <p className="text-[13px] text-[#2563EB]">Each link opens the full reference or assignment with save/print options.</p>
-                                    </CardContent>
-                                </Card>
                             </div>
                         )}
 
