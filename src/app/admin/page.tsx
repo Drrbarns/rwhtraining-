@@ -34,16 +34,14 @@ async function getAdminData() {
 
     const paidApps = applications.filter((a: any) => a.payment_status === "PAID");
     const pendingPayments = applications.filter((a: any) => a.payment_status === "PENDING").length;
-    const filledSeats = enrollments.length;
-    const totalCapacity = cohort?.capacity || 10;
+    const realEnrollments = enrollments.filter((e: any) => e.applications?.email !== "teststudent@remoteworkhub.org");
+    const filledSeats = realEnrollments.length;
+    const totalCapacity = cohort?.capacity || 40;
     const totalWhoStarted = applications.length + unfinishedApps.length;
 
-    const conversionRate = totalWhoStarted > 0 ? ((paidApps.length / totalWhoStarted) * 100).toFixed(1) : "0";
+    const conversionRate = totalWhoStarted > 0 ? ((realEnrollments.length / totalWhoStarted) * 100).toFixed(1) : "0";
     const completionRate = totalWhoStarted > 0 ? ((applications.length / totalWhoStarted) * 100).toFixed(1) : "0";
 
-    // Revenue = sum of what students have actually paid (from enrollments — source of truth)
-    // Excludes test student account
-    const realEnrollments = enrollments.filter((e: any) => e.applications?.email !== "teststudent@remoteworkhub.org");
     const totalRevenue = realEnrollments.reduce((acc: number, e: any) => acc + Number(e.total_paid || 0), 0);
     const outstandingBalance = realEnrollments.reduce((acc: number, e: any) => acc + Number(e.balance_due || 0), 0);
 
@@ -77,7 +75,7 @@ async function getAdminData() {
         { stage: "Started Application", count: totalWhoStarted, color: "#94A3B8" },
         { stage: "Completed Form", count: applications.length, color: "#3B82F6" },
         { stage: "Payment Initiated", count: applications.filter((a: any) => a.payment_reference).length, color: "#8B5CF6" },
-        { stage: "Payment Confirmed", count: paidApps.length, color: "#10B981" },
+        { stage: "Payment Confirmed", count: realEnrollments.length, color: "#10B981" },
         { stage: "Enrolled & Active", count: enrollments.length, color: "#059669" },
     ];
 
@@ -119,7 +117,7 @@ async function getAdminData() {
         totalRevenue, pendingPayments, filledSeats, totalCapacity, totalWhoStarted,
         conversionRate, completionRate, outstandingBalance,
         revenueByDay, tierBreakdown, gatewayBreakdown, funnelData, recentActivity,
-        paidCount: paidApps.length, cohort,
+        paidCount: realEnrollments.length, cohort,
         analytics: { todayViews, weekViews, totalViews, topPages },
     };
 }
