@@ -201,14 +201,26 @@ export class MoolreAdapter {
                 };
             }
 
-            // Note: Replace with Moolre's accurate success status check if different
-            if (data.status === true || data.status === 1 || data?.data?.status === "successful") {
+            const innerStatus = data?.data?.status;
+            const innerPaidAt = data?.data?.paid_at;
+
+            if (
+                innerStatus === "successful" ||
+                innerStatus === "1" ||
+                (innerStatus === 1 && innerPaidAt)
+            ) {
                 return {
                     status: "SUCCESS",
                     message: data.message || "Payment verified successfully.",
                     data: data.data,
                 };
-            } else if (data.status === "pending" || data?.data?.status === "pending" || data.code === "PENDING") {
+            } else if (
+                innerStatus === "pending" ||
+                innerStatus === "0" ||
+                innerStatus === 0 ||
+                data.status === "pending" ||
+                data.code === "PENDING"
+            ) {
                 return {
                     status: "PENDING",
                     message: data.message || "Payment is still processing.",
