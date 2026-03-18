@@ -11,16 +11,24 @@ async function getApplicationsData() {
     if (!supabaseUrl || !supabaseServiceKey) return null;
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
-    const { data, error } = await supabase
-        .from("applications")
-        .select("*")
-        .order("created_at", { ascending: false });
+    const [appsRes, enrollmentsRes] = await Promise.all([
+        supabase.from("applications").select("*").order("created_at", { ascending: false }),
+        supabase.from("enrollments").select("application_id, applications(email)"),
+    ]);
 
-    if (error) return null;
+    if (appsRes.error) return null;
 
-    const all = data ?? [];
+    const all = appsRes.data ?? [];
+    const enrolledEmails = new Set(
+        (enrollmentsRes.data ?? [])
+            .map((e: any) => e.applications?.email?.toLowerCase())
+            .filter(Boolean)
+    );
+
     const applications = all.filter((a: any) => !a.is_unfinished);
-    const unfinishedApps = all.filter((a: any) => a.is_unfinished);
+    const unfinishedApps = all.filter((a: any) =>
+        a.is_unfinished && !enrolledEmails.has(a.email?.toLowerCase())
+    );
 
     return { applications, unfinishedApps };
 }

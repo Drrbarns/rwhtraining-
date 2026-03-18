@@ -13,19 +13,32 @@ async function getStudentsData() {
     if (!supabaseUrl || !supabaseServiceKey) return null;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const [enrollmentsRes, profilesRes] = await Promise.all([
+    const [enrollmentsRes, profilesRes, paymentsRes] = await Promise.all([
         supabase.from("enrollments").select("*, applications(*)"),
-        supabase.from("profiles").select("*").eq("role", "STUDENT")
+        supabase.from("profiles").select("*").eq("role", "STUDENT"),
+        supabase.from("payments").select("*").in("status", ["PAID", "SUCCESS", "REVERSED"]).order("created_at", { ascending: false }),
     ]);
 
     const enrollments = enrollmentsRes.data || [];
     const students = profilesRes.data || [];
+    const payments = paymentsRes.data || [];
+
+    // Get last sign-in times from auth users
+    const lastSignInMap: Record<string, string | null> = {};
+    try {
+        const { data: authData } = await supabase.auth.admin.listUsers({ perPage: 500 });
+        if (authData?.users) {
+            for (const u of authData.users) {
+                if (u.last_sign_in_at) lastSignInMap[u.id] = u.last_sign_in_at;
+            }
+        }
+    } catch {}
 
     const totalPaid = enrollments.reduce((acc: number, e: any) => acc + Number(e.total_paid || 0), 0);
     const totalBalance = enrollments.reduce((acc: number, e: any) => acc + Number(e.balance_due || 0), 0);
     const fullPayers = enrollments.filter((e: any) => Number(e.balance_due || 0) === 0).length;
 
-    return { enrollments, students, totalPaid, totalBalance, fullPayers };
+    return { enrollments, students, payments, lastSignInMap, totalPaid, totalBalance, fullPayers };
 }
 
 export default async function ActiveStudentsPage() {
@@ -70,7 +83,7 @@ export default async function ActiveStudentsPage() {
             </div>
 
             {/* Students Table (interactive) */}
-            <StudentsTable students={data.students} enrollments={data.enrollments} />
+            <StudentsTable students={data.students} enrollments={data.enrollments} payments={data.payments} lastSignInMap={data.lastSignInMap} />
         </div>
     );
 }
