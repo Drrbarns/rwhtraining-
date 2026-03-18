@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { createClient as createSupabaseBrowser, type User, type SupabaseClient } from "@supabase/supabase-js";
-import { LogOut, BookOpen, Clock, Loader2, ShieldCheck, ArrowRight, Play, FileText, Settings, Trophy, CreditCard, Mail, Phone, MapPin, Lock, ChevronRight, User as UserIcon, Banknote, Calendar, ExternalLink, Eye, EyeOff, Copy } from "lucide-react";
+import { LogOut, BookOpen, Clock, Loader2, ShieldCheck, ArrowRight, Play, FileText, Settings, Trophy, CreditCard, Mail, Phone, MapPin, Lock, ChevronRight, User as UserIcon, Banknote, Calendar, ExternalLink } from "lucide-react";
 import CurriculumTab from "./CurriculumTab";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -380,9 +380,6 @@ export default function StudentPortal() {
                                         <ChevronRight className="w-4 h-4 text-gray-600 ml-auto group-hover:text-purple-500 transition-colors" />
                                     </button>
                                 </div>
-
-                                {/* Cursor IDE Login — fully paid only */}
-                                {balanceDue === 0 && <CursorLoginCard />}
                             </div>
                         )}
 
@@ -582,13 +579,6 @@ export default function StudentPortal() {
                 )}
             </main>
 
-            {/* Cursor Login — also on curriculum tab for fully paid */}
-            {activeTab === "curriculum" && balanceDue === 0 && (
-                <div className="max-w-7xl mx-auto px-4 md:px-6 -mt-4 mb-8">
-                    <CursorLoginCard />
-                </div>
-            )}
-
             {/* Payment Method Modal */}
             {showPayModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => { setShowPayModal(false); setPayError(null); }}>
@@ -647,85 +637,5 @@ export default function StudentPortal() {
                 </div>
             )}
         </div>
-    );
-}
-
-function CursorLoginCard() {
-    const [showPassword, setShowPassword] = useState(false);
-    const cursorEmail = "Info@remoteworkhub.org";
-    const cursorPassword = "Allosparakletos@12";
-
-    function copyToClipboard(text: string, label: string) {
-        navigator.clipboard.writeText(text);
-        const el = document.getElementById("cursor-copy-toast");
-        if (el) {
-            el.textContent = `${label} copied!`;
-            el.classList.remove("opacity-0");
-            el.classList.add("opacity-100");
-            setTimeout(() => { el.classList.remove("opacity-100"); el.classList.add("opacity-0"); }, 1500);
-        }
-    }
-
-    return (
-        <Card className="bg-gradient-to-br from-[#1a1a2e] to-[#16213e] border-[#2563EB]/30 overflow-hidden relative">
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#2563EB] via-purple-500 to-[#2563EB]" />
-            <CardContent className="p-6">
-                <div className="flex items-start gap-4 mb-5">
-                    <div className="p-3 rounded-xl bg-[#2563EB]/20 border border-[#2563EB]/30 shrink-0">
-                        <svg viewBox="0 0 24 24" className="w-6 h-6 text-[#2563EB]" fill="currentColor">
-                            <path d="M3.5 5.5L12 2l8.5 3.5v5c0 5.25-3.5 10-8.5 12-5-2-8.5-6.75-8.5-12v-5z" opacity="0.2" />
-                            <path d="M12 2L3.5 5.5v5c0 5.25 3.5 10 8.5 12 5-2 8.5-6.75 8.5-12v-5L12 2zm0 2.18l6.5 2.68v3.64c0 4.28-2.72 8.2-6.5 9.82-3.78-1.62-6.5-5.54-6.5-9.82V6.86L12 4.18z" />
-                            <path d="M10 12l-2-2 1.41-1.41L10 9.17l3.59-3.58L15 7l-5 5z" />
-                        </svg>
-                    </div>
-                    <div className="flex-1">
-                        <h3 className="text-[16px] font-extrabold text-white">Cursor IDE — Your Coding Environment</h3>
-                        <p className="text-[13px] text-gray-400 mt-1">Use these credentials to log into Cursor IDE for the masterclass. <span className="text-amber-400 font-semibold">Do not share these credentials.</span></p>
-                    </div>
-                </div>
-
-                <div className="space-y-3">
-                    <div className="flex items-center gap-3 p-3.5 rounded-xl border border-white/10 bg-black/40">
-                        <Mail className="w-4 h-4 text-gray-500 shrink-0" />
-                        <div className="flex-1 min-w-0">
-                            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Email</p>
-                            <p className="text-[14px] font-bold text-white font-mono truncate">{cursorEmail}</p>
-                        </div>
-                        <button
-                            onClick={() => copyToClipboard(cursorEmail, "Email")}
-                            className="p-2 rounded-lg hover:bg-white/10 text-gray-500 hover:text-white transition-colors shrink-0"
-                        >
-                            <Copy className="w-4 h-4" />
-                        </button>
-                    </div>
-
-                    <div className="flex items-center gap-3 p-3.5 rounded-xl border border-white/10 bg-black/40">
-                        <Lock className="w-4 h-4 text-gray-500 shrink-0" />
-                        <div className="flex-1 min-w-0">
-                            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Password</p>
-                            <p className="text-[14px] font-bold text-white font-mono truncate">
-                                {showPassword ? cursorPassword : "••••••••••••••"}
-                            </p>
-                        </div>
-                        <button
-                            onClick={() => setShowPassword(!showPassword)}
-                            className="p-2 rounded-lg hover:bg-white/10 text-gray-500 hover:text-white transition-colors shrink-0"
-                        >
-                            {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                        </button>
-                        <button
-                            onClick={() => copyToClipboard(cursorPassword, "Password")}
-                            className="p-2 rounded-lg hover:bg-white/10 text-gray-500 hover:text-white transition-colors shrink-0"
-                        >
-                            <Copy className="w-4 h-4" />
-                        </button>
-                    </div>
-                </div>
-
-                <div id="cursor-copy-toast" className="mt-3 text-[12px] font-semibold text-emerald-400 text-center opacity-0 transition-opacity duration-300">
-                    Copied!
-                </div>
-            </CardContent>
-        </Card>
     );
 }
