@@ -5,8 +5,9 @@ import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { CreditCard, Search, Download, RefreshCw, Loader2, Filter, ChevronLeft, ChevronRight } from "lucide-react";
+import { CreditCard, Search, Download, RefreshCw, Loader2, Filter, ChevronLeft, ChevronRight, Undo2 } from "lucide-react";
 import { toast } from "sonner";
+import { voidManualPaymentAction } from "@/app/actions/admin-control";
 
 type Payment = {
     id: string;
@@ -33,6 +34,7 @@ export function PaymentsClient({ payments }: { payments: Payment[] }) {
     const [gatewayFilter, setGatewayFilter] = useState<string>("ALL");
     const [page, setPage] = useState(1);
     const [reconciling, setReconciling] = useState(false);
+    const [voidingId, setVoidingId] = useState<string | null>(null);
 
     const filtered = useMemo(() => {
         return payments.filter((p) => {
@@ -103,9 +105,23 @@ export function PaymentsClient({ payments }: { payments: Payment[] }) {
         toast.success(`Exported ${filtered.length} transactions`);
     };
 
+    const handleVoid = async (id: string) => {
+        if (!confirm("Void this manual/cash payment? The enrollment balance will be adjusted back.")) return;
+        setVoidingId(id);
+        const res = await voidManualPaymentAction(id);
+        setVoidingId(null);
+        if (res.success) { toast.success("Payment voided and balance adjusted"); router.refresh(); }
+        else toast.error(res.error || "Failed");
+    };
+
+    const isVoidable = (p: Payment) =>
+        (p.status === "PAID" || p.status === "SUCCESS") &&
+        (p.gateway === "manual" || p.network === "CASH");
+
     const statusColor = (s: string) => {
         if (s === "PAID" || s === "SUCCESS") return "bg-emerald-50 text-emerald-700 border-emerald-200/60";
         if (s === "PENDING") return "bg-amber-50 text-amber-700 border-amber-200/60";
+        if (s === "REVERSED") return "bg-slate-100 text-slate-500 border-slate-200/60";
         return "bg-red-50 text-red-700 border-red-200/60";
     };
 
@@ -155,7 +171,7 @@ export function PaymentsClient({ payments }: { payments: Payment[] }) {
                         </button>
                     ))}
                     <span className="w-px h-6 bg-slate-200 mx-1" />
-                    {["ALL", "moolre", "paystack"].map(g => (
+                    {["ALL", "moolre", "paystack", "manual"].map(g => (
                         <button
                             key={g}
                             onClick={() => { setGatewayFilter(g); setPage(1); }}
@@ -181,7 +197,8 @@ export function PaymentsClient({ payments }: { payments: Payment[] }) {
                                 <th className="text-left px-4 py-3 text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">Tier</th>
                                 <th className="text-right px-4 py-3 text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">Amount</th>
                                 <th className="text-center px-4 py-3 text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">Status</th>
-                                <th className="text-right px-6 py-3 text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">Date</th>
+                                <th className="text-right px-4 py-3 text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">Date</th>
+                                <th className="text-center px-4 py-3 text-[10px] font-extrabold text-slate-400 uppercase tracking-widest"></th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100/80">
@@ -198,7 +215,9 @@ export function PaymentsClient({ payments }: { payments: Payment[] }) {
                                     </td>
                                     <td className="px-4 py-4">
                                         <span className={`text-[10px] font-extrabold px-2.5 py-1 rounded-md uppercase tracking-widest ${
-                                            p.gateway === "paystack" ? "bg-indigo-50 text-indigo-700 border border-indigo-200/60" : "bg-amber-50 text-amber-700 border border-amber-200/60"
+                                            p.gateway === "paystack" ? "bg-indigo-50 text-indigo-700 border border-indigo-200/60" :
+                                            p.gateway === "manual" ? "bg-orange-50 text-orange-700 border border-orange-200/60" :
+                                            "bg-amber-50 text-amber-700 border border-amber-200/60"
                                         }`}>
                                             {p.gateway || "moolre"}
                                         </span>
@@ -210,14 +229,27 @@ export function PaymentsClient({ payments }: { payments: Payment[] }) {
                                             {p.status}
                                         </span>
                                     </td>
-                                    <td className="px-6 py-4 text-right text-[12px] font-medium text-slate-400">
+                                    <td className="px-4 py-4 text-right text-[12px] font-medium text-slate-400">
                                         {p.paid_at ? new Date(p.paid_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) :
                                          new Date(p.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                                    </td>
+                                    <td className="px-4 py-4 text-center">
+                                        {isVoidable(p) && p.status !== "REVERSED" && (
+                                            <button
+                                                onClick={() => handleVoid(p.id)}
+                                                disabled={voidingId === p.id}
+                                                className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-bold text-red-600 hover:bg-red-50 transition-colors"
+                                                title="Void this manual payment"
+                                            >
+                                                {voidingId === p.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <Undo2 className="w-3 h-3" />}
+                                                Void
+                                            </button>
+                                        )}
                                     </td>
                                 </tr>
                             )) : (
                                 <tr>
-                                    <td colSpan={7} className="text-center py-16 text-[13px] text-slate-400 font-medium">
+                                    <td colSpan={8} className="text-center py-16 text-[13px] text-slate-400 font-medium">
                                         {search || statusFilter !== "ALL" || gatewayFilter !== "ALL"
                                             ? "No transactions match your filters"
                                             : "No transactions recorded yet"}
