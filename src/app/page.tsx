@@ -52,7 +52,7 @@ export default function HomePage() {
     <div className="bg-white text-slate-900 overflow-x-hidden">
 
       {/* ─── HERO ─── */}
-      <section className="relative min-h-[90vh] md:min-h-screen bg-[#0a192f] flex items-center pt-24 pb-16 overflow-hidden">
+      <section className="relative min-h-[93vh] md:min-h-[99vh] bg-[#0a192f] flex items-center pt-20 pb-12 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <Image
             src="/hero_bg_dark.jpg"
@@ -61,48 +61,52 @@ export default function HomePage() {
             className="object-cover object-center"
             priority
           />
-          <div className="absolute inset-0 bg-black/40" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0a192f] via-transparent to-transparent opacity-90" />
+          <div className="absolute inset-0 bg-[#0a192f]/40 mix-blend-multiply" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0a192f]/80 via-[#0a192f]/60 to-transparent" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,_var(--tw-gradient-stops))] from-blue-600/20 via-blue-900/5 to-transparent" />
         </div>
 
-        <Container className="relative z-10 w-full flex items-center min-h-[70vh]">
+        <Container className="relative z-10 w-full flex items-center min-h-[71vh]">
           <div className="w-full max-w-2xl mr-auto">
-            <div className="space-y-8 flex flex-col items-start text-left w-full">
-              <motion.div variants={FADE_UP} className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-500/20 border border-blue-400/30 text-blue-200 text-xs font-semibold uppercase tracking-wider rounded-full backdrop-blur-sm font-jakarta">
-                <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
-                2026 Elite Masterclass · Only 10 Seats Available
+            <div className="space-y-6 flex flex-col items-start text-left w-full">
+              <motion.div variants={FADE_UP} className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-blue-500/10 border border-blue-400/20 text-blue-200 text-[11px] font-bold uppercase tracking-wider rounded-full backdrop-blur-md font-sans shadow-[0_0_20px_rgba(59,130,246,0.15)]">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                </span>
+                2026 Elite Masterclass · Only 10 Seats
               </motion.div>
 
               <motion.h1
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.1 }}
-                className="text-5xl md:text-6xl lg:text-[5rem] font-extrabold text-white tracking-tight leading-[1.1] font-jakarta"
+                className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-b from-white to-white/80 tracking-tight leading-[1.08] font-sans drop-shadow-sm"
               >
                 Become a Professional <br className="hidden md:block" />
-                <span className="text-blue-500">Web Developer</span>{" "}
-                &amp; Secure Your First Client in <span className="text-amber-400">30 Days.</span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-blue-500 to-indigo-400 drop-shadow-md">Web Developer</span>{" "}
+                <br className="hidden lg:block" />
+                &amp; Secure Your First Client in <span className="text-white drop-shadow-md">30 Days.</span>
               </motion.h1>
 
               <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.2 }}
-                className="text-lg md:text-xl text-slate-300 font-light leading-relaxed max-w-2xl font-jakarta"
+                className="text-base md:text-lg text-slate-300/90 font-light leading-relaxed max-w-xl font-sans"
               >
                 This isn&apos;t another tutorial hell. We engineer absolute beginners into high-value developers capable of building the complex systems that corporate clients exactly pay for.
               </motion.p>
 
-              <motion.div variants={FADE_UP} className="grid grid-cols-2 gap-y-4 gap-x-2 w-full max-w-lg pt-2 font-jakarta">
+              <motion.div variants={FADE_UP} className="flex flex-wrap gap-2.5 pt-1 w-full font-sans">
                 {[
                   { icon: CheckCircle2, text: "Diploma Certification", color: "text-blue-400" },
-                  { icon: Flame, text: "Top 2 Get Hired", color: "text-amber-400" },
-                  { icon: CheckCircle2, text: "First Client Guaranteed", color: "text-emerald-400" },
+                  { icon: Flame, text: "Top 2 Get Hired", color: "text-blue-400" },
                   { icon: CheckCircle2, text: "No Experience Required", color: "text-blue-400" },
                 ].map((item) => (
-                  <div key={item.text} className="flex items-center gap-2.5">
+                  <div key={item.text} className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-white/20 transition-colors backdrop-blur-md shadow-xl">
                     <item.icon className={`w-4 h-4 ${item.color} shrink-0`} />
-                    <span className="text-[13px] font-medium text-white">{item.text}</span>
+                    <span className="text-[13px] font-medium text-slate-200/90">{item.text}</span>
                   </div>
                 ))}
               </motion.div>
@@ -111,14 +115,17 @@ export default function HomePage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.3 }}
-                className="flex flex-col sm:flex-row items-center justify-start gap-6 pt-8 w-full font-jakarta"
+                className="flex flex-col sm:flex-row items-center justify-start gap-4 pt-5 w-full font-sans"
               >
-                <Link href="/apply" className="h-14 px-8 text-[15px] bg-blue-600 hover:bg-blue-500 text-white font-bold shadow-[0_0_30px_rgba(37,99,235,0.4)] transition-all duration-300 w-full sm:w-auto rounded-xl inline-flex items-center justify-center">
-                  Apply for the Masterclass <ArrowRight className="ml-2 w-5 h-5" />
+                <Link href="/apply" className="group relative h-14 px-8 text-[15px] bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-bold transition-all duration-300 w-full sm:w-auto rounded-xl inline-flex items-center justify-center overflow-hidden shadow-[0_0_40px_rgba(37,99,235,0.3)] hover:shadow-[0_0_60px_rgba(37,99,235,0.5)]">
+                  <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out"></div>
+                  <span className="relative flex items-center">
+                    Apply for the Masterclass <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </span>
                 </Link>
-                <div className="flex flex-col justify-center text-left">
-                  <span className="text-[11px] text-slate-400 font-bold uppercase tracking-widest mb-1">Program Fee</span>
-                  <span className="text-2xl font-black text-white leading-none tracking-tight">GHS 1,000</span>
+                <div className="flex flex-col justify-center text-left pl-2 sm:pl-6 sm:border-l border-white/10 h-12">
+                  <span className="text-[10px] text-blue-300 font-bold uppercase tracking-widest mb-1">Program Fee</span>
+                  <span className="text-2xl font-black text-white leading-none tracking-tight drop-shadow-md">GHS 1,000</span>
                 </div>
               </motion.div>
             </div>
@@ -555,7 +562,7 @@ export default function HomePage() {
       </section>
 
       {/* ─── FINAL CTA ─── */}
-      <section className="py-16 sm:py-20 bg-white relative">
+      <section className="py-10 sm:py-14 bg-white relative">
         <Container>
           <motion.div
             initial={{ opacity: 0, scale: 0.97 }}
@@ -571,7 +578,7 @@ export default function HomePage() {
 
             <div className="relative z-10 flex flex-col lg:flex-row items-stretch">
               {/* Left: CTA Content */}
-              <div className="flex-1 p-10 md:p-16 lg:p-20 flex flex-col justify-center">
+              <div className="flex-1 p-8 md:p-10 lg:p-12 flex flex-col justify-center">
                 <span className="inline-flex w-fit items-center px-4 py-1.5 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-300 text-[10px] font-bold tracking-widest uppercase mb-6">
                   Application Open Now
                 </span>
@@ -581,12 +588,12 @@ export default function HomePage() {
                   Starts{" "}
                   <span className="text-amber-400">March 16.</span>
                 </h2>
-                <p className="text-slate-400 text-base leading-relaxed mb-8 max-w-md">
+                <p className="text-slate-400 text-base leading-relaxed mb-6 max-w-md">
                   Certification, paid internship, your first paying client, and the chance to get hired —
                   all included. Limited seats per cohort to ensure elite-level training.
                 </p>
 
-                <div className="flex flex-wrap gap-4 mb-8 text-slate-400 text-sm font-medium">
+                <div className="flex flex-wrap gap-4 mb-6 text-slate-400 text-sm font-medium">
                   {[
                     { icon: MapPin, text: "Offline · Accra" },
                     { icon: Target, text: "First Client Guaranteed" },
@@ -600,12 +607,12 @@ export default function HomePage() {
                   ))}
                 </div>
 
-                <div className="bg-white/5 border border-white/10 rounded-2xl p-6 max-w-sm flex items-center justify-between gap-6 mb-6">
+                <div className="bg-white/5 border border-white/10 rounded-2xl p-5 max-w-sm flex items-center justify-between gap-5 mb-4">
                   <div>
                     <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">One-Time Fee</p>
-                    <p className="text-4xl font-black text-white">GHS 1,000</p>
+                    <p className="text-3xl font-black text-white">GHS 1,000</p>
                   </div>
-                  <Link href="/apply" className="flex items-center gap-2 h-14 px-7 bg-blue-600 text-white font-bold text-sm rounded-xl hover:bg-blue-700 transition-all hover:-translate-y-0.5 shadow-lg group shrink-0">
+                  <Link href="/apply" className="flex items-center gap-2 h-12 px-6 bg-blue-600 text-white font-bold text-sm rounded-xl hover:bg-blue-700 transition-all hover:-translate-y-0.5 shadow-lg group shrink-0">
                     Apply Now
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </Link>
@@ -624,7 +631,7 @@ export default function HomePage() {
               </div>
 
               {/* Right: Background Image Panel */}
-              <div className="w-full lg:w-[420px] relative min-h-[300px] lg:min-h-full">
+              <div className="w-full lg:w-[380px] relative min-h-[220px] lg:min-h-full">
                 <Image
                   src="/hero_bg_dark.jpg"
                   alt="Students coding at Doctor Barns Tech"

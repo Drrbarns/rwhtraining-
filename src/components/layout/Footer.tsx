@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight, MapPin, Phone, Globe, ShieldCheck } from "lucide-react";
 import { brand } from "@/lib/siteData";
 import { Container } from "./Container";
@@ -6,13 +7,6 @@ import { Container } from "./Container";
 export function Footer() {
   return (
     <footer className="bg-[#0a192f] text-white pt-20 pb-8 overflow-hidden relative">
-      {/* Background grid overlay */}
-      <div className="absolute inset-0 opacity-[0.03] pointer-events-none"
-        style={{
-          backgroundImage: "linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(to right, rgba(255,255,255,1) 1px, transparent 1px)",
-          backgroundSize: "34px 34px"
-        }}
-      />
       {/* Glow */}
       <div className="absolute -top-[300px] -right-[300px] w-[800px] h-[800px] bg-blue-600/5 rounded-full blur-[120px] pointer-events-none" />
 
@@ -22,14 +16,14 @@ export function Footer() {
           {/* Brand & CTA */}
           <div className="lg:col-span-5 space-y-8">
             <div>
-              <Link href="/" className="inline-flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-lg bg-blue-600 flex items-center justify-center">
-                  <ShieldCheck className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <div className="text-xl font-bold text-white">{brand.name}</div>
-                  <div className="text-[10px] text-slate-500 uppercase tracking-widest">by {brand.company}</div>
-                </div>
+              <Link href="/" className="inline-flex items-center mb-4">
+                <Image 
+                  src="/remote-logo.png" 
+                  alt="Remote Work Hub Logo" 
+                  width={160} 
+                  height={121} 
+                  className="h-14 w-auto object-contain"
+                />
               </Link>
               <p className="text-slate-400 font-light text-base max-w-sm leading-relaxed">
                 The premier Elite Web Development &amp; SaaS Masterclass in Ghana. We engineer beginners into highly capable developers, complete with a paid internship and professional certification.

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Menu, X, ArrowRight, Phone, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -44,29 +45,15 @@ export function Navbar() {
           <div className="flex items-center justify-between">
 
             {/* ── Logo ── */}
-            <Link href="/" className="relative z-50 flex items-center gap-3 group">
-              <div className={cn(
-                "w-9 h-9 rounded-lg flex items-center justify-center transition-all duration-300",
-                isScrolled || !isHome
-                  ? "bg-blue-600 text-white"
-                  : "bg-white/10 backdrop-blur-sm text-white border border-white/20"
-              )}>
-                <ShieldCheck className="w-5 h-5" />
-              </div>
-              <div className="flex flex-col">
-                <span className={cn(
-                  "text-[15px] font-bold tracking-tight leading-tight transition-colors duration-300",
-                  isScrolled || !isHome ? "text-slate-900" : "text-white"
-                )}>
-                  Remote Work Hub
-                </span>
-                <span className={cn(
-                  "text-[10px] font-medium tracking-[0.15em] uppercase leading-tight transition-colors duration-300",
-                  isScrolled || !isHome ? "text-slate-400" : "text-white/60"
-                )}>
-                  by Doctor Barns Tech
-                </span>
-              </div>
+            <Link href="/" className="relative z-50 flex items-center group">
+              <Image 
+                src="/remote-logo.png" 
+                alt="Remote Work Hub Logo" 
+                width={140} 
+                height={106} 
+                className="h-12 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+                priority
+              />
             </Link>
 
             {/* ── Desktop Navigation ── */}

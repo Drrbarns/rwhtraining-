@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { createClient as createSupabaseBrowser, type User, type SupabaseClient } from "@supabase/supabase-js";
+import Image from "next/image";
 import { LogOut, BookOpen, Clock, Loader2, ShieldCheck, ArrowRight, Play, FileText, Settings, Trophy, CreditCard, Mail, Phone, MapPin, Lock, ChevronRight, User as UserIcon, Banknote, Calendar, ExternalLink } from "lucide-react";
 import CurriculumTab from "./CurriculumTab";
 import { Button } from "@/components/ui/button";
@@ -173,7 +174,7 @@ export default function StudentPortal() {
                 <div className="w-full max-w-md space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700 relative z-10">
                     <div className="text-center">
                         <div className="w-16 h-16 bg-[#2563EB]/10 rounded-2xl border border-[#2563EB]/20 flex items-center justify-center mx-auto mb-6 shadow-[0_0_30px_rgba(37,99,235,0.15)]">
-                            <ShieldCheck className="w-8 h-8 text-[#2563EB]" />
+                            <Image src="/remote-logo.png" alt="Logo" width={40} height={30} className="w-10 h-auto object-contain" />
                         </div>
                         <h2 className="mt-6 text-3xl font-serif font-extrabold text-white tracking-tight">Student Portal</h2>
                         <p className="mt-2 text-sm text-gray-400">Sign in with the credentials sent to your email after payment.</p>
