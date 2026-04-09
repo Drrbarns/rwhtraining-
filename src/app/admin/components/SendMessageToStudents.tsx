@@ -14,7 +14,7 @@ const EMAIL_TEMPLATES = [
     {
         name: "Welcome Message",
         subject: "Welcome to the Masterclass — You're In!",
-        body: `Hi {{first_name}},\n\nWelcome to the Elite Web Development & SaaS Masterclass!\n\nYour seat is officially secured. Here are your next steps:\n\n1. Log into your student dashboard\n2. Review the prep materials\n3. Join our Discord community\n\nWe start on March 16, 2026. Get excited!\n\nBest,\nThe Remote Work Hub Team`,
+        body: `Hi {{first_name}},\n\nWelcome to the Elite Web Development & SaaS Masterclass!\n\nYour seat is officially secured. Here are your next steps:\n\n1. Log into your student dashboard\n2. Review the prep materials\n3. Join our Discord community\n\nWe start on April 20, 2026. Get excited!\n\nBest,\nThe Remote Work Hub Team`,
     },
     {
         name: "Payment Reminder",
@@ -24,7 +24,7 @@ const EMAIL_TEMPLATES = [
     {
         name: "Pre-Session Reminder",
         subject: "Masterclass Starts Tomorrow!",
-        body: `Hi {{first_name}},\n\nThe masterclass begins tomorrow! Make sure you've:\n\n✅ Set up your development environment\n✅ Downloaded the prep materials\n✅ Joined the Discord community\n✅ Cleared your schedule for the next 30 days\n\nSee you there!\n\nBest,\nThe Remote Work Hub Team`,
+        body: `Hi {{first_name}},\n\nThe masterclass begins tomorrow! Make sure you've:\n\n✅ Set up your development environment\n✅ Downloaded the prep materials\n✅ Joined the Discord community\n✅ Cleared your schedule for the next 6 weeks\n\nSee you there!\n\nBest,\nThe Remote Work Hub Team`,
     },
 ];
 

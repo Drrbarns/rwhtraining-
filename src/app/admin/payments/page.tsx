@@ -3,44 +3,67 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { CreditCard, Banknote, Clock, AlertTriangle, CheckCircle2, XCircle } from "lucide-react";
 import { PaymentsClient } from "./PaymentsClient";
 import { RecordCashPayment } from "./RecordCashPayment";
+import { computeEnrollmentMoneyStats, filterRealEnrollments } from "@/lib/admin-metrics";
+import {
+    filterByCohortId,
+    getActiveCohortId,
+    normalizeCohortFilter,
+    resolveCohortScopeId,
+    type CohortFilterValue,
+} from "@/lib/admin-cohort";
+import { CohortScopePicker } from "@/components/admin/CohortScopePicker";
 
 export const revalidate = 0;
 
-async function getPaymentsData() {
+async function getPaymentsData(cohortFilter: CohortFilterValue) {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseServiceKey = process.env.NEXT_PUBLIC_SUPABASE_SERVICE_KEY;
 
     if (!supabaseUrl || !supabaseServiceKey) return null;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const [paymentsRes, enrollmentsRes] = await Promise.all([
+    const [paymentsRes, enrollmentsRes, appsRes, cohortsRes] = await Promise.all([
         supabase.from("payments").select("*").order("created_at", { ascending: false }),
-        supabase.from("enrollments").select("*, applications(*)")
+        supabase.from("enrollments").select("*, applications(*)"),
+        supabase.from("applications").select("id, cohort_id, payment_reference"),
+        supabase.from("cohorts").select("*").order("start_date", { ascending: false }),
     ]);
 
     const payments = paymentsRes.data || [];
-    const enrollments = enrollmentsRes.data || [];
+    const allEnrollments = enrollmentsRes.data || [];
+    const applications = appsRes.data || [];
+    const cohorts = cohortsRes.data || [];
+    const activeCohortId = getActiveCohortId(cohorts);
+    const scopeCohortId = resolveCohortScopeId(cohortFilter, activeCohortId);
 
-    const paid = payments.filter((p: any) => p.status === "PAID" || p.status === "SUCCESS");
+    const enrollments = filterByCohortId(allEnrollments, scopeCohortId);
+    const scopedApplications = filterByCohortId(applications, scopeCohortId);
+    const appIds = new Set(scopedApplications.map((app: any) => app.id));
+    const paymentRefs = new Set(scopedApplications.map((app: any) => app.payment_reference).filter(Boolean));
+    const scopedPayments = payments.filter((payment: any) => {
+        if (payment.application_id && appIds.has(payment.application_id)) return true;
+        if (payment.reference && paymentRefs.has(payment.reference)) return true;
+        return false;
+    });
+
     // Only count initial (not balance) PENDING payments — balance PENDING are abandoned button clicks
-    const pending = payments.filter((p: any) => p.status === "PENDING" && (!p.payment_type || p.payment_type === "initial"));
-    const failed = payments.filter((p: any) => p.status === "FAILED" || p.status === "CANCELLED");
+    const pending = scopedPayments.filter((p: any) => p.status === "PENDING" && (!p.payment_type || p.payment_type === "initial"));
+    const failed = scopedPayments.filter((p: any) => p.status === "FAILED" || p.status === "CANCELLED");
 
-    // Total Collected = what students have actually paid per enrollment records (source of truth)
-    // This includes manually approved students who paid outside the gateway
-    const realEnrollments = enrollments.filter((e: any) => e.applications?.email !== "teststudent@remoteworkhub.org");
-    const totalCollected = realEnrollments.reduce((acc: number, e: any) => acc + Number(e.total_paid || 0), 0);
+    const realEnrollments = filterRealEnrollments(enrollments);
+    const money = computeEnrollmentMoneyStats(realEnrollments);
     const totalPending = pending.reduce((acc: number, p: any) => acc + Number(p.amount_ghs || 0), 0);
-    const outstandingBalance = realEnrollments.reduce((acc: number, e: any) => acc + Number(e.balance_due || 0), 0);
 
     return {
-        payments,
+        payments: scopedPayments,
         enrollments: realEnrollments,
+        cohorts,
+        activeCohortId,
         stats: {
-            totalCollected,
+            totalCollected: money.totalCollected,
             totalPending,
-            outstandingBalance,
-            paidCount: realEnrollments.length,
+            outstandingBalance: money.outstandingBalance,
+            paidCount: money.enrolledCount,
             pendingCount: pending.length,
             failedCount: failed.length,
             totalTransactions: payments.length,
@@ -48,17 +71,22 @@ async function getPaymentsData() {
     };
 }
 
-export default async function PaymentsPage() {
-    const data = await getPaymentsData();
+export default async function PaymentsPage({
+    searchParams,
+}: {
+    searchParams?: Promise<{ cohort?: string }>;
+}) {
+    const params = (await searchParams) || {};
+    const data = await getPaymentsData(normalizeCohortFilter(params.cohort));
 
     if (!data) {
         return <div className="p-10 text-slate-900 font-bold">Error loading payments data.</div>;
     }
 
     const statCards = [
-        { title: "Total Collected", value: `GHS ${data.stats.totalCollected.toLocaleString()}`, desc: `${data.stats.paidCount} enrolled students`, icon: Banknote, color: "emerald" },
-        { title: "Pending", value: `GHS ${data.stats.totalPending.toLocaleString()}`, desc: `${data.stats.pendingCount} awaiting confirmation`, icon: Clock, color: "amber" },
-        { title: "Outstanding Balance", value: `GHS ${data.stats.outstandingBalance.toLocaleString()}`, desc: "From partial-payment students", icon: AlertTriangle, color: "orange" },
+        { title: "Total Collected", value: `GHS ${data.stats.totalCollected.toLocaleString()}`, desc: `${data.stats.paidCount} enrolled records (enrollment-based)`, icon: Banknote, color: "emerald" },
+        { title: "Pending Checkouts", value: `GHS ${data.stats.totalPending.toLocaleString()}`, desc: `${data.stats.pendingCount} initial checkout attempts`, icon: Clock, color: "amber" },
+        { title: "Outstanding Balance", value: `GHS ${data.stats.outstandingBalance.toLocaleString()}`, desc: "Enrollment balances still due", icon: AlertTriangle, color: "orange" },
         { title: "Failed", value: data.stats.failedCount.toString(), desc: "Failed or cancelled", icon: XCircle, color: "red" },
     ];
 
@@ -69,6 +97,7 @@ export default async function PaymentsPage() {
                     <h1 className="text-3xl md:text-[42px] font-extrabold tracking-tight text-slate-900 leading-none">Finance & Payments</h1>
                     <p className="text-slate-500 text-[15px] font-medium">Complete transaction ledger across all payment gateways.</p>
                 </div>
+                <CohortScopePicker cohorts={data.cohorts} activeCohortId={data.activeCohortId} />
             </div>
 
             {/* Stats Row */}

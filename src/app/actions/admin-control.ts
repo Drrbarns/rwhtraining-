@@ -4,8 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 import { createClient as createServerSupabase } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 import { onboardPaidStudent } from "@/lib/onboard-paid-student";
-
-const COURSE_TOTAL_GHS = 1000;
+import { COURSE_TOTAL_GHS, tierInitialAmountGhs } from "@/lib/pricing";
 
 async function getServiceAndAdminId(): Promise<{
     supabase: any;
@@ -119,7 +118,7 @@ export async function markApplicationPaidNoOnboardAction(applicationId: string) 
         first_name: app.first_name,
         last_name: app.last_name,
         network: "MANUAL",
-        amount_ghs: app.amount_ghs ?? 500,
+        amount_ghs: app.amount_ghs ?? tierInitialAmountGhs(app.tier || "50"),
         tier: app.tier || "50",
         gateway: "manual",
         payment_type: "mark_paid_only",

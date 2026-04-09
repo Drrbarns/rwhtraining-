@@ -6,10 +6,20 @@ import { createClient } from "@supabase/supabase-js";
 import { ExportReportButton, OpenRegistrationsButton } from "./ClientButtons";
 import { SendMessageToStudents } from "./components/SendMessageToStudents";
 import { RevenueChart, TierPieChart, GatewayPieChart, FunnelChart } from "./components/DashboardCharts";
+import { computeEnrollmentMoneyStats, filterRealEnrollments } from "@/lib/admin-metrics";
+import { splitApplicationsForAdmin } from "@/lib/admin-applications";
+import {
+    filterByCohortId,
+    getActiveCohortId,
+    normalizeCohortFilter,
+    resolveCohortScopeId,
+    type CohortFilterValue,
+} from "@/lib/admin-cohort";
+import { CohortScopePicker } from "@/components/admin/CohortScopePicker";
 
 export const revalidate = 0;
 
-async function getAdminData() {
+async function getAdminData(cohortFilter: CohortFilterValue) {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseServiceKey = process.env.NEXT_PUBLIC_SUPABASE_SERVICE_KEY;
 
@@ -21,32 +31,53 @@ async function getAdminData() {
         supabase.from("enrollments").select("*, applications(*)"),
         supabase.from("profiles").select("*").eq("role", "STUDENT"),
         supabase.from("payments").select("*").order("created_at", { ascending: false }),
-        supabase.from("cohorts").select("*").eq("is_active", true).limit(1).single()
+        supabase.from("cohorts").select("*").order("start_date", { ascending: false })
     ]);
 
     const allApps = appsRes.data || [];
-    const applications = allApps.filter((a: any) => !a.is_unfinished);
-    const unfinishedApps = allApps.filter((a: any) => a.is_unfinished);
-    const enrollments = enrollmentsRes.data || [];
+    const allEnrollments = enrollmentsRes.data || [];
+    const cohorts = cohortsRes.data || [];
+    const activeCohortId = getActiveCohortId(cohorts);
+    const scopeCohortId = resolveCohortScopeId(cohortFilter, activeCohortId);
+    const scopedApps = filterByCohortId(allApps, scopeCohortId);
+    const enrollments = filterByCohortId(allEnrollments, scopeCohortId);
+    const grouped = splitApplicationsForAdmin(scopedApps, enrollments);
+    const applications = grouped.completedApplications;
+    const unfinishedApps = grouped.abandonedDrafts;
     const students = profilesRes.data || [];
     const payments = paymentsRes.data || [];
-    const cohort = cohortsRes.data;
+    const cohort = cohorts.find((c: any) => c.id === scopeCohortId) || cohorts.find((c: any) => c.is_active);
 
     const paidApps = applications.filter((a: any) => a.payment_status === "PAID");
     const pendingPayments = applications.filter((a: any) => a.payment_status === "PENDING").length;
-    const realEnrollments = enrollments.filter((e: any) => e.applications?.email !== "teststudent@remoteworkhub.org");
-    const filledSeats = realEnrollments.length;
+    const realEnrollments = filterRealEnrollments(enrollments);
+    const enrollmentMoney = computeEnrollmentMoneyStats(realEnrollments);
+    const filledSeats = enrollmentMoney.enrolledCount;
     const totalCapacity = cohort?.capacity || 40;
     const totalWhoStarted = applications.length + unfinishedApps.length;
 
     const conversionRate = totalWhoStarted > 0 ? ((realEnrollments.length / totalWhoStarted) * 100).toFixed(1) : "0";
     const completionRate = totalWhoStarted > 0 ? ((applications.length / totalWhoStarted) * 100).toFixed(1) : "0";
 
-    const totalRevenue = realEnrollments.reduce((acc: number, e: any) => acc + Number(e.total_paid || 0), 0);
-    const outstandingBalance = realEnrollments.reduce((acc: number, e: any) => acc + Number(e.balance_due || 0), 0);
+    const totalRevenue = enrollmentMoney.totalCollected;
+    const outstandingBalance = enrollmentMoney.outstandingBalance;
 
     const revenueByDay: { date: string; amount: number }[] = [];
-    const paidPayments = payments.filter((p: any) => p.status === "PAID" || p.status === "SUCCESS");
+    const appIds = new Set(scopedApps.map((app: any) => app.id));
+    const paymentRefs = new Set(
+        scopedApps.map((app: any) => app.payment_reference).filter(Boolean)
+    );
+    const scopedPayments = payments.filter((payment: any) => {
+        if (payment.application_id && appIds.has(payment.application_id)) return true;
+        if (payment.reference && paymentRefs.has(payment.reference)) return true;
+        return false;
+    });
+
+    const paidPayments = scopedPayments.filter(
+        (p: any) =>
+            (p.status === "PAID" || p.status === "SUCCESS") &&
+            p.email?.toLowerCase() !== "teststudent@remoteworkhub.org"
+    );
     const dayMap = new Map<string, number>();
     paidPayments.forEach((p: any) => {
         const date = new Date(p.paid_at || p.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" });
@@ -59,9 +90,9 @@ async function getAdminData() {
     const tier50 = paidApps.filter((a: any) => a.tier === "50");
     const tier100 = paidApps.filter((a: any) => a.tier === "100");
     const tierBreakdown = [
-        { name: "20% Deposit (GHS 200)", value: tier20.length, amount: tier20.reduce((s: number, a: any) => s + Number(a.amount_ghs || 0), 0) },
-        { name: "50% Deposit (GHS 500)", value: tier50.length, amount: tier50.reduce((s: number, a: any) => s + Number(a.amount_ghs || 0), 0) },
-        { name: "Full Payment (GHS 1000)", value: tier100.length, amount: tier100.reduce((s: number, a: any) => s + Number(a.amount_ghs || 0), 0) },
+        { name: "20% Deposit (GHS 440)", value: tier20.length, amount: tier20.reduce((s: number, a: any) => s + Number(a.amount_ghs || 0), 0) },
+        { name: "50% Deposit (GHS 1,100)", value: tier50.length, amount: tier50.reduce((s: number, a: any) => s + Number(a.amount_ghs || 0), 0) },
+        { name: "Full Payment (GHS 2,200)", value: tier100.length, amount: tier100.reduce((s: number, a: any) => s + Number(a.amount_ghs || 0), 0) },
     ];
 
     const moolrePayments = paidPayments.filter((p: any) => p.gateway === "moolre").length;
@@ -75,8 +106,8 @@ async function getAdminData() {
         { stage: "Started Application", count: totalWhoStarted, color: "#94A3B8" },
         { stage: "Completed Form", count: applications.length, color: "#3B82F6" },
         { stage: "Payment Initiated", count: applications.filter((a: any) => a.payment_reference).length, color: "#8B5CF6" },
-        { stage: "Payment Confirmed", count: realEnrollments.length, color: "#10B981" },
-        { stage: "Enrolled & Active", count: enrollments.length, color: "#059669" },
+        { stage: "Payment Confirmed", count: applications.filter((a: any) => a.payment_status === "PAID").length, color: "#10B981" },
+        { stage: "Enrolled", count: realEnrollments.length, color: "#059669" },
     ];
 
     const recentActivity = allApps.slice(0, 8).map((app: any) => ({
@@ -113,17 +144,22 @@ async function getAdminData() {
         .map(([path, views]) => ({ path, views }));
 
     return {
-        applications, unfinishedApps, enrollments, students, payments,
+        applications, unfinishedApps, enrollments, students, payments: scopedPayments,
         totalRevenue, pendingPayments, filledSeats, totalCapacity, totalWhoStarted,
         conversionRate, completionRate, outstandingBalance,
         revenueByDay, tierBreakdown, gatewayBreakdown, funnelData, recentActivity,
-        paidCount: realEnrollments.length, cohort,
+        paidCount: enrollmentMoney.enrolledCount, cohort, cohorts, activeCohortId, scopeCohortId,
         analytics: { todayViews, weekViews, totalViews, topPages },
     };
 }
 
-export default async function AdminDashboardPage() {
-    const data = await getAdminData();
+export default async function AdminDashboardPage({
+    searchParams,
+}: {
+    searchParams?: Promise<{ cohort?: string }>;
+}) {
+    const params = (await searchParams) || {};
+    const data = await getAdminData(normalizeCohortFilter(params.cohort));
 
     if (!data) return <div className="p-10 text-slate-900 font-bold">Error: Supabase config missing.</div>;
 
@@ -132,7 +168,7 @@ export default async function AdminDashboardPage() {
         { title: "Total Leads", value: data.totalWhoStarted.toString(), desc: "All who started", icon: Users, color: "text-blue-600", bg: "bg-blue-50/50", border: "border-blue-100/50", trend: null },
         { title: "Completed", value: data.applications.length.toString(), desc: `${data.completionRate}% completion rate`, icon: Target, color: "text-indigo-600", bg: "bg-indigo-50/50", border: "border-indigo-100/50", trend: "up" },
         { title: "Enrolled", value: `${data.filledSeats} / ${data.totalCapacity}`, desc: `${data.totalCapacity - data.filledSeats} seats left`, icon: GraduationCap, color: "text-amber-600", bg: "bg-amber-50/50", border: "border-amber-100/50", trend: "up" },
-        { title: "Revenue", value: `GHS ${data.totalRevenue.toLocaleString()}`, desc: `${data.paidCount} paid students`, icon: Banknote, color: "text-emerald-600", bg: "bg-emerald-50/50", border: "border-emerald-100/50", trend: "up" },
+        { title: "Revenue", value: `GHS ${data.totalRevenue.toLocaleString()}`, desc: `${data.paidCount} enrollments (enrollment-based)`, icon: Banknote, color: "text-emerald-600", bg: "bg-emerald-50/50", border: "border-emerald-100/50", trend: "up" },
     ];
 
     return (
@@ -150,7 +186,8 @@ export default async function AdminDashboardPage() {
                     <h1 className="text-3xl md:text-[42px] font-extrabold tracking-tight text-slate-900 leading-none">Mission Control</h1>
                     <p className="text-slate-500 text-[15px] font-medium max-w-lg">Real-time analytics, student pipeline, and revenue intelligence.</p>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 flex-wrap">
+                    <CohortScopePicker cohorts={data.cohorts} activeCohortId={data.activeCohortId} />
                     <ExportReportButton applications={data.applications} />
                     <OpenRegistrationsButton />
                 </div>
@@ -184,10 +221,10 @@ export default async function AdminDashboardPage() {
                     <CardContent className="p-6 flex flex-col justify-between h-full">
                         <div className="flex items-center gap-2 mb-4">
                             <Zap className="w-5 h-5 text-blue-200" />
-                            <span className="text-[11px] font-bold uppercase tracking-widest text-blue-200">Conversion Rate</span>
+                            <span className="text-[11px] font-bold uppercase tracking-widest text-blue-200">Lead to Enrollment Rate</span>
                         </div>
                         <div className="text-4xl font-extrabold tracking-tight">{data.conversionRate}%</div>
-                        <p className="text-[12px] font-medium text-blue-200 mt-2">Started → Paid conversion</p>
+                        <p className="text-[12px] font-medium text-blue-200 mt-2">Started applications → enrolled records</p>
                     </CardContent>
                 </Card>
                 <Card className="bg-gradient-to-br from-amber-500 to-orange-600 border-0 rounded-2xl overflow-hidden text-white shadow-[0_8px_30px_-4px_rgba(245,158,11,0.3)]">
@@ -197,17 +234,17 @@ export default async function AdminDashboardPage() {
                             <span className="text-[11px] font-bold uppercase tracking-widest text-amber-200">Outstanding Balance</span>
                         </div>
                         <div className="text-4xl font-extrabold tracking-tight">GHS {data.outstandingBalance.toLocaleString()}</div>
-                        <p className="text-[12px] font-medium text-amber-200 mt-2">From partial payment students</p>
+                        <p className="text-[12px] font-medium text-amber-200 mt-2">Enrollment balances still due</p>
                     </CardContent>
                 </Card>
                 <Card className="bg-gradient-to-br from-emerald-500 to-teal-600 border-0 rounded-2xl overflow-hidden text-white shadow-[0_8px_30px_-4px_rgba(16,185,129,0.3)]">
                     <CardContent className="p-6 flex flex-col justify-between h-full">
                         <div className="flex items-center gap-2 mb-4">
                             <Activity className="w-5 h-5 text-emerald-200" />
-                            <span className="text-[11px] font-bold uppercase tracking-widest text-emerald-200">Pending Payments</span>
+                            <span className="text-[11px] font-bold uppercase tracking-widest text-emerald-200">Payments Pending (Apps)</span>
                         </div>
                         <div className="text-4xl font-extrabold tracking-tight">{data.pendingPayments}</div>
-                        <p className="text-[12px] font-medium text-emerald-200 mt-2">Awaiting payment confirmation</p>
+                        <p className="text-[12px] font-medium text-emerald-200 mt-2">Completed applications awaiting payment</p>
                     </CardContent>
                 </Card>
             </div>
@@ -221,7 +258,7 @@ export default async function AdminDashboardPage() {
                             <div className="p-1.5 rounded-lg bg-blue-50 text-blue-600"><Banknote className="w-4 h-4" /></div>
                             Revenue Over Time
                         </CardTitle>
-                        <CardDescription className="text-slate-500 text-[13px] font-medium">Daily revenue from confirmed payments</CardDescription>
+                        <CardDescription className="text-slate-500 text-[13px] font-medium">Daily paid transactions (ledger view)</CardDescription>
                     </CardHeader>
                     <CardContent className="px-6 pb-6">
                         <RevenueChart data={data.revenueByDay} />
@@ -344,7 +381,7 @@ export default async function AdminDashboardPage() {
                     <CardContent className="p-4 space-y-3">
                         {[
                             { href: "/admin/applications", label: "Applications", desc: `${data.applications.length} submitted`, icon: Users, color: "blue" },
-                            { href: "/admin/drafts", label: "Abandoned Drafts", desc: `${data.unfinishedApps.length} leads`, icon: AlertCircle, color: "red" },
+                            { href: "/admin/drafts", label: "Abandoned Drafts", desc: `${data.unfinishedApps.length} contactable (not enrolled)`, icon: AlertCircle, color: "red" },
                             { href: "/admin/students", label: "Active Students", desc: `${data.filledSeats} enrolled`, icon: GraduationCap, color: "amber" },
                             { href: "/admin/payments", label: "Payment Ledger", desc: `${data.payments.length} transactions`, icon: CreditCard, color: "emerald" },
                         ].map((action) => (

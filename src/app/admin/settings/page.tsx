@@ -64,9 +64,9 @@ export default async function SettingsPage() {
                 <CardContent className="px-6 pb-6">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         {[
-                            { tier: "20%", amount: "GHS 200", desc: "Deposit — secures seat", color: "blue" },
-                            { tier: "50%", amount: "GHS 500", desc: "Half payment — popular", color: "purple" },
-                            { tier: "100%", amount: "GHS 1,000", desc: "Full payment — all access", color: "emerald" },
+                            { tier: "20%", amount: "GHS 440", desc: "Deposit — secures seat", color: "blue" },
+                            { tier: "50%", amount: "GHS 1,100", desc: "Half payment — popular", color: "purple" },
+                            { tier: "100%", amount: "GHS 2,200", desc: "Full payment — all access", color: "emerald" },
                         ].map((t) => (
                             <div key={t.tier} className={`p-5 rounded-xl border border-${t.color}-200/60 bg-${t.color}-50/30`}>
                                 <div className="flex items-center justify-between mb-3">

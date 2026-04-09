@@ -294,7 +294,7 @@ export default function CurriculumPage() {
                   { label: "Location", value: "111 Newtown RD, Accra Newtown" },
                   { label: "Cohort Start", value: brand.cohort.startDate },
                   { label: "Program End", value: "May 31, 2026 (approx.)" },
-                  { label: "Internship", value: "June 2026 — 1 Month Paid" },
+                  { label: "Internship", value: "June 2026 — 6 Weeks Paid" },
                 ].map((item) => (
                   <div key={item.label} className="flex items-center justify-between p-4 rounded-xl bg-slate-50 border border-slate-200">
                     <span className="text-slate-600 text-sm font-medium">{item.label}</span>

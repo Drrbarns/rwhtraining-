@@ -272,7 +272,7 @@ export const EMAIL_TEMPLATES = {
         <a href="{{login_url}}" class="btn btn-primary" style="display: inline-block; background: ${BRAND_COLOR}; color: #ffffff; padding: 15px 36px; border-radius: 12px; text-decoration: none; font-weight: 700; font-size: 14px;">Access Your Dashboard &rarr;</a>
       </div>
       
-      <p style="font-size: 13px; color: #94a3b8; text-align: center;">We start on <strong style="color: #64748b;">March 16, 2026</strong>. Get ready to build something incredible.</p>
+      <p style="font-size: 13px; color: #94a3b8; text-align: center;">We start on <strong style="color: #64748b;">April 20, 2026</strong>. Get ready to build something incredible.</p>
     </div>
     `, "Your seat is secured! Welcome to the Elite Web Development Masterclass."),
   },
@@ -359,7 +359,7 @@ export const EMAIL_TEMPLATES = {
         <a href="{{login_url}}" class="btn btn-primary" style="display: inline-block; background: ${BRAND_COLOR}; color: #ffffff; padding: 15px 36px; border-radius: 12px; text-decoration: none; font-weight: 700; font-size: 14px;">Go to Your Dashboard &rarr;</a>
       </div>
 
-      <p style="font-size: 13px; color: #94a3b8; text-align: center;">We start on <strong style="color: #64748b;">March 16, 2026</strong>. See you there!</p>
+      <p style="font-size: 13px; color: #94a3b8; text-align: center;">We start on <strong style="color: #64748b;">April 20, 2026</strong>. See you there!</p>
     </div>
     `, "Your payment is confirmed! Log in with your existing credentials."),
   },
@@ -389,7 +389,7 @@ export const EMAIL_TEMPLATES = {
           <tr>
             <td style="padding-top: 12px;">
               <span style="font-size: 38px; font-weight: 900; color: #d97706; letter-spacing: -1px;">GHS {{balance}}</span>
-              <p style="margin: 8px 0 0; font-size: 13px; color: #92400e;">of GHS 1,000 total masterclass fee</p>
+              <p style="margin: 8px 0 0; font-size: 13px; color: #92400e;">of GHS 2,200 total masterclass fee</p>
             </td>
           </tr>
         </table>
@@ -417,7 +417,7 @@ export const EMAIL_TEMPLATES = {
       <h2>You were so close, {{first_name}}!</h2>
       <p>We noticed you started your application for the <strong>Elite Web Development &amp; SaaS Masterclass</strong> but didn't finish. Life gets busy &mdash; we get it.</p>
 
-      <p>But here's the thing: this isn't just another course. In 30 days, you'll:</p>
+      <p>But here's the thing: this isn't just another course. In 6 weeks, you'll:</p>
 
       <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin: 16px 0;">
         <tr>
@@ -449,7 +449,7 @@ export const EMAIL_TEMPLATES = {
       <div class="card card-gradient" style="text-align: center; background: linear-gradient(135deg, #eff6ff 0%, #f5f3ff 50%, #fef3c7 100%); border: none; border-radius: 16px; padding: 28px; margin: 24px 0;">
         <p style="font-size: 12px; font-weight: 700; color: ${BRAND_COLOR}; text-transform: uppercase; letter-spacing: 1.5px; margin: 0 0 8px;">Limited Seats Available</p>
         <p style="font-size: 28px; font-weight: 900; color: #0f172a; margin: 0; letter-spacing: -0.5px;">Only a few spots left</p>
-        <p style="color: #64748b; margin: 8px 0 0; font-size: 14px;">Start with just <strong>GHS 200</strong> (20% deposit)</p>
+        <p style="color: #64748b; margin: 8px 0 0; font-size: 14px;">Start with just <strong>GHS 440</strong> (20% deposit)</p>
       </div>
 
       <div style="text-align: center; margin: 32px 0 16px;">
@@ -508,7 +508,7 @@ export const EMAIL_TEMPLATES = {
           <td style="padding: 12px 0; vertical-align: top; width: 40px;">
             <div style="width: 26px; height: 26px; background: #ecfdf5; border-radius: 50%; text-align: center; line-height: 26px; color: #059669; font-size: 14px;">&#10003;</div>
           </td>
-          <td style="padding: 12px 0 12px 14px; font-size: 15px; color: #334155;"><strong>Schedule cleared</strong> for the next 30 days</td>
+          <td style="padding: 12px 0 12px 14px; font-size: 15px; color: #334155;"><strong>Schedule cleared</strong> for the next 6 weeks</td>
         </tr>
       </table>
 
@@ -632,14 +632,14 @@ export const EMAIL_TEMPLATES = {
         </table>
       </div>
 
-      <p>This isn't theory. This is 30 days of building real products with real deadlines and real outcomes.</p>
+      <p>This isn't theory. This is 6 weeks of building real products with real deadlines and real outcomes.</p>
       
       <div style="text-align: center; margin: 32px 0 16px;">
         <a href="{{login_url}}" class="btn btn-primary" style="display: inline-block; background: ${BRAND_COLOR}; color: #ffffff; padding: 15px 36px; border-radius: 12px; text-decoration: none; font-weight: 700; font-size: 14px;">Apply Now &rarr;</a>
       </div>
 
       <div class="divider" style="height: 1px; background: linear-gradient(to right, transparent, #e2e8f0, transparent); margin: 28px 0;"></div>
-      <p style="font-size: 13px; color: #94a3b8; text-align: center;">Start with just <strong>GHS 200</strong> (20% deposit) to secure your seat.</p>
+      <p style="font-size: 13px; color: #94a3b8; text-align: center;">Start with just <strong>GHS 440</strong> (20% deposit) to secure your seat.</p>
     </div>
     `, "The masterclass is still open. Your journey to becoming a professional web developer starts here."),
   },
@@ -671,7 +671,7 @@ export const SMS_TEMPLATES = {
     name: "Abandoned Application SMS",
     category: "retarget",
     variables: ["first_name"],
-    body: `Hi {{first_name}}, you started your Remote Work Hub Masterclass application but didn't finish. Seats are limited! Complete it now and start with just GHS 200. Visit remoteworkhub.org/apply - Remote Work Hub`,
+    body: `Hi {{first_name}}, you started your Remote Work Hub Masterclass application but didn't finish. Seats are limited! Complete it now and start with just GHS 440. Visit remoteworkhub.org/apply - Remote Work Hub`,
   },
   welcome_sms: {
     name: "Welcome SMS",

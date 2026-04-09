@@ -1,4 +1,7 @@
+import { COURSE_TOTAL_GHS } from "@/lib/pricing";
+
 const APP_URL = "https://remoteworkhub.org";
+const FEE_STRING = String(COURSE_TOTAL_GHS);
 
 const organizationSchema = {
   "@type": "Organization",
@@ -37,7 +40,7 @@ const courseSchema = {
   "@id": `${APP_URL}/#course`,
   name: "2026 Elite Web Development & SaaS Masterclass",
   description:
-    "An intensive 30-day offline web development masterclass in Accra, Ghana. Learn to build production-ready web applications, e-commerce platforms, dashboards, and SaaS products. Includes a 1-month paid internship at Doctor Barns Tech. Top 2 students get hired. Every student lands their first paying client before graduation.",
+    "An intensive 6-week offline web development masterclass in Accra, Ghana. Learn to build production-ready web applications, e-commerce platforms, dashboards, and SaaS products. Includes a 1-month paid internship at Doctor Barns Tech. Top 2 students get hired. Every student lands their first paying client before graduation.",
   url: `${APP_URL}/apply`,
   provider: { "@id": `${APP_URL}/#organization` },
   courseCode: "RWH-2026-ELITE",
@@ -54,12 +57,12 @@ const courseSchema = {
   ],
   numberOfCredits: 1,
   occupationalCredentialAwarded: "Diploma Certification in Web Development",
-  timeRequired: "P30D",
+  timeRequired: "P6W",
   hasCourseInstance: {
     "@type": "CourseInstance",
-    name: "March 2026 Cohort",
-    startDate: "2026-03-16",
-    endDate: "2026-04-15",
+    name: "April 2026 Cohort",
+    startDate: "2026-04-20",
+    endDate: "2026-06-01",
     courseMode: "Offline",
     courseWorkload: "PT8H",
     instructor: {
@@ -80,12 +83,12 @@ const courseSchema = {
     },
     offers: {
       "@type": "Offer",
-      price: "1000",
+      price: FEE_STRING,
       priceCurrency: "GHS",
       availability: "https://schema.org/LimitedAvailability",
       url: `${APP_URL}/apply`,
       validFrom: "2026-01-01",
-      validThrough: "2026-03-16",
+      validThrough: "2026-04-20",
       category: "Web Development Training",
     },
   },
@@ -109,7 +112,7 @@ const faqSchema = {
       name: "Do I need any prior coding experience?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "No. This masterclass is designed for absolute beginners. We take you from zero to building production-ready web applications in 30 days. All you need is a laptop, dedication, and the willingness to learn.",
+        text: "No. This masterclass is designed for absolute beginners. We take you from zero to building production-ready web applications in 6 weeks. All you need is a laptop, dedication, and the willingness to learn.",
       },
     },
     {
@@ -141,7 +144,7 @@ const faqSchema = {
       name: "How does the paid internship work?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "After the 30-day masterclass, every student transitions into a 1-month paid internship at Doctor Barns Tech. You'll work on real client projects alongside senior developers, building your portfolio and professional experience.",
+        text: "After the 6-week masterclass, every student transitions into a 1-month paid internship at Doctor Barns Tech. You'll work on real client projects alongside senior developers, building your portfolio and professional experience.",
       },
     },
     {
@@ -157,7 +160,7 @@ const faqSchema = {
       name: "Can I pay in installments?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Yes. You can start with a 20% deposit (GHS 200), a 50% payment (GHS 500), or pay the full GHS 1,000 upfront. All payment tiers secure your seat immediately.",
+        text: "Yes. You can start with a 20% deposit (GHS 440), a 50% payment (GHS 1,100), or pay the full GHS 2,200 upfront. All payment tiers secure your seat immediately.",
       },
     },
     {
@@ -217,9 +220,9 @@ const eventSchema = {
   "@type": "EducationEvent",
   name: "2026 Elite Web Development & SaaS Masterclass",
   description:
-    "30-day intensive offline web development training in Accra. Learn to build real business applications, get a paid internship, and land your first client.",
-  startDate: "2026-03-16T09:00:00+00:00",
-  endDate: "2026-04-15T17:00:00+00:00",
+    "6-week intensive offline web development training in Accra. Learn to build real business applications, get a 1-month paid internship, and land your first client.",
+  startDate: "2026-04-20T09:00:00+00:00",
+  endDate: "2026-06-01T17:00:00+00:00",
   eventStatus: "https://schema.org/EventScheduled",
   eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
   location: {
@@ -239,7 +242,7 @@ const eventSchema = {
   },
   offers: {
     "@type": "Offer",
-    price: "1000",
+    price: FEE_STRING,
     priceCurrency: "GHS",
     availability: "https://schema.org/LimitedAvailability",
     url: `${APP_URL}/apply`,

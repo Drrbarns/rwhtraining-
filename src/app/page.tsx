@@ -86,7 +86,7 @@ export default function HomePage() {
                 Become a Professional <br className="hidden md:block" />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-blue-500 to-indigo-400 drop-shadow-md">Web Developer</span>{" "}
                 <br className="hidden lg:block" />
-                &amp; Secure Your First Client in <span className="text-white drop-shadow-md">30 Days.</span>
+                &amp; Secure Your First Client in <span className="text-white drop-shadow-md">6 Weeks.</span>
               </motion.h1>
 
               <motion.p
@@ -125,7 +125,7 @@ export default function HomePage() {
                 </Link>
                 <div className="flex flex-col justify-center text-left pl-2 sm:pl-6 sm:border-l border-white/10 h-12">
                   <span className="text-[10px] text-blue-300 font-bold uppercase tracking-widest mb-1">Program Fee</span>
-                  <span className="text-2xl font-black text-white leading-none tracking-tight drop-shadow-md">GHS 1,000</span>
+                  <span className="text-2xl font-black text-white leading-none tracking-tight drop-shadow-md">GHS 2,200</span>
                 </div>
               </motion.div>
             </div>
@@ -171,7 +171,7 @@ export default function HomePage() {
                 Tutorials Will Not{" "}
                 <span className="text-blue-400">Get You Paid.</span>
               </motion.h2>
-              <motion.div variants={FADE_UP} className="space-y-5 text-slate-400 text-lg leading-relaxed">
+              <motion.div variants={FADE_UP} className="space-y-5 text-slate-300 text-lg leading-relaxed">
                 <p>
                   The market is flooded with &ldquo;developers&rdquo; who can only build basic landing pages after
                   watching endless free tutorials. But the brutal truth:{" "}
@@ -209,13 +209,13 @@ export default function HomePage() {
                 <motion.div
                   key={f.title}
                   variants={FADE_UP}
-                  className="bg-white/5 border border-white/10 p-6 rounded-2xl hover:border-blue-500/50 hover:bg-white/8 transition-all group"
+                  className="bg-white/10 border border-white/15 p-6 rounded-2xl hover:border-blue-400/60 hover:bg-white/15 transition-all group"
                 >
                   <div className="w-11 h-11 bg-blue-500/10 flex items-center justify-center rounded-xl mb-4 group-hover:bg-blue-500/20 transition-colors">
                     <f.icon className="w-5 h-5 text-blue-400" />
                   </div>
                   <h3 className="text-white font-bold text-base mb-2">{f.title}</h3>
-                  <p className="text-slate-400 text-sm leading-relaxed">{f.desc}</p>
+                  <p className="text-slate-200/90 text-sm leading-relaxed">{f.desc}</p>
                 </motion.div>
               ))}
             </motion.div>
@@ -241,7 +241,7 @@ export default function HomePage() {
               <motion.h2 variants={FADE_UP} className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-slate-950">
                 What You Will Achieve
                 <br className="hidden sm:block" />
-                <span className="font-serif italic text-slate-500 font-medium">by Day 30</span>
+                <span className="font-serif italic text-slate-500 font-medium">in 6 Weeks</span>
               </motion.h2>
             </motion.div>
             <motion.div
@@ -365,69 +365,6 @@ export default function HomePage() {
         </Container>
       </section>
 
-      {/* ─── FAQ ON HOME ─── */}
-      <section className="py-24 sm:py-32 bg-slate-50 border-y border-slate-200" id="faq">
-        <Container>
-          <div className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20 lg:items-start">
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              variants={STAGGER}
-              className="lg:sticky lg:top-32"
-            >
-              <motion.span variants={FADE_UP} className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.2em] text-blue-600 mb-6">
-                <span className="w-8 h-px bg-blue-600" />
-                Common Questions
-              </motion.span>
-              <motion.h2 variants={FADE_UP} className="text-4xl sm:text-5xl font-bold tracking-tight text-slate-950 mb-6">
-                Frequently Asked
-                <br className="hidden lg:block" />
-                <span className="font-serif italic text-slate-500 font-medium">Questions</span>
-              </motion.h2>
-              <motion.p variants={FADE_UP} className="text-lg leading-relaxed text-slate-600 mb-10 max-w-md">
-                Everything you need to know about the masterclass before you apply. If you have additional questions, our admissions team is ready to assist you.
-              </motion.p>
-
-              <motion.div variants={FADE_UP} className="relative w-full aspect-[4/3] max-w-sm overflow-hidden rounded-2xl shadow-sm border border-slate-200">
-                <Image
-                  src="/african_tech_lab_wide_7.png"
-                  alt="Senior and junior developers collaborating"
-                  fill
-                  className="object-cover"
-                />
-              </motion.div>
-            </motion.div>
-
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              variants={STAGGER}
-              className="flex flex-col"
-            >
-              {faqs.slice(0, 10).map((item) => (
-                <motion.details
-                  key={item.q}
-                  variants={FADE_UP}
-                  className="group border-b border-slate-200 last:border-0"
-                >
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-6 text-base sm:text-lg font-medium text-slate-900 transition-colors hover:text-blue-600">
-                    <span className="flex-1">{item.q}</span>
-                    <span className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white transition-colors group-hover:border-blue-200 group-hover:bg-blue-50 group-open:border-blue-600 group-open:bg-blue-600">
-                      <Plus className="absolute h-4 w-4 text-slate-400 transition-transform group-hover:text-blue-600 group-open:rotate-45 group-open:text-white" />
-                    </span>
-                  </summary>
-                  <div className="overflow-hidden pr-2 sm:pr-12 pb-6">
-                    <p className="text-sm sm:text-base leading-relaxed text-slate-600">{item.a}</p>
-                  </div>
-                </motion.details>
-              ))}
-            </motion.div>
-          </div>
-        </Container>
-      </section>
-
       {/* ─── GUARANTEES ─── */}
       <section
         className="relative py-16 text-white bg-fixed bg-cover bg-center"
@@ -531,7 +468,7 @@ export default function HomePage() {
                   With Doctor Barns Tech
                 </p>
                 <p className="text-slate-600 text-sm leading-relaxed mb-6">
-                  After your 30 days of training, transition directly into an offline, paid internship role.
+                  After your 6 weeks of training, transition directly into an offline, paid internship role.
                   Work elbow-to-elbow with senior developers on actual live client projects — supercharging
                   your portfolio and professional experience instantly.
                 </p>
@@ -556,6 +493,114 @@ export default function HomePage() {
                   className="object-cover"
                 />
               </div>
+            </motion.div>
+          </div>
+        </Container>
+      </section>
+
+      {/* ─── FAQ ON HOME ─── */}
+      <section className="py-20 sm:py-24 bg-gradient-to-b from-slate-50 to-white border-y border-slate-200" id="faq">
+        <Container>
+          <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:gap-10 items-start">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={STAGGER}
+              className="rounded-3xl bg-[#0a192f] p-8 md:p-10 border border-blue-900/50 text-white relative overflow-hidden"
+            >
+              <div className="absolute -top-24 -right-20 w-56 h-56 rounded-full bg-blue-500/20 blur-3xl pointer-events-none" />
+              <div className="absolute -bottom-20 -left-20 w-56 h-56 rounded-full bg-cyan-400/10 blur-3xl pointer-events-none" />
+
+              <motion.span variants={FADE_UP} className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-blue-200 mb-5">
+                <span className="w-2 h-2 rounded-full bg-blue-400" />
+                Support Hub
+              </motion.span>
+
+              <motion.h2 variants={FADE_UP} className="text-3xl md:text-4xl font-extrabold tracking-tight leading-tight mb-4">
+                Questions Before You Apply?
+              </motion.h2>
+              <motion.p variants={FADE_UP} className="text-slate-300 leading-relaxed text-sm md:text-base mb-8 max-w-md">
+                Get clarity on class format, outcomes, fees, internship, and how we help you start getting paid quickly.
+              </motion.p>
+
+              <motion.div variants={FADE_UP} className="grid grid-cols-3 gap-3 mb-8">
+                {[
+                  { label: "Replies", value: "< 10min" },
+                  { label: "Seats Left", value: "10 Only" },
+                  { label: "Format", value: "Offline" },
+                ].map((meta) => (
+                  <div key={meta.label} className="rounded-xl border border-white/10 bg-white/5 px-3 py-3">
+                    <p className="text-[10px] uppercase tracking-wider text-slate-400 font-bold">{meta.label}</p>
+                    <p className="text-sm md:text-base font-bold text-white mt-1">{meta.value}</p>
+                  </div>
+                ))}
+              </motion.div>
+
+              <motion.div variants={FADE_UP} className="flex flex-col sm:flex-row gap-3">
+                <a
+                  href={`https://wa.me/${brand.whatsapp.replace(/\D/g, "").replace(/^0/, "233")}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center justify-center gap-2 h-11 px-5 rounded-xl bg-blue-600 hover:bg-blue-700 transition-colors text-sm font-bold"
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  Talk to Admissions
+                </a>
+                <Link
+                  href="/apply"
+                  className="inline-flex items-center justify-center gap-2 h-11 px-5 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 transition-colors text-sm font-semibold"
+                >
+                  Apply Now
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </motion.div>
+
+              <motion.div
+                variants={FADE_UP}
+                className="relative mt-6 w-full h-44 rounded-2xl overflow-hidden border border-white/10"
+              >
+                <Image
+                  src="/african_students_collaborating_2.png"
+                  alt="Remote Work Hub students collaborating"
+                  fill
+                  className="object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0a192f]/60 via-transparent to-transparent" />
+              </motion.div>
+            </motion.div>
+
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={STAGGER}
+              className="grid gap-4"
+            >
+              {faqs.slice(0, 8).map((item, idx) => (
+                <motion.details
+                  key={item.q}
+                  variants={FADE_UP}
+                  className="group rounded-2xl border border-slate-200 bg-white shadow-sm open:shadow-md transition-shadow"
+                >
+                  <summary className="flex cursor-pointer list-none items-center gap-4 px-5 py-4">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-500 text-xs font-bold group-open:bg-blue-600 group-open:text-white transition-colors">
+                      {idx + 1}
+                    </div>
+                    <span className="flex-1 text-[15px] sm:text-base font-semibold text-slate-900 group-open:text-blue-700 transition-colors">
+                      {item.q}
+                    </span>
+                    <span className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-slate-50 group-open:border-blue-600 group-open:bg-blue-600 transition-colors">
+                      <Plus className="h-4 w-4 text-slate-500 group-open:text-white group-open:rotate-45 transition-all" />
+                    </span>
+                  </summary>
+                  <div className="px-5 pb-5">
+                    <div className="pl-12 pr-2">
+                      <p className="text-sm sm:text-[15px] leading-relaxed text-slate-600">{item.a}</p>
+                    </div>
+                  </div>
+                </motion.details>
+              ))}
             </motion.div>
           </div>
         </Container>
@@ -586,7 +631,7 @@ export default function HomePage() {
                   Your Engineering Career{" "}
                   <br className="hidden md:block" />
                   Starts{" "}
-                  <span className="text-amber-400">March 16.</span>
+                  <span className="text-amber-400">April 20.</span>
                 </h2>
                 <p className="text-slate-400 text-base leading-relaxed mb-6 max-w-md">
                   Certification, paid internship, your first paying client, and the chance to get hired —
@@ -610,7 +655,7 @@ export default function HomePage() {
                 <div className="bg-white/5 border border-white/10 rounded-2xl p-5 max-w-sm flex items-center justify-between gap-5 mb-4">
                   <div>
                     <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">One-Time Fee</p>
-                    <p className="text-3xl font-black text-white">GHS 1,000</p>
+                    <p className="text-3xl font-black text-white">GHS 2,200</p>
                   </div>
                   <Link href="/apply" className="flex items-center gap-2 h-12 px-6 bg-blue-600 text-white font-bold text-sm rounded-xl hover:bg-blue-700 transition-all hover:-translate-y-0.5 shadow-lg group shrink-0">
                     Apply Now
@@ -633,8 +678,8 @@ export default function HomePage() {
               {/* Right: Background Image Panel */}
               <div className="w-full lg:w-[380px] relative min-h-[220px] lg:min-h-full">
                 <Image
-                  src="/hero_bg_dark.jpg"
-                  alt="Students coding at Doctor Barns Tech"
+                  src="/african_instructor_teaching_4.png"
+                  alt="Remote Work Hub instructor guiding students"
                   fill
                   className="object-cover"
                 />

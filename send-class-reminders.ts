@@ -5,9 +5,9 @@
  *   Wave 1 — NOW          — Location & directions
  *   Wave 2 — NOW          — Meeting info, time, what to bring
  *   Wave 3 — 8:00 PM tonight — Get excited, sleep well
- *   Wave 4 — 6:00 AM Mar 19  — Good morning, today is the day
- *   Wave 5 — 8:00 AM Mar 19  — Are you on your way?
- *   Wave 6 — 9:45 AM Mar 19  — Starting in 10 mins!
+ *   Wave 4 — 6:00 AM Apr 20  — Good morning, today is the day
+ *   Wave 5 — 8:00 AM Apr 20  — Are you on your way?
+ *   Wave 6 — 9:45 AM Apr 20  — Starting in 10 mins!
  *
  * Run all waves:     USE_DATABASE=1 npx tsx send-class-reminders.ts
  * Run specific wave: USE_DATABASE=1 ONLY_WAVES=1,2 npx tsx send-class-reminders.ts
@@ -57,13 +57,13 @@ async function getStudentsFromDb(): Promise<Contact[]> {
 // ─── Message Templates ───────────────────────────────────────────────────────
 
 function msg1(name: string) {
-    const sms = `Hi ${name}! 📍 Reminder: The RWH Masterclass class is TOMORROW (Thursday, March 19) at 10:00AM sharp!\n\nLocation: 111 Newtown RD, Accra Newtown.\n🗺 Search "Doctor Barns Tech" on Google Maps, Bolt or Uber.\n🚕 From Circle: take a Newtown car, stop at ADB Bank.\n📞 Need directions? Call: 0599551331\n\nPlease arrive BEFORE 10:00AM. See you there! 🚀 - Remote Work Hub`;
+    const sms = `Hi ${name}! 📍 Reminder: The RWH Masterclass begins Monday, April 20 at 10:00AM sharp!\n\nLocation: 111 Newtown RD, Accra Newtown.\n🗺 Search "Doctor Barns Tech" on Google Maps, Bolt or Uber.\n🚕 From Circle: take a Newtown car, stop at ADB Bank.\n📞 Need directions? Call: 0599551331\n\nPlease arrive BEFORE 10:00AM. See you there! 🚀 - Remote Work Hub`;
 
     const email = makeEmail(name, `📍 Class Tomorrow — Here's the Location & Directions`, `
       <div style="text-align:center;margin-bottom:28px;">
         <div style="width:64px;height:64px;background:linear-gradient(135deg,#dbeafe,#bfdbfe);border-radius:50%;margin:0 auto 12px;line-height:64px;font-size:28px;">📍</div>
         <h2 style="font-size:22px;font-weight:800;color:#0f172a;margin:0;">Class is TOMORROW!</h2>
-        <p style="color:#64748b;margin:8px 0 0;font-size:15px;">Thursday, March 19 · 10:00AM sharp</p>
+        <p style="color:#64748b;margin:8px 0 0;font-size:15px;">Monday, April 20 · 10:00AM sharp</p>
       </div>
       <p style="font-size:15px;color:#334155;line-height:1.7;">Hi <strong>${name}</strong>! Just a reminder — we have class tomorrow. Here's everything you need to get to us:</p>
       <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:16px;padding:24px;margin:20px 0;">
@@ -87,7 +87,7 @@ function msg1(name: string) {
       </div>
       <div style="background:linear-gradient(135deg,#2563EB,#4f46e5);border-radius:16px;padding:20px;text-align:center;margin:24px 0;">
         <p style="color:#ffffff;font-size:15px;font-weight:700;margin:0;">⏰ Please arrive <strong>BEFORE 10:00AM</strong></p>
-        <p style="color:#bfdbfe;font-size:13px;margin:6px 0 0;">Thursday, March 19, 2026 · We'll be starting promptly!</p>
+        <p style="color:#bfdbfe;font-size:13px;margin:6px 0 0;">Monday, April 20, 2026 · We'll be starting promptly!</p>
       </div>
       <p style="font-size:14px;color:#64748b;text-align:center;">See you tomorrow! 🚀</p>`);
 
@@ -101,7 +101,7 @@ function msg2(name: string) {
       <div style="text-align:center;margin-bottom:28px;">
         <div style="width:64px;height:64px;background:linear-gradient(135deg,#d1fae5,#a7f3d0);border-radius:50%;margin:0 auto 12px;line-height:64px;font-size:28px;">📋</div>
         <h2 style="font-size:22px;font-weight:800;color:#0f172a;margin:0;">Everything You Need for Tomorrow</h2>
-        <p style="color:#64748b;margin:8px 0 0;font-size:15px;">Thursday, March 19 at 10:00AM</p>
+        <p style="color:#64748b;margin:8px 0 0;font-size:15px;">Monday, April 20 at 10:00AM</p>
       </div>
       <p style="font-size:15px;color:#334155;line-height:1.7;">Hi <strong>${name}</strong>! Here's a quick rundown for tomorrow's class:</p>
       <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:16px;padding:24px;margin:20px 0;">
@@ -133,7 +133,7 @@ function msg2(name: string) {
       </div>
       <div style="background:linear-gradient(135deg,#2563EB,#4f46e5);border-radius:16px;padding:20px;text-align:center;margin:24px 0;">
         <p style="color:#ffffff;font-size:15px;font-weight:700;margin:0;">We can't wait to see you tomorrow! 🚀</p>
-        <p style="color:#bfdbfe;font-size:13px;margin:6px 0 0;">Thursday, March 19 · 10:00AM · 111 Newtown RD</p>
+        <p style="color:#bfdbfe;font-size:13px;margin:6px 0 0;">Monday, April 20 · 10:00AM · 111 Newtown RD</p>
       </div>`);
 
     return { sms, email, subject: "📋 Tomorrow's Class — Time, Location & What to Bring" };
@@ -158,7 +158,7 @@ function msg3(name: string) {
       </div>
       <div style="background:linear-gradient(135deg,#2563EB,#4f46e5);border-radius:16px;padding:20px;text-align:center;margin:24px 0;">
         <p style="color:#ffffff;font-size:15px;font-weight:700;margin:0;">📍 111 Newtown RD, Accra Newtown</p>
-        <p style="color:#bfdbfe;font-size:13px;margin:6px 0 0;">Tomorrow · Thursday March 19 · 10:00AM sharp</p>
+        <p style="color:#bfdbfe;font-size:13px;margin:6px 0 0;">Monday, April 20 · 10:00AM sharp</p>
       </div>
       <p style="font-size:15px;color:#334155;text-align:center;font-weight:700;">Sleep well. See you tomorrow! 🌟</p>
       <p style="font-size:14px;color:#64748b;text-align:center;">— Doctor Barns & Remote Work Hub ❤️</p>`);
@@ -173,7 +173,7 @@ function msg4(name: string) {
       <div style="text-align:center;margin-bottom:28px;">
         <div style="width:64px;height:64px;background:linear-gradient(135deg,#fef3c7,#fde68a);border-radius:50%;margin:0 auto 12px;line-height:64px;font-size:28px;">☀️</div>
         <h2 style="font-size:24px;font-weight:800;color:#0f172a;margin:0;">Good Morning, ${name}!</h2>
-        <p style="color:#64748b;margin:8px 0 0;font-size:15px;">Friday, March 20, 2026 — Class Day!</p>
+        <p style="color:#64748b;margin:8px 0 0;font-size:15px;">Monday, April 20, 2026 — Class Day!</p>
       </div>
       <div style="background:linear-gradient(135deg,#2563EB,#1d4ed8);border-radius:20px;padding:32px;margin:20px 0;text-align:center;">
         <p style="font-size:28px;font-weight:900;color:#ffffff;margin:0;letter-spacing:-1px;">CLASS TODAY! 🎓</p>
@@ -364,24 +364,24 @@ async function main() {
 
     // Full schedule mode
     const now = new Date();
-    const mar20_6am   = new Date("2026-03-20T06:00:00Z");
-    const mar20_8am   = new Date("2026-03-20T08:00:00Z");
-    const mar20_945am = new Date("2026-03-20T09:45:00Z");
+    const apr20_6am   = new Date("2026-04-20T06:00:00Z");
+    const apr20_8am   = new Date("2026-04-20T08:00:00Z");
+    const apr20_945am = new Date("2026-04-20T09:45:00Z");
 
     console.log("\n🚀 CLASS REMINDER MESSAGING SCHEDULER");
     console.log("==========================================");
     console.log(`Now (Ghana): ${now.toLocaleString("en-GH", { timeZone: "Africa/Accra" })}`);
     console.log(`\n📅 Schedule:`);
-    console.log(`  Wave 4 — 6:00AM  Mar 20     → Good morning`);
-    console.log(`  Wave 5 — 8:00AM  Mar 20     → Are you on your way?`);
-    console.log(`  Wave 6 — 9:45AM  Mar 20     → Starting in 10 mins!`);
+    console.log(`  Wave 4 — 6:00AM  Apr 20     → Good morning`);
+    console.log(`  Wave 5 — 8:00AM  Apr 20     → Are you on your way?`);
+    console.log(`  Wave 6 — 9:45AM  Apr 20     → Starting in 10 mins!`);
     console.log(`\n${recipients.length} students will receive each wave via email + SMS.\n`);
 
-    scheduleAt(mar20_6am,   "Wave 4 (good morning)",     () => sendWave(4, msg4));
-    scheduleAt(mar20_8am,   "Wave 5 (on your way?)",     () => sendWave(5, msg5));
-    scheduleAt(mar20_945am, "Wave 6 (starting in 10!)",  () => sendWave(6, msg6));
+    scheduleAt(apr20_6am,   "Wave 4 (good morning)",     () => sendWave(4, msg4));
+    scheduleAt(apr20_8am,   "Wave 5 (on your way?)",     () => sendWave(5, msg5));
+    scheduleAt(apr20_945am, "Wave 6 (starting in 10!)",  () => sendWave(6, msg6));
 
-    const lastMs = msUntil(mar20_945am) + 5 * 60 * 1000;
+    const lastMs = msUntil(apr20_945am) + 5 * 60 * 1000;
     console.log(`\n⏳ Process will stay alive until all 6 waves are sent (~${Math.round(lastMs / 3600000)} hrs).\n`);
 }
 

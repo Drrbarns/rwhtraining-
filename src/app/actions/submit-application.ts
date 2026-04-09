@@ -1,6 +1,7 @@
 "use server";
 
 import { MoolreAdapter, type PaymentTier, type MomoNetwork, type TransactionPayload } from "@/lib/moolre-adapter";
+import { tierInitialAmountGhs } from "@/lib/pricing";
 import { PaystackAdapter } from "@/lib/paystack-adapter";
 import { createClient } from "@supabase/supabase-js";
 import { applicationSchema } from "@/lib/validations";
@@ -30,9 +31,7 @@ export async function submitApplicationAction(formData: FormData) {
     const { firstName, lastName, email, phone, age, city, occupation, experience, reason, tier, paymentMethod, applicationId } = parsed.data;
     const usePaystack = paymentMethod === "paystack";
 
-    let amount_ghs = 500;
-    if (tier === "20") amount_ghs = 200;
-    if (tier === "100") amount_ghs = 1000;
+    const amount_ghs = tierInitialAmountGhs(tier);
 
     const reference = MoolreAdapter.generateReference();
 

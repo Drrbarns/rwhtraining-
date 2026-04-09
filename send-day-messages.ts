@@ -9,9 +9,9 @@
  *   Message 1 — NOW          — Location & directions
  *   Message 2 — +30 min      — Bring your laptop
  *   Message 3 — +60 min      — Congratulations in advance
- *   Message 4 — 6:00 AM Mar 16 — Good morning, get ready
- *   Message 5 — 8:00 AM Mar 16 — Are you on your way?
- *   Message 6 — 9:45 AM Mar 16 — Seated? Starting in 10 mins!
+ *   Message 4 — 6:00 AM Apr 20 — Good morning, get ready
+ *   Message 5 — 8:00 AM Apr 20 — Are you on your way?
+ *   Message 6 — 9:45 AM Apr 20 — Seated? Starting in 10 mins!
  *
  * Run: npx tsx send-day-messages.ts
  *      USE_DATABASE=1 npx tsx send-day-messages.ts   ← use DB for students + leads
@@ -211,7 +211,7 @@ function msg1(name: string) {
       <div style="text-align:center;margin-bottom:28px;">
         <div style="width:64px;height:64px;background:linear-gradient(135deg,#dbeafe,#bfdbfe);border-radius:50%;margin:0 auto 12px;line-height:64px;font-size:28px;">📍</div>
         <h2 style="font-size:22px;font-weight:800;color:#0f172a;margin:0;">The Masterclass is TOMORROW!</h2>
-        <p style="color:#64748b;margin:8px 0 0;font-size:15px;">Monday, March 16 · 10:00AM sharp</p>
+        <p style="color:#64748b;margin:8px 0 0;font-size:15px;">Monday, April 20 · 10:00AM sharp</p>
       </div>
       <p style="font-size:15px;color:#334155;line-height:1.7;">Hi <strong>${name}</strong>! We're so excited to see you tomorrow. Here's everything you need to get to us:</p>
       <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:16px;padding:24px;margin:20px 0;">
@@ -260,7 +260,7 @@ function msg2(name: string) {
       </div>
       <div style="background:linear-gradient(135deg,#2563EB,#4f46e5);border-radius:16px;padding:20px;text-align:center;margin:24px 0;">
         <p style="color:#ffffff;font-size:15px;font-weight:700;margin:0;">📍 111 Newtown RD, Accra Newtown</p>
-        <p style="color:#bfdbfe;font-size:13px;margin:6px 0 0;">Tomorrow · Monday March 16 · 10:00AM</p>
+        <p style="color:#bfdbfe;font-size:13px;margin:6px 0 0;">Tomorrow · Monday April 20 · 10:00AM</p>
       </div>`);
 
     return { sms, email, subject: "💻 Don't Forget Your Laptop — Masterclass Tomorrow" };
@@ -285,7 +285,7 @@ function msg3(name: string) {
       <p style="font-size:15px;color:#334155;line-height:1.8;">Sleep well tonight, ${name}. Come fresh, come hungry, come <strong>ready to build</strong>. We cannot wait to see what you create.</p>
       <div style="background:linear-gradient(135deg,#2563EB,#4f46e5);border-radius:16px;padding:20px;text-align:center;margin:24px 0;">
         <p style="color:#ffffff;font-size:15px;font-weight:700;margin:0;">📍 111 Newtown RD, Accra Newtown</p>
-        <p style="color:#bfdbfe;font-size:13px;margin:6px 0 0;">Tomorrow · Monday March 16 · 10:00AM sharp</p>
+        <p style="color:#bfdbfe;font-size:13px;margin:6px 0 0;">Tomorrow · Monday April 20 · 10:00AM sharp</p>
       </div>
       <p style="font-size:15px;color:#334155;text-align:center;font-weight:700;">See you there. Let's build. 🚀</p>
       <p style="font-size:14px;color:#64748b;text-align:center;">— Doctor Barns & The Remote Work Hub Team ❤️</p>`);
@@ -300,7 +300,7 @@ function msg4(name: string) {
       <div style="text-align:center;margin-bottom:28px;">
         <div style="width:64px;height:64px;background:linear-gradient(135deg,#fef3c7,#fde68a);border-radius:50%;margin:0 auto 12px;line-height:64px;font-size:28px;">☀️</div>
         <h2 style="font-size:24px;font-weight:800;color:#0f172a;margin:0;">Good Morning, ${name}!</h2>
-        <p style="color:#64748b;margin:8px 0 0;font-size:15px;">Today is the day. March 16, 2026.</p>
+        <p style="color:#64748b;margin:8px 0 0;font-size:15px;">Today is the day. April 20, 2026.</p>
       </div>
       <div style="background:linear-gradient(135deg,#2563EB,#1d4ed8);border-radius:20px;padding:32px;margin:20px 0;text-align:center;">
         <p style="font-size:28px;font-weight:900;color:#ffffff;margin:0;letter-spacing:-1px;">TODAY IS THE DAY! 🎓</p>
@@ -367,7 +367,7 @@ function msg6(name: string) {
         <p style="font-size:16px;color:#fca5a5;margin:10px 0 0;">The RWH Elite Web Dev Masterclass is <strong style="color:#ffffff;">starting NOW</strong></p>
       </div>
       <p style="font-size:15px;color:#334155;line-height:1.8;">Hi <strong>${name}</strong>! Are you seated and ready? This is the moment you invested in, the moment you've been waiting for.</p>
-      <p style="font-size:15px;color:#334155;line-height:1.8;">In 10 minutes, you'll write your first line of code (if you haven't already), meet your cohort, and begin 30 days that will change everything.</p>
+      <p style="font-size:15px;color:#334155;line-height:1.8;">In 10 minutes, you'll write your first line of code (if you haven't already), meet your cohort, and begin 6 weeks that will change everything.</p>
       <div style="background:linear-gradient(135deg,#0f172a,#1e293b);border-radius:16px;padding:24px;text-align:center;margin:24px 0;">
         <p style="font-size:18px;font-weight:800;color:#60a5fa;margin:0;">Today you become a developer. Let's build. 💻</p>
       </div>
@@ -511,9 +511,9 @@ async function main() {
     const wave3Time = new Date(now.getTime() + 60 * 60 * 1000);  // +60 min
 
     // Tomorrow absolute times (UTC = Ghana time)
-    const mar16_6am  = new Date("2026-03-16T06:00:00Z");
-    const mar16_8am  = new Date("2026-03-16T08:00:00Z");
-    const mar16_945am = new Date("2026-03-16T09:45:00Z");
+    const apr20_6am  = new Date("2026-04-20T06:00:00Z");
+    const apr20_8am  = new Date("2026-04-20T08:00:00Z");
+    const apr20_945am = new Date("2026-04-20T09:45:00Z");
 
     console.log("\n🚀 RWH MASTERCLASS DAY MESSAGING SCHEDULER");
     console.log("==========================================");
@@ -522,9 +522,9 @@ async function main() {
     console.log(`  Wave 1 — NOW            → Location & directions`);
     console.log(`  Wave 2 — +30 min        → Bring your laptop`);
     console.log(`  Wave 3 — +60 min        → Congratulations in advance`);
-    console.log(`  Wave 4 — 6:00AM  Mar 16 → Good morning`);
-    console.log(`  Wave 5 — 8:00AM  Mar 16 → Are you on your way?`);
-    console.log(`  Wave 6 — 9:45AM  Mar 16 → Seated? Starting in 10 mins`);
+    console.log(`  Wave 4 — 6:00AM  Apr 20 → Good morning`);
+    console.log(`  Wave 5 — 8:00AM  Apr 20 → Are you on your way?`);
+    console.log(`  Wave 6 — 9:45AM  Apr 20 → Seated? Starting in 10 mins`);
     console.log(`\n${recipients.length} recipients will receive each wave via email + SMS.\n`);
 
     // Send all waves (will block on wave 1 then schedule the rest)
@@ -532,12 +532,12 @@ async function main() {
 
     scheduleAt(wave2Time, "Wave 2 (laptop reminder)", () => sendWave(2, msg2));
     scheduleAt(wave3Time, "Wave 3 (congratulations)", () => sendWave(3, msg3));
-    scheduleAt(mar16_6am,  "Wave 4 (good morning)",    () => sendWave(4, msg4));
-    scheduleAt(mar16_8am,  "Wave 5 (on your way)",     () => sendWave(5, msg5));
-    scheduleAt(mar16_945am,"Wave 6 (seated? 10 mins)", () => sendWave(6, msg6));
+    scheduleAt(apr20_6am,  "Wave 4 (good morning)",    () => sendWave(4, msg4));
+    scheduleAt(apr20_8am,  "Wave 5 (on your way)",     () => sendWave(5, msg5));
+    scheduleAt(apr20_945am,"Wave 6 (seated? 10 mins)", () => sendWave(6, msg6));
 
     // Keep process alive until all waves are done
-    const lastMs = msUntil(mar16_945am) + 5 * 60 * 1000;
+    const lastMs = msUntil(apr20_945am) + 5 * 60 * 1000;
     console.log(`\n⏳ Process will stay alive until all 6 waves are sent (~${Math.round(lastMs/3600000)} hrs).\n`);
 }
 

@@ -4,10 +4,10 @@
  *
  * Schedule (Ghana time = UTC+0):
  *   Wave 1 — NOW          — Exclusive guest invitation to FIRST CLASS
- *   Wave 2 — +45 min      — Last chance to secure a seat (GHS 200)
- *   Wave 3 — 6:00AM Mar 16 — Good morning, your guest spot is waiting
- *   Wave 4 — 8:00AM Mar 16 — Are you on your way?
- *   Wave 5 — 9:45AM Mar 16 — Get in here! Starting in 10 mins
+ *   Wave 2 — +45 min      — Last chance to secure a seat (GHS 440)
+ *   Wave 3 — 6:00AM Apr 20 — Good morning, your guest spot is waiting
+ *   Wave 4 — 8:00AM Apr 20 — Are you on your way?
+ *   Wave 5 — 9:45AM Apr 20 — Get in here! Starting in 10 mins
  *
  * Run: npx tsx send-leads-messages.ts
  */
@@ -61,7 +61,7 @@ Come experience day one, see what it's really about, and decide for yourself.
 📍 111 Newtown RD, Accra Newtown
 🗺 Search "Doctor Barns Tech" on Google Maps, Bolt or Uber
 📞 Directions: 0599551331
-⏰ Mon March 16 · 10:00AM
+⏰ Mon April 20 · 10:00AM
 
 This is for you only. I want you in that room. 🚀 - Doctor Barns`;
 
@@ -90,12 +90,12 @@ This is for you only. I want you in that room. 🚀 - Doctor Barns`;
           <tr><td style="padding:8px 0;font-size:14px;color:#64748b;font-weight:700;">🗺 Find Us</td><td style="padding:8px 0;font-size:14px;color:#0f172a;">Search <strong>"Doctor Barns Tech"</strong> on Google Maps, Bolt or Uber</td></tr>
           <tr><td style="padding:8px 0;font-size:14px;color:#64748b;font-weight:700;">🚕 From Circle</td><td style="padding:8px 0;font-size:14px;color:#0f172a;">Take a Newtown car → stop at <strong>ADB Bank</strong></td></tr>
           <tr><td style="padding:8px 0;font-size:14px;color:#64748b;font-weight:700;">📞 Directions</td><td style="padding:8px 0;font-size:14px;color:#0f172a;font-weight:800;letter-spacing:1px;">0599 551 331</td></tr>
-          <tr><td style="padding:8px 0;font-size:14px;color:#64748b;font-weight:700;">⏰ Time</td><td style="padding:8px 0;font-size:14px;color:#0f172a;font-weight:700;">Monday, March 16 · Arrive before 10:00AM</td></tr>
+          <tr><td style="padding:8px 0;font-size:14px;color:#64748b;font-weight:700;">⏰ Time</td><td style="padding:8px 0;font-size:14px;color:#0f172a;font-weight:700;">Monday, April 20 · Arrive before 10:00AM</td></tr>
         </table>
       </div>
 
       <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:16px 20px;margin:20px 0;">
-        <p style="font-size:14px;color:#1e40af;font-weight:600;margin:0;">💡 If you want to make it official before tomorrow, you can secure your seat with just a <strong>GHS 200 deposit</strong> at <a href="${APPLY_URL}" style="color:#2563EB;">${APPLY_URL}</a></p>
+        <p style="font-size:14px;color:#1e40af;font-weight:600;margin:0;">💡 If you want to make it official before tomorrow, you can secure your seat with just a <strong>GHS 440 (20% deposit)</strong> at <a href="${APPLY_URL}" style="color:#2563EB;">${APPLY_URL}</a></p>
       </div>
 
       <p style="font-size:15px;color:#334155;line-height:1.8;">I don't extend this invitation to everyone. I'm extending it to you because I think you're ready.</p>
@@ -107,7 +107,7 @@ This is for you only. I want you in that room. 🚀 - Doctor Barns`;
 }
 
 function msg2(name: string) {
-    const sms = `Hey ${name}! If you want to officially lock in your seat before tomorrow, you can start with just GHS 200 tonight.
+    const sms = `Hey ${name}! If you want to officially lock in your seat before tomorrow, you can start with just GHS 440 tonight.
 
 👉 ${APPLY_URL} — takes 5 mins.
 
@@ -116,20 +116,20 @@ Or just show up tomorrow as my guest. Either way, I want you there. 💪
 📍 111 Newtown RD, Accra Newtown · 10:00AM Mon
 - Doctor Barns`;
 
-    const email = makeEmail(name, `⚡ Lock In Your Seat Tonight — Just GHS 200`, `
+    const email = makeEmail(name, `⚡ Lock In Your Seat Tonight — Just GHS 440`, `
       <div style="text-align:center;margin-bottom:28px;">
         <div style="width:64px;height:64px;background:linear-gradient(135deg,#dbeafe,#bfdbfe);border-radius:50%;margin:0 auto 12px;line-height:64px;font-size:28px;">⚡</div>
         <h2 style="font-size:22px;font-weight:800;color:#0f172a;margin:0;">Make It Official Tonight</h2>
       </div>
-      <p style="font-size:15px;color:#334155;line-height:1.8;">Hi <strong>${name}</strong>! If you want to officially secure your full seat in the cohort before tomorrow, you can lock it in right now with just a <strong>GHS 200 deposit</strong>.</p>
+      <p style="font-size:15px;color:#334155;line-height:1.8;">Hi <strong>${name}</strong>! If you want to officially secure your full seat in the cohort before tomorrow, you can lock it in right now with just a <strong>GHS 440 (20% deposit)</strong>.</p>
       <div style="text-align:center;margin:28px 0;">
-        <a href="${APPLY_URL}" style="display:inline-block;background:#2563EB;color:#ffffff;padding:16px 40px;border-radius:12px;text-decoration:none;font-weight:700;font-size:15px;">Secure My Seat — GHS 200 →</a>
+        <a href="${APPLY_URL}" style="display:inline-block;background:#2563EB;color:#ffffff;padding:16px 40px;border-radius:12px;text-decoration:none;font-weight:700;font-size:15px;">Secure My Seat — GHS 440 →</a>
       </div>
       <p style="font-size:14px;color:#64748b;text-align:center;">Takes less than 5 minutes. Or just show up tomorrow as my guest — either way, I want you there. 💪</p>
       <p style="font-size:14px;color:#64748b;text-align:center;font-weight:600;">— Doctor Barns</p>
     `);
 
-    return { sms, email, subject: `⚡ ${name}, Secure Your Seat Tonight — GHS 200 Deposit` };
+    return { sms, email, subject: `⚡ ${name}, Secure Your Seat Tonight — GHS 440 Deposit` };
 }
 
 function msg3(name: string) {
@@ -149,7 +149,7 @@ Come! I'm expecting you. 🚀 - Doctor Barns`;
       <div style="text-align:center;margin-bottom:28px;">
         <div style="width:64px;height:64px;background:linear-gradient(135deg,#fef3c7,#fde68a);border-radius:50%;margin:0 auto 12px;line-height:64px;font-size:28px;">☀️</div>
         <h2 style="font-size:22px;font-weight:800;color:#0f172a;margin:0;">Good Morning, ${name}!</h2>
-        <p style="color:#64748b;margin:8px 0 0;font-size:15px;">Today is the day. Monday, March 16.</p>
+        <p style="color:#64748b;margin:8px 0 0;font-size:15px;">Today is the day. Monday, April 20.</p>
       </div>
       <p style="font-size:15px;color:#334155;line-height:1.8;">Your exclusive guest seat at the <strong>RWH Elite Web Dev Masterclass</strong> is waiting. This is the moment — come and experience what everyone's talking about.</p>
       <div style="background:linear-gradient(135deg,#2563EB,#1d4ed8);border-radius:16px;padding:24px;margin:20px 0;">
@@ -307,29 +307,29 @@ async function main() {
     const now = new Date();
     const wave2Time = new Date(now.getTime() + 45 * 60 * 1000); // +45 min
 
-    const mar16_6am   = new Date("2026-03-16T06:00:00Z");
-    const mar16_8am   = new Date("2026-03-16T08:00:00Z");
-    const mar16_945am = new Date("2026-03-16T09:45:00Z");
+    const apr20_6am   = new Date("2026-04-20T06:00:00Z");
+    const apr20_8am   = new Date("2026-04-20T08:00:00Z");
+    const apr20_945am = new Date("2026-04-20T09:45:00Z");
 
     console.log("\n🎯 RWH LEADS MARKETING SCHEDULER");
     console.log("==================================");
     console.log(`Now (Ghana): ${now.toLocaleString("en-GH", { timeZone: "Africa/Accra" })}`);
     console.log(`\n📅 Schedule:`);
     console.log(`  Wave 1 — NOW             → Exclusive guest invitation to first class`);
-    console.log(`  Wave 2 — +45 min         → Last chance to secure a seat (GHS 200)`);
-    console.log(`  Wave 3 — 6:00AM  Mar 16  → Good morning, guest spot waiting`);
-    console.log(`  Wave 4 — 8:00AM  Mar 16  → Are you on your way?`);
-    console.log(`  Wave 5 — 9:45AM  Mar 16  → Starting in 10 mins, get in here!\n`);
+    console.log(`  Wave 2 — +45 min         → Last chance to secure a seat (GHS 440)`);
+    console.log(`  Wave 3 — 6:00AM  Apr 20  → Good morning, guest spot waiting`);
+    console.log(`  Wave 4 — 8:00AM  Apr 20  → Are you on your way?`);
+    console.log(`  Wave 5 — 9:45AM  Apr 20  → Starting in 10 mins, get in here!\n`);
     console.log(`👥 ${leads.length} leads · Each receives SMS + Email (where valid)\n`);
 
     await sendWave(1, msg1);
 
-    scheduleAt(wave2Time,   "Wave 2 (GHS 200 push)",      () => sendWave(2, msg2));
-    scheduleAt(mar16_6am,   "Wave 3 (good morning)",       () => sendWave(3, msg3));
-    scheduleAt(mar16_8am,   "Wave 4 (on your way)",        () => sendWave(4, msg4));
-    scheduleAt(mar16_945am, "Wave 5 (10 mins — get in!)", () => sendWave(5, msg5));
+    scheduleAt(wave2Time,   "Wave 2 (GHS 440 push)",      () => sendWave(2, msg2));
+    scheduleAt(apr20_6am,   "Wave 3 (good morning)",       () => sendWave(3, msg3));
+    scheduleAt(apr20_8am,   "Wave 4 (on your way)",        () => sendWave(4, msg4));
+    scheduleAt(apr20_945am, "Wave 5 (10 mins — get in!)", () => sendWave(5, msg5));
 
-    const lastMs = msUntil(mar16_945am) + 5 * 60 * 1000;
+    const lastMs = msUntil(apr20_945am) + 5 * 60 * 1000;
     console.log(`\n⏳ Process stays alive for ~${Math.round(lastMs / 3600000)} hrs until all waves fire.\n`);
 }
 

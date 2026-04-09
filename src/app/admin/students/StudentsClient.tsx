@@ -157,7 +157,7 @@ export function StudentsTable({
                                                         <span className="text-[10px] font-extrabold px-2.5 py-1 rounded-md bg-slate-100 text-slate-500 border border-slate-200/60 uppercase tracking-widest">Inactive</span>
                                                     ) : balance > 0 ? (
                                                         <span className="text-[10px] font-extrabold px-2.5 py-1 rounded-md bg-amber-50 text-amber-700 border border-amber-200/60 uppercase tracking-widest">
-                                                            Partial
+                                                            Partially paid
                                                         </span>
                                                     ) : (
                                                         <span className="text-[10px] font-extrabold px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200/60 uppercase tracking-widest">Fully paid</span>

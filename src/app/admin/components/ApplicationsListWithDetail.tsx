@@ -174,14 +174,14 @@ export function ApplicationsListWithDetail({
                           if (isPartial) {
                             return (
                               <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-600" title={`GHS ${balanceDue} still due`}>
-                                Partial — GHS {balanceDue} due
+                                Partially paid — GHS {balanceDue} due
                               </span>
                             );
                           }
                           if (isFullyPaid) {
                             return (
                               <span className="text-[11px] font-extrabold uppercase tracking-wider text-emerald-600">
-                                PAID (full)
+                                Fully paid
                               </span>
                             );
                           }
@@ -240,7 +240,7 @@ export function ApplicationsListWithDetail({
                     Abandoned Drafts
                   </h3>
                   <p className="text-slate-500 text-[13px] font-medium mt-1">
-                    {filteredDrafts.length} leads who started but did not finish
+                    {filteredDrafts.length} contactable drafts (not enrolled)
                   </p>
                 </div>
                 {ExportUnfinishedButton}

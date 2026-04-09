@@ -2,7 +2,7 @@
 
 const SHARE_URL = "https://remoteworkhub.org";
 const SHARE_TEXT =
-  "I just found this Elite Web Development Masterclass in Accra — 30 days to become a professional web developer, paid internship included, and the top 2 students get hired! Check it out:";
+  "I just found this Elite Web Development Masterclass in Accra — 6 weeks to become a professional web developer, paid internship included, and the top 2 students get hired! Check it out:";
 
 function openShareWindow(url: string) {
   window.open(url, "_blank", "width=600,height=500,noopener,noreferrer");

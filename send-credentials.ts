@@ -102,7 +102,7 @@ async function sendCredentialEmail(student: typeof students[0]) {
         <tr>
           <td style="background:#f8fafc;padding:24px 40px;text-align:center;border-top:1px solid #e2e8f0;">
             <p style="font-size:12px;color:#94a3b8;margin:0;">Remote Work Hub Masterclass · 111 Newtown RD, Accra Newtown</p>
-            <p style="font-size:12px;color:#94a3b8;margin:4px 0 0;">We start <strong style="color:#64748b;">Monday, March 16, 2026</strong> 🚀</p>
+            <p style="font-size:12px;color:#94a3b8;margin:4px 0 0;">We start <strong style="color:#64748b;">Monday, April 20, 2026</strong> 🚀</p>
           </td>
         </tr>
       </table>

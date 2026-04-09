@@ -123,7 +123,7 @@ export function Footer() {
             {/* Next cohort callout */}
             <div className="mt-8 p-4 rounded-xl bg-blue-600/10 border border-blue-500/20">
               <p className="text-xs font-bold text-blue-400 uppercase tracking-wider mb-1">Only 10 Seats Available</p>
-              <p className="text-white font-bold text-base">One-Time Fee: GHS 1,000</p>
+              <p className="text-white font-bold text-base">One-Time Fee: GHS 2,200</p>
               <p className="text-slate-400 text-xs mt-1">Curriculum · Portfolio · Internship · Challenge</p>
             </div>
           </div>

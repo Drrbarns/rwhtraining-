@@ -1,36 +1,60 @@
 import { createClient } from "@supabase/supabase-js";
 import { ApplicationsListWithDetail } from "../components/ApplicationsListWithDetail";
 import { ExportReportButton, ExportUnfinishedButton } from "../ClientButtons";
+import { splitApplicationsForAdmin } from "@/lib/admin-applications";
+import {
+    filterByCohortId,
+    getActiveCohortId,
+    normalizeCohortFilter,
+    resolveCohortScopeId,
+    type CohortFilterValue,
+} from "@/lib/admin-cohort";
+import { CohortScopePicker } from "@/components/admin/CohortScopePicker";
 
 export const revalidate = 0;
 
-async function getApplicationsData() {
+async function getApplicationsData(cohortFilter: CohortFilterValue) {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseServiceKey = process.env.NEXT_PUBLIC_SUPABASE_SERVICE_KEY;
 
     if (!supabaseUrl || !supabaseServiceKey) return null;
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
-    const [appsRes, enrollmentsRes] = await Promise.all([
+    const [appsRes, enrollmentsRes, cohortsRes] = await Promise.all([
         supabase.from("applications").select("*").order("created_at", { ascending: false }),
-        supabase.from("enrollments").select("application_id, balance_due"),
+        supabase.from("enrollments").select("cohort_id, application_id, balance_due, applications(email)"),
+        supabase.from("cohorts").select("*").order("start_date", { ascending: false }),
     ]);
 
     if (appsRes.error) return null;
 
-    const all = appsRes.data ?? [];
-    const applications = all.filter((a: any) => !a.is_unfinished);
-    const unfinishedApps = all.filter((a: any) => a.is_unfinished);
+    const cohorts = cohortsRes.data ?? [];
+    const activeCohortId = getActiveCohortId(cohorts);
+    const scopeCohortId = resolveCohortScopeId(cohortFilter, activeCohortId);
+    const all = filterByCohortId(appsRes.data ?? [], scopeCohortId);
+    const enrollments = filterByCohortId(enrollmentsRes.data ?? [], scopeCohortId);
+    const grouped = splitApplicationsForAdmin(all, enrollments);
     const balanceDueByApplicationId: Record<string, number> = {};
-    (enrollmentsRes.data ?? []).forEach((e: any) => {
+    enrollments.forEach((e: any) => {
         if (e.application_id) balanceDueByApplicationId[e.application_id] = Number(e.balance_due || 0);
     });
 
-    return { applications, unfinishedApps, balanceDueByApplicationId };
+    return {
+        applications: grouped.completedApplications,
+        unfinishedApps: grouped.abandonedDrafts,
+        balanceDueByApplicationId,
+        cohorts,
+        activeCohortId,
+    };
 }
 
-export default async function ApplicationsPipelinePage() {
-    const data = await getApplicationsData();
+export default async function ApplicationsPipelinePage({
+    searchParams,
+}: {
+    searchParams?: Promise<{ cohort?: string }>;
+}) {
+    const params = (await searchParams) || {};
+    const data = await getApplicationsData(normalizeCohortFilter(params.cohort));
 
     if (!data) {
         return (
@@ -49,6 +73,7 @@ export default async function ApplicationsPipelinePage() {
                         Completed applications. Click any row to view full details.
                     </p>
                 </div>
+                <CohortScopePicker cohorts={data.cohorts} activeCohortId={data.activeCohortId} />
             </div>
 
             <div>

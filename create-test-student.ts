@@ -95,7 +95,7 @@ async function main() {
         email: TEST_EMAIL,
         phone: "0000000000",
         tier: "50",
-        amount_ghs: 500,
+        amount_ghs: 1100,
         payment_status: "PAID",
         status: "APPROVED",
         is_unfinished: false,
@@ -124,8 +124,8 @@ async function main() {
       cohort_id: cohortId,
       application_id: applicationId,
       is_active: true,
-      total_paid: 500,
-      balance_due: 500,
+      total_paid: 1100,
+      balance_due: 1100,
     });
   }
 

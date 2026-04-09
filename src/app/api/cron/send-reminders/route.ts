@@ -3,7 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import { SmsAdapter } from "@/lib/sms-adapter";
 import { sendEmail } from "@/lib/send-email";
 import { wrapInLayout, mergeVariables } from "@/lib/email-templates";
-const CLASS_DATE = new Date("2026-03-16T08:00:00Z"); // Monday March 16, 8am GMT
+const CLASS_DATE = new Date("2026-04-20T08:00:00Z"); // Monday April 20, 8am GMT
 
 const SMS_SUFFIX = ` - Remote Work Hub`;
 
@@ -17,14 +17,14 @@ function getReminderSms(daysLeft: number, timeOfDay: "morning" | "evening", firs
 
   if (daysLeft >= 4) {
     if (timeOfDay === "morning") {
-      return `Good morning ${name}! The Remote Work Hub Elite Web Dev Masterclass starts in just ${daysLeft} days (Monday March 16). Seats are filling fast! Complete your application & secure your spot: remoteworkhub.org/apply` + SMS_SUFFIX;
+      return `Good morning ${name}! The Remote Work Hub Elite Web Dev Masterclass starts in just ${daysLeft} days (Monday April 20). Seats are filling fast! Complete your application & secure your spot: remoteworkhub.org/apply` + SMS_SUFFIX;
     }
     return `Hey ${name}, only ${daysLeft} days until the Remote Work Hub Masterclass begins! This is your chance to learn web development, get a paid internship & land your first client. Don't miss out - apply now: remoteworkhub.org/apply` + SMS_SUFFIX;
   }
 
   if (daysLeft === 3) {
     if (timeOfDay === "morning") {
-      return `Good morning ${name}! 3 DAYS LEFT. The Remote Work Hub Masterclass starts Monday. In 30 days you could be building real apps & earning from tech. Start with just GHS 200. Apply: remoteworkhub.org/apply` + SMS_SUFFIX;
+      return `Good morning ${name}! 3 DAYS LEFT. The Remote Work Hub Masterclass starts Monday. In 6 weeks you could be building real apps & earning from tech. Start with just GHS 440. Apply: remoteworkhub.org/apply` + SMS_SUFFIX;
     }
     return `${name}, the weekend is here but the clock is ticking! Only 3 days until the Masterclass starts. This could change your career forever. Complete your application NOW: remoteworkhub.org/apply` + SMS_SUFFIX;
   }
@@ -38,7 +38,7 @@ function getReminderSms(daysLeft: number, timeOfDay: "morning" | "evening", firs
 
   if (daysLeft === 1) {
     if (timeOfDay === "morning") {
-      return `TOMORROW, ${name}! The Remote Work Hub Masterclass starts TOMORROW (Monday March 16). This is your LAST CHANCE to enroll. Complete your application and payment right now: remoteworkhub.org/apply` + SMS_SUFFIX;
+      return `TOMORROW, ${name}! The Remote Work Hub Masterclass starts TOMORROW (Monday April 20). This is your LAST CHANCE to enroll. Complete your application and payment right now: remoteworkhub.org/apply` + SMS_SUFFIX;
     }
     return `FINAL REMINDER ${name}! The Masterclass starts TOMORROW MORNING. After tonight, enrollment closes. If you've been waiting, the time is NOW. Apply: remoteworkhub.org/apply` + SMS_SUFFIX;
   }
@@ -60,22 +60,22 @@ function getReminderEmail(daysLeft: number, timeOfDay: "morning" | "evening", fi
     urgencyBadge = `${daysLeft} DAYS LEFT`;
     urgencyColor = "#2563EB";
     bodyContent = timeOfDay === "morning"
-      ? `<p>Good morning! Just a friendly reminder that the <strong>Elite Web Development & SaaS Masterclass</strong> starts on <strong>Monday, March 16</strong>.</p><p>Seats are filling up fast. If you haven't completed your application and payment yet, now is the perfect time.</p>`
+      ? `<p>Good morning! Just a friendly reminder that the <strong>Elite Web Development & SaaS Masterclass</strong> starts on <strong>Monday, April 20</strong>.</p><p>Seats are filling up fast. If you haven't completed your application and payment yet, now is the perfect time.</p>`
       : `<p>The clock is ticking! In just ${daysLeft} days, the Masterclass begins. This is your opportunity to learn web development, earn a paid internship, and land your first client.</p><p>Don't let this chance pass you by.</p>`;
   } else if (daysLeft === 3) {
     subject = `Only 3 days left, ${name}!`;
     urgencyBadge = "3 DAYS LEFT";
     urgencyColor = "#d97706";
     bodyContent = timeOfDay === "morning"
-      ? `<p>Good morning! The Masterclass starts in just <strong>3 days</strong>. This weekend is your last chance to complete your application and secure your seat.</p><p>In 30 days, you could be building real web applications and earning from tech. All it takes is starting with <strong>GHS 200</strong>.</p>`
+      ? `<p>Good morning! The Masterclass starts in just <strong>3 days</strong>. This weekend is your last chance to complete your application and secure your seat.</p><p>In 6 weeks, you could be building real web applications and earning from tech. All it takes is starting with <strong>GHS 440</strong>.</p>`
       : `<p>The weekend is here but the clock is ticking! Monday will be here before you know it.</p><p>The students who are already enrolled are prepping their development environments. Don't get left behind.</p>`;
   } else if (daysLeft === 2) {
     subject = `${name}, 2 days to go!`;
     urgencyBadge = "2 DAYS LEFT";
     urgencyColor = "#ea580c";
     bodyContent = timeOfDay === "morning"
-      ? `<p>Good morning! The Masterclass is <strong>2 days away</strong>. Monday is almost here.</p><p>This isn't just another course — it's 30 days of building real products, with a <strong>paid internship</strong> at Doctor Barns Tech waiting for you at the end.</p>`
-      : `<p><strong>Only 2 days remain.</strong> The Elite Web Dev Masterclass kicks off Monday morning and seats are almost full.</p><p>If you've been on the fence, this is your sign. The investment starts at just GHS 200.</p>`;
+      ? `<p>Good morning! The Masterclass is <strong>2 days away</strong>. Monday is almost here.</p><p>This isn't just another course — it's 6 weeks of building real products, with a <strong>paid internship</strong> at Doctor Barns Tech waiting for you at the end.</p>`
+      : `<p><strong>Only 2 days remain.</strong> The Elite Web Dev Masterclass kicks off Monday morning and seats are almost full.</p><p>If you've been on the fence, this is your sign. The investment starts at just GHS 440.</p>`;
   } else if (daysLeft === 1) {
     subject = timeOfDay === "morning"
       ? `TOMORROW! ${name}, the Masterclass starts tomorrow!`
@@ -83,7 +83,7 @@ function getReminderEmail(daysLeft: number, timeOfDay: "morning" | "evening", fi
     urgencyBadge = "STARTS TOMORROW";
     urgencyColor = "#dc2626";
     bodyContent = timeOfDay === "morning"
-      ? `<p><strong>This is it.</strong> The Masterclass starts <strong>TOMORROW</strong> (Monday, March 16).</p><p>This is your last full day to complete your application and payment. After tonight, it may be too late to join this cohort.</p>`
+      ? `<p><strong>This is it.</strong> The Masterclass starts <strong>TOMORROW</strong> (Monday, April 20).</p><p>This is your last full day to complete your application and payment. After tonight, it may be too late to join this cohort.</p>`
       : `<p><strong>FINAL REMINDER.</strong> The Masterclass begins <strong>tomorrow morning</strong>.</p><p>If you've been thinking about it, procrastinating, or waiting for the "right time" — this is it. After tonight, enrollment may close.</p><p>Don't wake up Monday morning with regret. Secure your spot NOW.</p>`;
   } else {
     subject = `IT'S TODAY! The Masterclass starts now, ${name}!`;
@@ -101,8 +101,8 @@ function getReminderEmail(daysLeft: number, timeOfDay: "morning" | "evening", fi
 
     <div style="background: linear-gradient(135deg, #eff6ff 0%, #f5f3ff 50%, #fef3c7 100%); border-radius: 16px; padding: 28px; margin: 28px 0; text-align: center;">
       <p style="font-size: 12px; font-weight: 700; color: #2563EB; text-transform: uppercase; letter-spacing: 1.5px; margin: 0 0 8px;">Class Starts</p>
-      <p style="font-size: 28px; font-weight: 900; color: #0f172a; margin: 0; letter-spacing: -0.5px;">Monday, March 16</p>
-      <p style="color: #64748b; margin: 8px 0 0; font-size: 14px;">Start with just <strong>GHS 200</strong> (20% deposit)</p>
+      <p style="font-size: 28px; font-weight: 900; color: #0f172a; margin: 0; letter-spacing: -0.5px;">Monday, April 20</p>
+      <p style="color: #64748b; margin: 8px 0 0; font-size: 14px;">Start with just <strong>GHS 440</strong> (20% deposit)</p>
     </div>
 
     <div style="text-align: center; margin: 32px 0 16px;">

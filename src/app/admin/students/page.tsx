@@ -3,25 +3,51 @@ import { ExportRosterButton } from "../ClientButtons";
 import { Card, CardContent } from "@/components/ui/card";
 import { GraduationCap, Banknote, CreditCard, Users } from "lucide-react";
 import { StudentsTable } from "./StudentsClient";
+import { computeEnrollmentMoneyStats, filterRealEnrollments } from "@/lib/admin-metrics";
+import {
+    filterByCohortId,
+    getActiveCohortId,
+    normalizeCohortFilter,
+    resolveCohortScopeId,
+    type CohortFilterValue,
+} from "@/lib/admin-cohort";
+import { CohortScopePicker } from "@/components/admin/CohortScopePicker";
 
 export const revalidate = 0;
 
-async function getStudentsData() {
+async function getStudentsData(cohortFilter: CohortFilterValue) {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseServiceKey = process.env.NEXT_PUBLIC_SUPABASE_SERVICE_KEY;
 
     if (!supabaseUrl || !supabaseServiceKey) return null;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const [enrollmentsRes, profilesRes, paymentsRes] = await Promise.all([
+    const [enrollmentsRes, profilesRes, paymentsRes, cohortsRes, appsRes] = await Promise.all([
         supabase.from("enrollments").select("*, applications(*)"),
         supabase.from("profiles").select("*").eq("role", "STUDENT"),
         supabase.from("payments").select("*").in("status", ["PAID", "SUCCESS", "REVERSED"]).order("created_at", { ascending: false }),
+        supabase.from("cohorts").select("*").order("start_date", { ascending: false }),
+        supabase.from("applications").select("id, cohort_id, payment_reference"),
     ]);
 
-    const enrollments = enrollmentsRes.data || [];
-    const students = profilesRes.data || [];
-    const payments = paymentsRes.data || [];
+    const cohorts = cohortsRes.data || [];
+    const activeCohortId = getActiveCohortId(cohorts);
+    const scopeCohortId = resolveCohortScopeId(cohortFilter, activeCohortId);
+    const allEnrollments = enrollmentsRes.data || [];
+    const allStudents = profilesRes.data || [];
+    const allPayments = paymentsRes.data || [];
+    const applications = filterByCohortId(appsRes.data || [], scopeCohortId);
+    const enrollments = filterByCohortId(allEnrollments, scopeCohortId);
+    const appIds = new Set(applications.map((app: any) => app.id));
+    const paymentRefs = new Set(applications.map((app: any) => app.payment_reference).filter(Boolean));
+    const payments = allPayments.filter((payment: any) => {
+        if (payment.application_id && appIds.has(payment.application_id)) return true;
+        if (payment.reference && paymentRefs.has(payment.reference)) return true;
+        return false;
+    });
+    const students = allStudents.filter((student: any) =>
+        enrollments.some((enrollment: any) => enrollment.user_id === student.id)
+    );
 
     // Get last sign-in times from auth users
     const lastSignInMap: Record<string, string | null> = {};
@@ -34,15 +60,19 @@ async function getStudentsData() {
         }
     } catch {}
 
-    const totalPaid = enrollments.reduce((acc: number, e: any) => acc + Number(e.total_paid || 0), 0);
-    const totalBalance = enrollments.reduce((acc: number, e: any) => acc + Number(e.balance_due || 0), 0);
-    const fullPayers = enrollments.filter((e: any) => Number(e.balance_due || 0) === 0).length;
+    const realEnrollments = filterRealEnrollments(enrollments);
+    const money = computeEnrollmentMoneyStats(realEnrollments);
 
-    return { enrollments, students, payments, lastSignInMap, totalPaid, totalBalance, fullPayers };
+    return { enrollments: realEnrollments, students, payments, lastSignInMap, money, cohorts, activeCohortId };
 }
 
-export default async function ActiveStudentsPage() {
-    const data = await getStudentsData();
+export default async function ActiveStudentsPage({
+    searchParams,
+}: {
+    searchParams?: Promise<{ cohort?: string }>;
+}) {
+    const params = (await searchParams) || {};
+    const data = await getStudentsData(normalizeCohortFilter(params.cohort));
 
     if (!data) {
         return <div className="p-10 text-slate-900 font-bold">Error loading students data.</div>;
@@ -56,6 +86,7 @@ export default async function ActiveStudentsPage() {
                     <p className="text-slate-500 text-[15px] font-medium">Enrolled members with payment confirmation and credentials.</p>
                 </div>
                 <div className="flex items-center gap-3">
+                    <CohortScopePicker cohorts={data.cohorts} activeCohortId={data.activeCohortId} />
                     <ExportRosterButton students={data.students} enrollments={data.enrollments} />
                 </div>
             </div>
@@ -63,10 +94,10 @@ export default async function ActiveStudentsPage() {
             {/* Stats Row */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {[
-                    { title: "Total Students", value: data.students.length.toString(), icon: Users, color: "blue" },
-                    { title: "Total Collected", value: `GHS ${data.totalPaid.toLocaleString()}`, icon: Banknote, color: "emerald" },
-                    { title: "Outstanding", value: `GHS ${data.totalBalance.toLocaleString()}`, icon: CreditCard, color: "amber" },
-                    { title: "Fully Paid", value: data.fullPayers.toString(), icon: GraduationCap, color: "purple" },
+                    { title: "Student Accounts", value: data.students.length.toString(), icon: Users, color: "blue" },
+                    { title: "Total Collected", value: `GHS ${data.money.totalCollected.toLocaleString()}`, icon: Banknote, color: "emerald" },
+                    { title: "Outstanding", value: `GHS ${data.money.outstandingBalance.toLocaleString()}`, icon: CreditCard, color: "amber" },
+                    { title: "Fully Paid", value: data.money.fullyPaidCount.toString(), icon: GraduationCap, color: "purple" },
                 ].map((stat, i) => (
                     <Card key={i} className="bg-white border-slate-200/60 rounded-2xl shadow-[0_2px_10px_-3px_rgba(0,0,0,0.02)]">
                         <CardContent className="p-5">

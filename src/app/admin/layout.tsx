@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { LayoutDashboard, Users, CreditCard, Settings as SettingsIcon, LogOut, ChevronRight, Menu, Bell, Loader2, ShieldCheck, ArrowUpRight, AlertCircle, GraduationCap, X, Megaphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,7 @@ const supabase = createClient();
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
+    const searchParams = useSearchParams();
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
     const [email, setEmail] = useState("");
@@ -31,6 +32,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         { name: "Marketing", href: "/admin/marketing", icon: Megaphone },
         { name: "Settings", href: "/admin/settings", icon: SettingsIcon },
     ];
+    const cohortScope = searchParams.get("cohort");
 
     const currentPage = navigation.find(n => n.href === pathname)?.name || "Dashboard";
 
@@ -163,8 +165,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <div className="flex-1 overflow-y-auto py-6 px-3 space-y-1">
                 {navigation.map((item) => {
                     const isActive = pathname === item.href;
+                    const href = cohortScope ? `${item.href}?cohort=${encodeURIComponent(cohortScope)}` : item.href;
                     return (
-                        <Link key={item.name} href={item.href}>
+                        <Link key={item.name} href={href}>
                             <span className={`group relative flex items-center px-4 py-3 text-[13px] font-bold rounded-xl transition-all duration-200 ${
                                 isActive
                                     ? "bg-blue-50 text-blue-600 border border-blue-100/80"

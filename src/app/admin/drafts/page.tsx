@@ -1,40 +1,55 @@
 import { createClient } from "@supabase/supabase-js";
 import { ApplicationsListWithDetail } from "../components/ApplicationsListWithDetail";
 import { ExportReportButton, ExportUnfinishedButton } from "../ClientButtons";
+import { splitApplicationsForAdmin } from "@/lib/admin-applications";
+import {
+    filterByCohortId,
+    getActiveCohortId,
+    normalizeCohortFilter,
+    resolveCohortScopeId,
+    type CohortFilterValue,
+} from "@/lib/admin-cohort";
+import { CohortScopePicker } from "@/components/admin/CohortScopePicker";
 
 export const revalidate = 0;
 
-async function getApplicationsData() {
+async function getApplicationsData(cohortFilter: CohortFilterValue) {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseServiceKey = process.env.NEXT_PUBLIC_SUPABASE_SERVICE_KEY;
 
     if (!supabaseUrl || !supabaseServiceKey) return null;
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
-    const [appsRes, enrollmentsRes] = await Promise.all([
+    const [appsRes, enrollmentsRes, cohortsRes] = await Promise.all([
         supabase.from("applications").select("*").order("created_at", { ascending: false }),
-        supabase.from("enrollments").select("application_id, applications(email)"),
+        supabase.from("enrollments").select("cohort_id, application_id, applications(email)"),
+        supabase.from("cohorts").select("*").order("start_date", { ascending: false }),
     ]);
 
     if (appsRes.error) return null;
 
-    const all = appsRes.data ?? [];
-    const enrolledEmails = new Set(
-        (enrollmentsRes.data ?? [])
-            .map((e: any) => e.applications?.email?.toLowerCase())
-            .filter(Boolean)
-    );
+    const cohorts = cohortsRes.data ?? [];
+    const activeCohortId = getActiveCohortId(cohorts);
+    const scopeCohortId = resolveCohortScopeId(cohortFilter, activeCohortId);
+    const all = filterByCohortId(appsRes.data ?? [], scopeCohortId);
+    const enrollments = filterByCohortId(enrollmentsRes.data ?? [], scopeCohortId);
+    const grouped = splitApplicationsForAdmin(all, enrollments);
 
-    const applications = all.filter((a: any) => !a.is_unfinished);
-    const unfinishedApps = all.filter((a: any) =>
-        a.is_unfinished && !enrolledEmails.has(a.email?.toLowerCase())
-    );
-
-    return { applications, unfinishedApps };
+    return {
+        applications: grouped.completedApplications,
+        unfinishedApps: grouped.abandonedDrafts,
+        cohorts,
+        activeCohortId,
+    };
 }
 
-export default async function AbandonedDraftsPage() {
-    const data = await getApplicationsData();
+export default async function AbandonedDraftsPage({
+    searchParams,
+}: {
+    searchParams?: Promise<{ cohort?: string }>;
+}) {
+    const params = (await searchParams) || {};
+    const data = await getApplicationsData(normalizeCohortFilter(params.cohort));
 
     if (!data) {
         return (
@@ -50,9 +65,10 @@ export default async function AbandonedDraftsPage() {
                         Abandoned Drafts
                     </h1>
                     <p className="text-slate-500 text-[15px] font-medium">
-                        Users who started the form but did not complete it. Click any row to view saved data.
+                        Contactable drafts only, excluding anyone already enrolled.
                     </p>
                 </div>
+                <CohortScopePicker cohorts={data.cohorts} activeCohortId={data.activeCohortId} />
             </div>
 
             <div>

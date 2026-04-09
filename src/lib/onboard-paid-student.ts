@@ -1,4 +1,5 @@
 import { SupabaseClient } from "@supabase/supabase-js";
+import { COURSE_TOTAL_GHS } from "@/lib/pricing";
 import { sendEmail } from "@/lib/send-email";
 import { SmsAdapter } from "@/lib/sms-adapter";
 import { EMAIL_TEMPLATES, SMS_TEMPLATES, mergeVariables } from "@/lib/email-templates";
@@ -88,7 +89,7 @@ export async function onboardPaidStudent(
             application_id: appData.id,
             is_active: true,
             total_paid: appData.amount_ghs,
-            balance_due: 1000 - appData.amount_ghs,
+            balance_due: COURSE_TOTAL_GHS - appData.amount_ghs,
         });
 
         await supabase.from("applications").update({ user_id: authData.user.id }).eq("id", appData.id);
@@ -135,7 +136,7 @@ async function ensureProfileAndEnrollment(
             application_id: appData.id,
             is_active: true,
             total_paid: appData.amount_ghs,
-            balance_due: 1000 - appData.amount_ghs,
+            balance_due: COURSE_TOTAL_GHS - appData.amount_ghs,
         });
     }
     await supabase.from("applications").update({ user_id: userId }).eq("id", appData.id);

@@ -235,10 +235,10 @@ export const guarantees = [
   },
   {
     title: "1-Month Paid Internship",
-    desc: "After 6 weeks of training, every student transitions into a paid internship at Doctor Barns Tech — working on live client projects alongside senior developers.",
+    desc: "After 6 weeks of training, every student transitions into a 1-month paid internship at Doctor Barns Tech — working on live client projects alongside senior developers.",
     icon: "Briefcase",
     color: "blue" as const,
-    stat: "4 Weeks",
+    stat: "1 Month",
     statLabel: "Paid Real-World Experience",
   },
 ];
@@ -272,7 +272,7 @@ export const testimonials = [
     role: "Freelance Developer & Agency Owner",
     cohort: "Cohort 2 Graduate",
     quote:
-      "The internship experience alone was worth more than the entire program fee. Working on live client projects with senior devs — I learned more in those 4 weeks than I ever could watching YouTube videos for a year.",
+      "The internship experience alone was worth more than the entire program fee. Working on live client projects with senior devs — I learned more in that month than I ever could watching YouTube videos for a year.",
     highlight: "Launched own dev agency 2 months after graduation",
     avatar: "KB",
     rating: 5,

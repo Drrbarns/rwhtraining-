@@ -163,7 +163,7 @@ export function MarketingClient({ audiences, allContacts, cities, tiers, campaig
 
   const previewVars: Record<string, string> = {
     first_name: "John", last_name: "Doe", email: "john@example.com",
-    amount: "500", balance: "500", tier: "50",
+    amount: "1100", balance: "1100", tier: "50",
     login_url: "#", cohort_name: "2026 Elite Web Development & SaaS Masterclass",
     subject_line: subject, message_body: messageBody,
   };

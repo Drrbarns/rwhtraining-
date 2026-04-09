@@ -213,7 +213,7 @@ export default function StudentPortal() {
     const firstName = profile?.full_name?.split(" ")[0] || "Student";
     const totalPaid = Number(enrollment?.total_paid || 0);
     const balanceDue = Number(enrollment?.balance_due || 0);
-    const totalCost = 1000;
+    const totalCost = 2200;
     const paymentProgress = totalCost > 0 ? (totalPaid / totalCost) * 100 : 0;
 
     const tabs = [

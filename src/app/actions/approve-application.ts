@@ -4,6 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 import { createClient as createServerSupabase } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 import { onboardPaidStudent } from "@/lib/onboard-paid-student";
+import { tierInitialAmountGhs } from "@/lib/pricing";
 
 export async function approveApplicationAction(id: string) {
     if (!id || typeof id !== "string") {
@@ -103,7 +104,7 @@ export async function approveApplicationAction(id: string) {
             first_name: app.first_name,
             last_name: app.last_name,
             network: "MANUAL",
-            amount_ghs: app.amount_ghs ?? 500,
+            amount_ghs: app.amount_ghs ?? tierInitialAmountGhs(app.tier || "50"),
             tier: app.tier || "50",
             gateway: "manual",
             status: "PAID",

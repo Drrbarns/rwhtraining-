@@ -64,7 +64,7 @@ export const metadata: Metadata = {
     siteName: "Remote Work Hub",
     title: "2026 Elite Web Development Masterclass — Remote Work Hub",
     description:
-      "Become a professional web developer in 30 days. First client guaranteed. Paid internship included. Top 2 get hired by Doctor Barns Tech. GHS 1,000 — Accra, Ghana.",
+      "Become a professional web developer in 6 weeks. First client guaranteed. Paid internship included. Top 2 get hired by Doctor Barns Tech. GHS 2,200 — Accra, Ghana.",
     countryName: "Ghana",
   },
   twitter: {
@@ -73,7 +73,7 @@ export const metadata: Metadata = {
     creator: "@remoteworkhub",
     title: "2026 Elite Web Development Masterclass — Remote Work Hub",
     description:
-      "Become a professional web developer in 30 days. First client guaranteed. Paid internship. Top 2 get hired. Starts March 16.",
+      "Become a professional web developer in 6 weeks. First client guaranteed. Paid internship. Top 2 get hired. GHS 2,200. Starts April 20, 2026.",
   },
   robots: {
     index: true,
