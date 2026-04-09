@@ -1,15 +1,16 @@
 import type { Metadata } from "next";
-import { Inter, Plus_Jakarta_Sans, Playfair_Display } from "next/font/google";
+import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Toaster } from "@/components/ui/toaster";
 import { StructuredData } from "@/components/StructuredData";
 import { PageViewTracker } from "@/components/PageViewTracker";
+import { Navbar } from "@/components/layout/Navbar";
+import { Footer } from "@/components/layout/Footer";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-jakarta" });
-const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" });
 
 const APP_URL = "https://remoteworkhub.org";
 
@@ -19,7 +20,7 @@ export const metadata: Metadata = {
     template: "%s | Remote Work Hub",
   },
   description:
-    "Become a Professional Web Developer & Get Your First Paying Client in 30 Days. Paid internship at Doctor Barns Tech. Top 2 students get hired. Starts March 16 in Accra, Ghana.",
+    "Become a Professional Web Developer in 6 Weeks. First client guaranteed. Paid internship at Doctor Barns Tech. Top 2 students get hired. Starts April 20, 2026 in Accra, Ghana.",
   metadataBase: new URL(APP_URL),
   applicationName: "Remote Work Hub Masterclass",
   generator: "Next.js",
@@ -105,14 +106,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark scroll-smooth">
+    <html lang="en" className="scroll-smooth">
       <head>
         <meta name="theme-color" content="#2563EB" />
         <link rel="canonical" href={APP_URL} />
         <StructuredData />
       </head>
-      <body className={`${inter.variable} ${jakarta.variable} ${playfair.variable} antialiased font-sans bg-[#0A0A0A] text-gray-100`}>
-        {children}
+      <body className={`${inter.variable} ${jakarta.variable} antialiased font-sans bg-white text-slate-900`}>
+        <Navbar />
+        <main>{children}</main>
+        <Footer />
         <PageViewTracker />
         <Toaster />
         <Analytics />

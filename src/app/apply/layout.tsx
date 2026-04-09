@@ -3,14 +3,14 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Apply Now — Elite Web Development Masterclass",
   description:
-    "Apply for the 2026 Elite Web Development & SaaS Masterclass. No experience needed. Start with GHS 200 deposit. Paid internship, first client guaranteed, top 2 get hired. Accra, Ghana.",
+    "Apply for the April 2026 Elite 6-Week Web Development Masterclass. No experience needed. GHS 2,200 total. Deposit options available. Paid internship, first client guaranteed, top 2 get hired. Accra, Ghana.",
   alternates: {
     canonical: "https://remoteworkhub.org/apply",
   },
   openGraph: {
     title: "Apply Now — Remote Work Hub Masterclass",
     description:
-      "Apply for the 30-day intensive web development masterclass. GHS 1,000 total. Start with just GHS 200. Paid internship included.",
+      "Apply for the 6-week intensive web development masterclass starting April 20, 2026. GHS 2,200 total. Paid internship included. Top 2 get hired.",
     url: "https://remoteworkhub.org/apply",
   },
 };

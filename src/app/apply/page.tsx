@@ -350,7 +350,7 @@ export default function ApplyPage() {
                                             {selectedTier === "20" && <div className="w-2 h-2 bg-black rounded-full shadow-sm" />}
                                         </div>
                                         <div>
-                                            <span className="block text-[17px] tracking-wide font-bold text-gray-200 mb-1 transition-colors">20% Deposit <span className={`font-medium ml-2 text-sm transition-colors ${selectedTier === "20" ? "text-[#2563EB]/80" : "text-gray-600"}`}>(GHS 200)</span></span>
+                                            <span className="block text-[17px] tracking-wide font-bold text-gray-200 mb-1 transition-colors">20% Deposit <span className={`font-medium ml-2 text-sm transition-colors ${selectedTier === "20" ? "text-[#2563EB]/80" : "text-gray-600"}`}>(GHS 440)</span></span>
                                             <span className="text-[15px] font-medium text-gray-500 transition-colors">Lock your seat now, pay the rest later.</span>
                                         </div>
                                     </div>
@@ -371,7 +371,7 @@ export default function ApplyPage() {
                                             {selectedTier === "50" && <div className="w-2 h-2 bg-black rounded-full shadow-sm" />}
                                         </div>
                                         <div>
-                                            <span className={`block text-[17px] tracking-wide font-bold mb-1 transition-colors ${selectedTier === "50" ? "text-white" : "text-gray-200"}`}>50% Half-Payment <span className={`font-medium ml-2 text-sm transition-colors ${selectedTier === "50" ? "text-[#2563EB]" : "text-[#2563EB]/60"}`}>(GHS 500)</span></span>
+                                            <span className={`block text-[17px] tracking-wide font-bold mb-1 transition-colors ${selectedTier === "50" ? "text-white" : "text-gray-200"}`}>50% Half-Payment <span className={`font-medium ml-2 text-sm transition-colors ${selectedTier === "50" ? "text-[#2563EB]" : "text-[#2563EB]/60"}`}>(GHS 1,100)</span></span>
                                             <span className="text-[15px] font-medium text-gray-500 transition-colors">Access all initial portal features immediately.</span>
                                         </div>
                                     </div>
@@ -390,7 +390,7 @@ export default function ApplyPage() {
                                             {selectedTier === "100" && <div className="w-2 h-2 bg-black rounded-full shadow-sm" />}
                                         </div>
                                         <div>
-                                            <span className={`block text-[17px] tracking-wide font-bold mb-1 transition-colors ${selectedTier === "100" ? "text-white" : "text-gray-200"}`}>100% Full Payment <span className="text-gray-600 font-medium ml-2 text-sm">(GHS 1000)</span></span>
+                                            <span className={`block text-[17px] tracking-wide font-bold mb-1 transition-colors ${selectedTier === "100" ? "text-white" : "text-gray-200"}`}>100% Full Payment <span className="text-gray-600 font-medium ml-2 text-sm">(GHS 2,200)</span></span>
                                             <span className="text-[15px] font-medium text-gray-500 transition-colors">Zero distractions. Full VIP priority boarding.</span>
                                         </div>
                                     </div>

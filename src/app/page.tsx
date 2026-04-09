@@ -2,419 +2,546 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { motion, useScroll, useSpring, Variants } from "framer-motion";
+import { motion, Variants, AnimatePresence } from "framer-motion";
 import {
-  ArrowRight,
-  CheckCircle2,
-  ShieldCheck,
-  Rocket,
-  GraduationCap,
-  Phone,
-  MapPin,
-  Globe,
-  Flame,
-  Monitor,
-  Building2,
-  Briefcase,
-  Target,
-  Award,
-  Terminal,
-  Cpu,
-  LineChart,
-  Users,
-  CheckCircle
+  ArrowRight, CheckCircle2, Rocket, GraduationCap,
+  MapPin, Globe, Flame, Monitor, Building2, Briefcase, Target,
+  Award, Terminal, Cpu, LineChart, Users, Star, MessageCircle,
+  Zap, Plus, Store, Hotel, LayoutDashboard, ClipboardList, CircleDollarSign
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { SocialShareButtons } from "@/components/SocialShareButtons";
+import { Container } from "@/components/layout/Container";
+import { stats, faqs, brand } from "@/lib/siteData";
 
 const FADE_UP: Variants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } },
+  hidden: { opacity: 0, y: 28 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } },
 };
-
 const STAGGER: Variants = {
-  visible: { transition: { staggerChildren: 0.15 } },
+  visible: { transition: { staggerChildren: 0.12 } },
 };
 
-export default function MasterpieceHomepage() {
-  const { scrollYProgress } = useScroll();
-  const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
+const iconMap: Record<string, React.ElementType> = {
+  GraduationCap, Monitor, Building2, Activity: Zap, Users,
+  Home: MapPin, LineChart, Cpu, ShoppingCart: Target,
+  LayoutDashboard: Terminal, Heart: Star, Globe,
+};
 
+const systems = [
+  { icon: GraduationCap, title: "School Management", desc: "Student, teacher & administrative portals.", value: "Market Value: GHS 8k - 15k" },
+  { icon: Store, title: "POS Systems", desc: "Sales, inventory, and automated receipts.", value: "Market Value: GHS 7k - 12k" },
+  { icon: Hotel, title: "Hotel Management", desc: "Real-time room booking and guest tracking.", value: "Market Value: GHS 10k - 20k" },
+  { icon: ClipboardList, title: "Hospital Management", desc: "Patient histories, appointments & records.", value: "Market Value: GHS 12k - 25k" },
+  { icon: Users, title: "CRM Systems", desc: "Lead pipelines & customer relationships.", value: "Market Value: GHS 8k - 18k" },
+  { icon: Building2, title: "Hostel Management", desc: "Tenant bed-space allocation & rent billing.", value: "Market Value: GHS 8k - 14k" },
+  { icon: CircleDollarSign, title: "Accounting Software", desc: "Dynamic invoicing & financial reporting.", value: "Market Value: GHS 10k - 22k" },
+  { icon: LayoutDashboard, title: "ERP Platforms", desc: "Full-scale company resource planning.", value: "Market Value: GHS 20k+" },
+];
+
+// Weeks preview for home page
+const weekHighlights = [
+  { week: 1, title: "HTML, CSS & React Foundations", color: "bg-blue-50 border-blue-200", badge: "bg-blue-600" },
+  { week: 2, title: "TypeScript, Tailwind & Advanced UI", color: "bg-blue-50 border-blue-200", badge: "bg-blue-600" },
+  { week: 3, title: "Backend, Databases & Auth Systems", color: "bg-indigo-50 border-indigo-200", badge: "bg-indigo-600" },
+  { week: 4, title: "E-Commerce & Payment Gateways", color: "bg-blue-50 border-blue-200", badge: "bg-blue-600" },
+  { week: 5, title: "Enterprise Dashboards & ERP Systems", color: "bg-blue-50 border-blue-200", badge: "bg-blue-600" },
+  { week: 6, title: "Client Acquisition & Agency Launch", color: "bg-amber-50 border-amber-200", badge: "bg-amber-500" },
+];
+
+export default function HomePage() {
   return (
-    <div className="bg-white text-slate-900 min-h-screen selection:bg-blue-600/20 selection:text-blue-900 font-sans overflow-x-hidden">
-      {/* Scroll Progress */}
-      <motion.div className="fixed top-0 left-0 right-0 h-1 bg-blue-600 z-50 origin-left" style={{ scaleX }} />
+    <div className="bg-white text-slate-900 overflow-x-hidden">
 
-      {/* ─── STANDARD CORPORATE HEADER ─── */}
-      <header className="fixed top-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 py-2 sm:py-3 shadow-sm transition-all h-16 sm:h-20 flex items-center">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 w-full flex items-center justify-between gap-3">
-
-          {/* Logo Section */}
-          <Link href="/" className="flex items-center gap-2 sm:gap-3 shrink-0">
-            <div className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-blue-50 text-blue-600">
-              <ShieldCheck className="w-5 h-5 sm:w-6 sm:h-6" />
-            </div>
-            <div className="font-extrabold text-lg sm:text-xl tracking-tight text-slate-900 hidden sm:flex items-baseline">
-              Remote Work Hub
-            </div>
-          </Link>
-
-          {/* Navigation */}
-          <nav className="hidden lg:flex items-center gap-8">
-            {['Curriculum', 'Portfolio', 'Challenge', 'Internship', 'FAQ'].map((item) => (
-              <Link
-                key={item}
-                href={`#${item.toLowerCase()}`}
-                className="text-[14px] font-semibold text-slate-600 hover:text-blue-600 transition-colors py-2"
-              >
-                {item}
-              </Link>
-            ))}
-          </nav>
-
-          {/* CTA Group */}
-          <div className="flex items-center gap-2 sm:gap-5 shrink-0">
-            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-md bg-amber-50 border border-amber-200/60">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-500 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500" />
-              </span>
-              <span className="text-[12px] font-bold text-amber-700 tracking-wide whitespace-nowrap">
-                Only 10 Seats Available
-              </span>
-            </div>
-            <Link href="/apply">
-              <Button className="h-9 px-4 sm:h-11 sm:px-7 rounded-lg bg-blue-600 text-white hover:bg-blue-700 font-bold text-[12px] sm:text-[14px] transition-all duration-300 shadow-md hover:shadow-lg">
-                Secure Your Seat
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      {/* ─── FULL BACKGROUND IMAGE HERO ─── */}
-      <section className="relative pt-24 pb-16 sm:pt-32 sm:pb-24 md:pt-48 md:pb-40 min-h-[90vh] sm:min-h-[95vh] flex items-center overflow-hidden">
-        {/* Absolute Background Image */}
+      {/* ─── HERO ─── */}
+      <section className="relative min-h-[90vh] md:min-h-screen bg-[#0a192f] flex items-center pt-24 pb-16 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <Image
             src="/hero_bg_dark.jpg"
             alt="Young ambitious web developer learning"
             fill
-            className="object-cover object-top"
+            className="object-cover object-center"
             priority
           />
-          {/* 20% Corporate Blue Overlay */}
-          <div className="absolute inset-0 bg-[#0a192f]/20" />
+          <div className="absolute inset-0 bg-black/40" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0a192f] via-transparent to-transparent opacity-90" />
         </div>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 w-full">
-          <div className="max-w-3xl">
-
-            <motion.div initial="hidden" animate="visible" variants={STAGGER} className="flex flex-col items-start text-left bg-white/95 backdrop-blur-xl p-6 sm:p-8 md:p-12 rounded-2xl sm:rounded-[2rem] border border-white/40 shadow-2xl max-w-2xl">
-
-              {/* Top Badge */}
-              <motion.div variants={FADE_UP} className="mb-6">
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-100 shadow-sm">
-                  <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
-                  <span className="text-blue-700 text-[13px] font-bold tracking-widest uppercase">
-                    2026 Elite Masterclass
-                  </span>
-                </div>
+        <Container className="relative z-10 w-full flex items-center min-h-[70vh]">
+          <div className="w-full max-w-2xl mr-auto">
+            <div className="space-y-8 flex flex-col items-start text-left w-full">
+              <motion.div variants={FADE_UP} className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-500/20 border border-blue-400/30 text-blue-200 text-xs font-semibold uppercase tracking-wider rounded-full backdrop-blur-sm font-jakarta">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
+                2026 Elite Masterclass · Only 10 Seats Available
               </motion.div>
 
-              {/* Main Headline */}
-              <motion.h1 variants={FADE_UP} className="text-3xl sm:text-4xl md:text-5xl lg:text-[3.5rem] font-extrabold tracking-tight text-slate-900 leading-[1.1] mb-5 sm:mb-6">
-                Become a Professional <br className="hidden lg:block" />
-                <span className="text-blue-600">Web Developer</span><br className="hidden lg:block" />
-                <span className="text-slate-600 font-semibold tracking-tight text-xl sm:text-2xl md:text-3xl mt-2 sm:mt-3 block">
-                  &amp; Secure Your First Client in 30 Days.
-                </span>
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.1 }}
+                className="text-5xl md:text-6xl lg:text-[5rem] font-extrabold text-white tracking-tight leading-[1.1] font-jakarta"
+              >
+                Become a Professional <br className="hidden md:block" />
+                <span className="text-blue-500">Web Developer</span>{" "}
+                &amp; Secure Your First Client in <span className="text-amber-400">30 Days.</span>
               </motion.h1>
 
-              {/* Sub-headline */}
-              <motion.p variants={FADE_UP} className="text-base sm:text-lg text-slate-600 mb-6 sm:mb-8 leading-relaxed max-w-xl">
-                This isn't another tutorial hell. We engineer absolute beginners into high-value developers capable of building the complex systems that corporate clients exactly pay for.
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="text-lg md:text-xl text-slate-300 font-light leading-relaxed max-w-2xl font-jakarta"
+              >
+                This isn&apos;t another tutorial hell. We engineer absolute beginners into high-value developers capable of building the complex systems that corporate clients exactly pay for.
               </motion.p>
 
-              {/* High-End Trust Checks */}
-              <motion.div variants={FADE_UP} className="grid sm:grid-cols-2 gap-4 mb-10 w-full">
-                <div className="flex flex-col gap-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
-                      <CheckCircle2 className="w-4 h-4 text-blue-600" />
-                    </div>
-                    <span className="text-[14px] font-bold text-slate-700">Diploma Certification</span>
+              <motion.div variants={FADE_UP} className="grid grid-cols-2 gap-y-4 gap-x-2 w-full max-w-lg pt-2 font-jakarta">
+                {[
+                  { icon: CheckCircle2, text: "Diploma Certification", color: "text-blue-400" },
+                  { icon: Flame, text: "Top 2 Get Hired", color: "text-amber-400" },
+                  { icon: CheckCircle2, text: "First Client Guaranteed", color: "text-emerald-400" },
+                  { icon: CheckCircle2, text: "No Experience Required", color: "text-blue-400" },
+                ].map((item) => (
+                  <div key={item.text} className="flex items-center gap-2.5">
+                    <item.icon className={`w-4 h-4 ${item.color} shrink-0`} />
+                    <span className="text-[13px] font-medium text-white">{item.text}</span>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 rounded-full bg-amber-50 flex items-center justify-center shrink-0">
-                      <Flame className="w-4 h-4 text-amber-500" />
-                    </div>
-                    <span className="text-[14px] font-bold text-slate-700">Top 2 Get <span className="text-blue-600">Hired</span></span>
-                  </div>
-                </div>
-                <div className="flex flex-col gap-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 rounded-full bg-emerald-50 flex items-center justify-center shrink-0">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                    </div>
-                    <span className="text-[14px] font-bold text-slate-700">First Client <span className="text-emerald-600">Guaranteed</span></span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
-                      <CheckCircle2 className="w-4 h-4 text-blue-600" />
-                    </div>
-                    <span className="text-[14px] font-bold text-slate-700">No Experience Required</span>
-                  </div>
-                </div>
+                ))}
               </motion.div>
 
-              {/* Primary Call to Action */}
-              <motion.div variants={FADE_UP} className="flex flex-col sm:flex-row items-center gap-6 w-full">
-                <Link href="/apply" className="w-full sm:w-auto">
-                  <Button className="w-full sm:w-auto h-14 px-8 rounded-xl bg-blue-600 text-white hover:bg-blue-700 font-bold text-base transition-all duration-300 shadow-[0_8px_20px_rgba(37,99,235,0.2)] hover:shadow-[0_12px_25px_rgba(37,99,235,0.3)] hover:-translate-y-0.5 group">
-                    Apply for the Masterclass
-                    <ArrowRight className="w-5 h-5 ml-2 transition-transform group-hover:translate-x-1" />
-                  </Button>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+                className="flex flex-col sm:flex-row items-center justify-start gap-6 pt-8 w-full font-jakarta"
+              >
+                <Link href="/apply" className="h-14 px-8 text-[15px] bg-blue-600 hover:bg-blue-500 text-white font-bold shadow-[0_0_30px_rgba(37,99,235,0.4)] transition-all duration-300 w-full sm:w-auto rounded-xl inline-flex items-center justify-center">
+                  Apply for the Masterclass <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
-                <div className="flex flex-col items-center sm:items-start shrink-0">
-                  <span className="text-[11px] text-slate-500 font-bold uppercase tracking-widest mb-0.5">Program Fee</span>
-                  <span className="text-2xl font-black text-slate-900 tracking-tight">GHS 1,000</span>
+                <div className="flex flex-col justify-center text-left">
+                  <span className="text-[11px] text-slate-400 font-bold uppercase tracking-widest mb-1">Program Fee</span>
+                  <span className="text-2xl font-black text-white leading-none tracking-tight">GHS 1,000</span>
                 </div>
               </motion.div>
-
-            </motion.div>
+            </div>
           </div>
-        </div>
+        </Container>
       </section>
 
-      {/* ─── THE REALITY SHIFT (High Contrast Deep Blue Section) ─── */}
-      <section className="py-16 sm:py-24 bg-[#0a192f] text-white border-y border-[#112240]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="grid lg:grid-cols-2 gap-10 sm:gap-16 items-center">
+      {/* ─── STATS BAR ─── */}
+      <section className="py-10 bg-white border-b border-slate-100">
+        <Container>
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={STAGGER}
+            className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-0 divide-y-2 lg:divide-y-0 lg:divide-x divide-slate-100"
+          >
+            {stats.map((stat) => (
+              <motion.div key={stat.label} variants={FADE_UP} className="text-center px-6 py-2">
+                <div className="text-3xl md:text-4xl font-black text-blue-600 mb-1">{stat.value}</div>
+                <div className="text-sm font-bold text-slate-900 mb-0.5">{stat.label}</div>
+                <div className="text-xs text-slate-500">{stat.desc}</div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </Container>
+      </section>
 
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={STAGGER}>
-              <motion.span variants={FADE_UP} className="text-blue-400 font-bold uppercase tracking-widest text-sm mb-4 block">The Industry Reality</motion.span>
+      {/* ─── THE REALITY SHIFT ─── */}
+      <section className="py-20 sm:py-28 bg-[#0a192f] text-white">
+        <Container>
+          <div className="grid lg:grid-cols-2 gap-14 items-center">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={STAGGER}
+            >
+              <motion.span variants={FADE_UP} className="eyebrow text-blue-400 mb-4 block">
+                The Industry Reality
+              </motion.span>
               <motion.h2 variants={FADE_UP} className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight leading-tight mb-6">
-                Tutorials Will Not Get You Paid.
+                Tutorials Will Not{" "}
+                <span className="text-blue-400">Get You Paid.</span>
               </motion.h2>
-              <motion.div variants={FADE_UP} className="space-y-6 text-slate-300 text-lg leading-relaxed">
+              <motion.div variants={FADE_UP} className="space-y-5 text-slate-400 text-lg leading-relaxed">
                 <p>
-                  The market is flooded with "developers" who can only build basic landing pages after watching endless free tutorials online. But here is the brutal truth: <strong className="text-white border-b-2 border-blue-500">Corporate clients don't pay high retainers for landing pages; they pay for complex business systems.</strong>
+                  The market is flooded with &ldquo;developers&rdquo; who can only build basic landing pages after
+                  watching endless free tutorials. But the brutal truth:{" "}
+                  <strong className="text-white border-b border-blue-500">
+                    Corporate clients don&apos;t pay high retainers for landing pages — they pay for complex business systems.
+                  </strong>
                 </p>
                 <p>
-                  Our masterclass is a rigid, offline immersion specifically designed to strip away the fluff. We focus entirely on high-value, production-grade logic—the exact systems that companies are actively paying thousands of Cedis to acquire.
+                  Our masterclass is a rigid, offline immersion specifically designed to strip away the fluff.
+                  We focus on high-value, production-grade systems — the exact software Ghanaian companies
+                  are actively paying GHS 5,000 to GHS 15,000 to acquire.
                 </p>
+              </motion.div>
+              <motion.div variants={FADE_UP} className="mt-8">
+                <Link href="/about" className="inline-flex items-center gap-2 text-blue-400 font-semibold hover:text-blue-300 transition-colors group text-sm">
+                  Learn about our approach
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </Link>
               </motion.div>
             </motion.div>
 
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={STAGGER} className="grid sm:grid-cols-2 gap-6">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={STAGGER}
+              className="grid sm:grid-cols-2 gap-4"
+            >
               {[
-                { icon: Terminal, title: "Offline Immersion", desc: "Hands-on, in-person mentorship to enforce focus and rapid learning." },
-                { icon: Target, title: "Client Acquisition", desc: "Learn the exact psychology of finding and closing real corporate deals." },
-                { icon: Cpu, title: "Real Architecture", desc: "Build scalable databases, strict authentication, and business logic." },
-                { icon: Award, title: "Premium Branding", desc: "Position yourself as a highly-skilled agency, not a cheap freelancer." },
-              ].map((feature, i) => (
-                <div key={i} className="bg-[#112240] border border-[#233554] p-6 rounded-2xl hover:border-blue-500 transition-colors group">
-                  <div className="w-12 h-12 bg-blue-500/10 flex items-center justify-center rounded-lg mb-5 group-hover:bg-blue-500/20 transition-colors">
-                    <feature.icon className="w-6 h-6 text-blue-400" />
+                { icon: Terminal, title: "Offline Immersion", desc: "Hands-on, in-person mentorship to enforce focus and accelerate learning." },
+                { icon: Target, title: "Client Acquisition", desc: "Learn the exact psychology of finding, pitching & closing real corporate deals." },
+                { icon: Cpu, title: "Real Architecture", desc: "Build scalable databases, strict authentication, and enterprise business logic." },
+                { icon: Award, title: "Premium Positioning", desc: "Position yourself as a high-value agency — not a cheap, disposable freelancer." },
+              ].map((f) => (
+                <motion.div
+                  key={f.title}
+                  variants={FADE_UP}
+                  className="bg-white/5 border border-white/10 p-6 rounded-2xl hover:border-blue-500/50 hover:bg-white/8 transition-all group"
+                >
+                  <div className="w-11 h-11 bg-blue-500/10 flex items-center justify-center rounded-xl mb-4 group-hover:bg-blue-500/20 transition-colors">
+                    <f.icon className="w-5 h-5 text-blue-400" />
                   </div>
-                  <h3 className="text-white font-bold text-lg mb-2">{feature.title}</h3>
-                  <p className="text-slate-400 text-sm leading-relaxed">{feature.desc}</p>
-                </div>
+                  <h3 className="text-white font-bold text-base mb-2">{f.title}</h3>
+                  <p className="text-slate-400 text-sm leading-relaxed">{f.desc}</p>
+                </motion.div>
               ))}
             </motion.div>
-
           </div>
-        </div>
+        </Container>
       </section>
 
-      {/* ─── CURRICULUM: WHAT YOU WILL ACHIEVE ─── */}
-      <section id="curriculum" className="py-16 sm:py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={STAGGER} className="text-center mb-16 max-w-3xl mx-auto">
-            <motion.span variants={FADE_UP} className="text-blue-600 font-bold uppercase tracking-widest text-sm mb-3 block">Program Outcomes</motion.span>
-            <motion.h2 variants={FADE_UP} className="text-2xl sm:text-3xl md:text-5xl font-extrabold tracking-tight text-slate-900 leading-tight mb-6">
-              What You Will Achieve by Day 30
-            </motion.h2>
-            <motion.p variants={FADE_UP} className="text-slate-600 text-lg">
-              By the end of this intensive program, you will transition from an absolute beginner to a capable technical consultant ready to take on clients.
-            </motion.p>
-          </motion.div>
-
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={STAGGER} className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-8">
-            {[
-              { title: "Build Corporate Sites", desc: "Design and code high-performance, responsive websites for corporate entities." },
-              { title: "Develop E-Commerce", desc: "Build full-scale online stores including user carts, products, and secure payment flows." },
-              { title: "Engineer Dashboards", desc: "Create the internal management software that companies rely on to run daily operations." },
-              { title: "Start Your Agency", desc: "Structure your own web development company, from basic legalities to service pricing." },
-              { title: "Land Your First Client — Guaranteed", desc: "We don't let you leave without a paying client. Every student signs their first web design contract before the program ends." },
-            ].map((item, i) => (
-              <motion.div
-                key={item.title}
-                variants={FADE_UP}
-                className={`flex gap-4 sm:gap-5 p-5 sm:p-8 rounded-2xl bg-slate-50 border border-slate-200 hover:border-blue-200 hover:shadow-lg transition-all ${i === 4 ? 'sm:col-span-2 lg:col-span-1' : ''}`}
-              >
-                <div className="shrink-0 mt-1">
-                  <CheckCircle className="w-8 h-8 text-blue-600" />
-                </div>
-                <div>
-                  <h3 className="text-slate-900 font-bold text-xl mb-2">{item.title}</h3>
-                  <p className="text-slate-600 text-base leading-relaxed">{item.desc}</p>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ─── THE PORTFOLIO: SYSTEMS WE BUILD ─── */}
-      <section id="portfolio" className="py-16 sm:py-24 bg-slate-100 border-y border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={STAGGER} className="text-center mb-16 max-w-3xl mx-auto">
-            <motion.span variants={FADE_UP} className="text-blue-600 font-bold uppercase tracking-widest text-sm mb-3 block">High-Ticket Software</motion.span>
-            <motion.h2 variants={FADE_UP} className="text-2xl sm:text-3xl md:text-5xl font-extrabold tracking-tight text-slate-900 leading-tight mb-6">
-              Real Business Systems You Will Build.
-            </motion.h2>
-            <motion.p variants={FADE_UP} className="text-slate-600 text-lg">
-              We focus on building the exact enterprise tools and portals that real businesses use heavily, giving you an elite portfolio right out of the gate.
-            </motion.p>
-          </motion.div>
-
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={STAGGER} className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
-            {[
-              { name: "School Management", desc: "Student, teacher & administrative portals.", icon: Building2 },
-              { name: "POS Systems", desc: "Sales, inventory, and automated receipts.", icon: Monitor },
-              { name: "Hotel Management", desc: "Real-time room booking and guest tracking.", icon: Briefcase },
-              { name: "Hospital Management", desc: "Patient histories, appointments & records.", icon: ShieldCheck },
-              { name: "CRM Systems", desc: "Lead pipelines & customer relationships.", icon: Users },
-              { name: "Hostel Management", desc: "Tenant bed-space allocation & rent billing.", icon: Building2 },
-              { name: "Accounting Software", desc: "Dynamic invoicing & financial reporting.", icon: LineChart },
-              { name: "ERP Platforms", desc: "Full-scale company resource planning.", icon: Cpu },
-            ].map((sys) => (
-              <motion.div
-                key={sys.name}
-                variants={FADE_UP}
-                className="bg-white p-4 sm:p-6 rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-blue-300 transition-all group"
-              >
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-blue-50 flex items-center justify-center mb-3 sm:mb-5 group-hover:bg-blue-600 transition-colors">
-                  <sys.icon className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 group-hover:text-white transition-colors" />
-                </div>
-                <h3 className="font-bold text-slate-900 text-base sm:text-lg mb-1 sm:mb-2">{sys.name}</h3>
-                <p className="text-slate-500 text-xs sm:text-sm leading-relaxed">{sys.desc}</p>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ─── OUR GUARANTEES ─── */}
-      <section className="py-10 sm:py-16 bg-[#0a192f] border-y border-[#112240]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={STAGGER} className="grid sm:grid-cols-2 gap-4 sm:gap-6">
-            <motion.div variants={FADE_UP} className="flex items-start sm:items-center gap-4 sm:gap-5 bg-[#112240] border border-[#233554] rounded-2xl p-5 sm:p-8">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-emerald-500/10 flex items-center justify-center shrink-0">
-                <Target className="w-6 h-6 sm:w-7 sm:h-7 text-emerald-400" />
-              </div>
-              <div>
-                <h3 className="text-white font-extrabold text-base sm:text-lg mb-1">First Client Guaranteed</h3>
-                <p className="text-slate-400 text-[13px] sm:text-[14px] leading-relaxed">Every single student will sign their first paying web design client before the training ends. We make sure of it.</p>
-              </div>
-            </motion.div>
-            <motion.div variants={FADE_UP} className="flex items-start sm:items-center gap-4 sm:gap-5 bg-[#112240] border border-[#233554] rounded-2xl p-5 sm:p-8">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-amber-500/10 flex items-center justify-center shrink-0">
-                <Flame className="w-6 h-6 sm:w-7 sm:h-7 text-amber-400" />
-              </div>
-              <div>
-                <h3 className="text-white font-extrabold text-base sm:text-lg mb-1">Top 2 Get Hired by Doctor Barns Tech</h3>
-                <p className="text-slate-400 text-[13px] sm:text-[14px] leading-relaxed">The two best-performing students will receive a full-time job offer. Train hard, stand out, and walk into a career.</p>
-              </div>
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ─── CHALLENGE & PAID INTERNSHIP ─── */}
-      <section className="py-16 sm:py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="grid lg:grid-cols-2 gap-6 sm:gap-12">
-
-            {/* The 100K Challenge */}
+      {/* ─── WHAT YOU WILL ACHIEVE ─── */}
+      <section id="curriculum" className="py-24 sm:py-32 bg-white border-y border-slate-200 overflow-hidden">
+        <Container>
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-20 sm:mb-28">
             <motion.div
-              id="challenge"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={STAGGER}
+              className="max-w-2xl"
+            >
+              <motion.span variants={FADE_UP} className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.2em] text-blue-600 mb-6">
+                <span className="w-8 h-px bg-blue-600" />
+                Program Outcomes
+              </motion.span>
+              <motion.h2 variants={FADE_UP} className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-slate-950">
+                What You Will Achieve
+                <br className="hidden sm:block" />
+                <span className="font-serif italic text-slate-500 font-medium">by Day 30</span>
+              </motion.h2>
+            </motion.div>
+            <motion.div
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
               variants={FADE_UP}
-              className="bg-amber-50 rounded-2xl sm:rounded-3xl p-6 sm:p-10 md:p-14 border border-amber-200"
+              className="max-w-md md:pb-3"
             >
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-amber-100 text-amber-800 text-sm font-bold uppercase tracking-wider mb-6">
-                <Rocket className="w-4 h-4" />
+              <p className="text-lg leading-relaxed text-slate-600">
+                By the end of this intensive program, you transition from absolute beginner
+                to a capable technical consultant ready to take on real paying clients.
+              </p>
+            </motion.div>
+          </div>
+
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={STAGGER}
+            className="grid gap-x-12 gap-y-20 md:grid-cols-2 lg:grid-cols-3"
+          >
+            {[
+              { title: "Build Corporate Websites", desc: "Design and code high-performance, responsive websites for corporate clients — the kind that close contracts." },
+              { title: "Develop Full E-Commerce Platforms", desc: "Build complete online stores with product catalogs, cart systems, and live payment processing via Paystack." },
+              { title: "Engineer Complex Dashboards", desc: "Create the internal management software that companies rely on to run their daily operations." },
+              { title: "Start Your Web Dev Agency", desc: "Structure your own web development company — from legal basics to service packaging and premium pricing." },
+              { title: "Land Your First Client — Guaranteed", desc: "We don't let you leave without a paying contract. Every student signs their first web design deal before the program ends." },
+              { title: "Become Internship-Ready", desc: "Build delivery discipline, technical confidence, and communication standards to thrive in paid internship environments." },
+            ].map((item, i) => (
+              <motion.div
+                key={item.title}
+                variants={FADE_UP}
+                className="group relative flex flex-col"
+              >
+                <div className="absolute -top-14 left-0 text-[9rem] leading-none font-serif font-bold text-slate-100 -z-10 transition-colors duration-500 group-hover:text-blue-50 pointer-events-none select-none">
+                  {String(i + 1).padStart(2, "0")}
+                </div>
+
+                <div className="relative z-10 pt-6 border-t-2 border-slate-200 transition-colors duration-300 group-hover:border-blue-600 flex-1 flex flex-col">
+                  <div className="mb-6 flex items-center justify-between">
+                    <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 transition-colors duration-300 group-hover:text-blue-600">
+                      Phase {i + 1}
+                    </span>
+                    <div className="opacity-0 -translate-x-4 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-50">
+                        <CheckCircle2 className="h-4 w-4 text-blue-600" />
+                      </div>
+                    </div>
+                  </div>
+                  <h3 className="mb-4 text-2xl font-bold tracking-tight text-slate-950 transition-colors duration-300 group-hover:text-blue-950">
+                    {item.title}
+                  </h3>
+                  <p className="text-base leading-relaxed text-slate-600 mt-auto">
+                    {item.desc}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </Container>
+      </section>
+
+      {/* ─── SYSTEMS PORTFOLIO ─── */}
+      <section id="portfolio" className="py-20 sm:py-28 bg-gradient-to-b from-slate-200 to-slate-100 border-y border-slate-300/70">
+        <Container>
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={STAGGER}
+            className="text-center mb-16 max-w-3xl mx-auto"
+          >
+            <motion.span variants={FADE_UP} className="eyebrow mb-3 block">High-Ticket Software</motion.span>
+            <motion.h2 variants={FADE_UP} className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 leading-tight mb-5">
+              Real Business Systems You Will Build.
+            </motion.h2>
+            <motion.p variants={FADE_UP} className="text-slate-600 text-lg">
+              We focus exclusively on the enterprise tools and portals that real businesses
+              pay heavily for — giving you an elite, high-value portfolio from day one.
+            </motion.p>
+          </motion.div>
+
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={STAGGER}
+            className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4"
+          >
+            {systems.map((sys) => {
+              const Icon = sys.icon;
+              return (
+                <motion.div
+                  key={sys.title}
+                  variants={FADE_UP}
+                  className="bg-slate-50 border border-slate-200 p-5 rounded-xl hover:shadow-md hover:border-blue-300 hover:bg-white transition-all group"
+                >
+                  <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center mb-3 group-hover:bg-blue-600 transition-colors">
+                    <Icon className="w-5 h-5 text-blue-600 group-hover:text-white transition-colors" />
+                  </div>
+                  <h3 className="font-bold text-slate-900 text-sm mb-1">{sys.title}</h3>
+                  <p className="text-slate-500 text-xs leading-relaxed mb-2">{sys.desc}</p>
+                  <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">{sys.value}</span>
+                </motion.div>
+              );
+            })}
+          </motion.div>
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={FADE_UP}
+            className="mt-10 rounded-2xl border border-blue-100 bg-blue-50/70 px-6 py-4 text-center"
+          >
+            <p className="text-sm font-medium text-blue-900">
+              Every system above is taught step-by-step in class, then built by you for your portfolio.
+            </p>
+          </motion.div>
+        </Container>
+      </section>
+
+      {/* ─── FAQ ON HOME ─── */}
+      <section className="py-24 sm:py-32 bg-slate-50 border-y border-slate-200" id="faq">
+        <Container>
+          <div className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20 lg:items-start">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={STAGGER}
+              className="lg:sticky lg:top-32"
+            >
+              <motion.span variants={FADE_UP} className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.2em] text-blue-600 mb-6">
+                <span className="w-8 h-px bg-blue-600" />
+                Common Questions
+              </motion.span>
+              <motion.h2 variants={FADE_UP} className="text-4xl sm:text-5xl font-bold tracking-tight text-slate-950 mb-6">
+                Frequently Asked
+                <br className="hidden lg:block" />
+                <span className="font-serif italic text-slate-500 font-medium">Questions</span>
+              </motion.h2>
+              <motion.p variants={FADE_UP} className="text-lg leading-relaxed text-slate-600 mb-10 max-w-md">
+                Everything you need to know about the masterclass before you apply. If you have additional questions, our admissions team is ready to assist you.
+              </motion.p>
+
+              <motion.div variants={FADE_UP} className="relative w-full aspect-[4/3] max-w-sm overflow-hidden rounded-2xl shadow-sm border border-slate-200">
+                <Image
+                  src="/african_tech_lab_wide_7.png"
+                  alt="Senior and junior developers collaborating"
+                  fill
+                  className="object-cover"
+                />
+              </motion.div>
+            </motion.div>
+
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={STAGGER}
+              className="flex flex-col"
+            >
+              {faqs.slice(0, 10).map((item) => (
+                <motion.details
+                  key={item.q}
+                  variants={FADE_UP}
+                  className="group border-b border-slate-200 last:border-0"
+                >
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-6 text-base sm:text-lg font-medium text-slate-900 transition-colors hover:text-blue-600">
+                    <span className="flex-1">{item.q}</span>
+                    <span className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white transition-colors group-hover:border-blue-200 group-hover:bg-blue-50 group-open:border-blue-600 group-open:bg-blue-600">
+                      <Plus className="absolute h-4 w-4 text-slate-400 transition-transform group-hover:text-blue-600 group-open:rotate-45 group-open:text-white" />
+                    </span>
+                  </summary>
+                  <div className="overflow-hidden pr-2 sm:pr-12 pb-6">
+                    <p className="text-sm sm:text-base leading-relaxed text-slate-600">{item.a}</p>
+                  </div>
+                </motion.details>
+              ))}
+            </motion.div>
+          </div>
+        </Container>
+      </section>
+
+      {/* ─── GUARANTEES ─── */}
+      <section
+        className="relative py-16 text-white bg-fixed bg-cover bg-center"
+        style={{ backgroundImage: "url('/african_students_collaborating_2.png')" }}
+      >
+        <div className="absolute inset-0 bg-slate-950/30" />
+        <Container className="relative z-10">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={STAGGER}
+            className="grid gap-6 lg:grid-cols-2"
+          >
+            {[
+              {
+                icon: Target,
+                title: "First Client Guaranteed",
+                desc: "Every single student will sign their first paying web design client before the training ends. We make sure of it.",
+              },
+              {
+                icon: Flame,
+                title: "Top 2 Get Hired by Doctor Barns Tech",
+                desc: "The two best-performing students will receive a full-time job offer. Train hard, stand out, and walk into a career.",
+              },
+            ].map((g) => (
+              <motion.div
+                key={g.title}
+                variants={FADE_UP}
+                className="rounded-3xl border border-white/20 bg-white/10 p-7 backdrop-blur-sm"
+              >
+                <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-500/20">
+                  <g.icon className="h-6 w-6 text-blue-200" />
+                </div>
+                <h3 className="mt-5 text-2xl font-bold tracking-tight text-white">{g.title}</h3>
+                <p className="mt-4 text-sm leading-relaxed text-slate-100">{g.desc}</p>
+              </motion.div>
+            ))}
+          </motion.div>
+        </Container>
+      </section>
+
+      {/* ─── CHALLENGE + INTERNSHIP ─── */}
+      <section id="challenge" className="py-20 sm:py-28 bg-white">
+        <Container>
+          <div className="grid lg:grid-cols-2 gap-8">
+
+            {/* 100K Challenge */}
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={FADE_UP}
+              className="bg-amber-50 rounded-3xl p-8 sm:p-12 border border-amber-200"
+            >
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-100 text-amber-800 text-xs font-bold uppercase tracking-wider mb-6">
+                <Rocket className="w-3.5 h-3.5" />
                 The Special Challenge
               </div>
-
-              <h3 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 mb-4 sm:mb-6 leading-tight">
-                Join our <span className="text-amber-600">100K in 2 Weeks</span> Client Generation Challenge.
+              <h3 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4 leading-tight">
+                Join our{" "}
+                <span className="text-amber-600">100K in 2 Weeks</span>{" "}
+                Client Generation Challenge.
               </h3>
-
-              <p className="text-slate-600 text-lg mb-8 leading-relaxed">
-                We don't want you to just know how to code. We mandate that you know how to sell. During the program, you will learn how to:
+              <p className="text-slate-600 text-base mb-8 leading-relaxed">
+                We don&apos;t just train you to code. We mandate that you know how to sell. During the program, you will learn how to:
               </p>
-
-              <div className="space-y-4 text-slate-700 font-medium">
+              <div className="space-y-4">
                 {[
-                  "Find high-paying, verified real-world clients.",
-                  "Pitch, negotiate, and close your first contract.",
-                  "Start replacing your income with freelance development.",
+                  "Find high-paying, verified real-world clients in Accra and beyond.",
+                  "Pitch, negotiate, and close your first development contract.",
+                  "Start replacing your income with freelance web development revenue.",
                 ].map((item) => (
-                  <div key={item} className="flex items-start gap-4">
-                    <CheckCircle2 className="w-6 h-6 text-amber-500 shrink-0" />
-                    <span className="text-[16px] leading-relaxed">{item}</span>
+                  <div key={item} className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+                    <span className="text-slate-700 text-sm leading-relaxed">{item}</span>
                   </div>
                 ))}
               </div>
             </motion.div>
 
-            {/* The Internship + Hiring Bonus */}
+            {/* Internship + Hiring */}
             <motion.div
-              id="internship"
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
               variants={FADE_UP}
-              className="bg-slate-50 rounded-2xl sm:rounded-3xl p-6 sm:p-10 md:p-14 border border-slate-200 flex flex-col justify-between"
+              className="bg-slate-50 rounded-3xl p-8 sm:p-12 border border-slate-200 flex flex-col justify-between"
             >
               <div>
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-blue-100 text-blue-700 text-sm font-bold uppercase tracking-wider mb-6">
-                  <Award className="w-4 h-4" />
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-100 text-blue-700 text-xs font-bold uppercase tracking-wider mb-6">
+                  <Award className="w-3.5 h-3.5" />
                   Internship + Hiring
                 </div>
-
-                <h3 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 mb-3 leading-tight">
-                  1-Month <span className="text-blue-600">Paid Internship</span>
+                <h3 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-2 leading-tight">
+                  1-Month{" "}
+                  <span className="text-blue-600">Paid Internship</span>
                 </h3>
-                <p className="text-slate-900 text-xl font-bold mb-6 flex items-center gap-2">
+                <p className="text-slate-900 font-bold text-lg mb-5 flex items-center gap-2">
                   <Briefcase className="w-5 h-5 text-blue-600" />
                   With Doctor Barns Tech
                 </p>
-                <p className="text-slate-600 text-[16px] leading-relaxed mb-6">
-                  After your 30 days of training, transition directly into an offline, paid internship role. Work elbow-to-elbow with senior developers on actual live projects and supercharge your resume immediately.
+                <p className="text-slate-600 text-sm leading-relaxed mb-6">
+                  After your 30 days of training, transition directly into an offline, paid internship role.
+                  Work elbow-to-elbow with senior developers on actual live client projects — supercharging
+                  your portfolio and professional experience instantly.
                 </p>
-
-                <div className="bg-blue-600 text-white rounded-2xl p-5 mb-8">
+                <div className="bg-blue-600 text-white rounded-2xl p-5">
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center shrink-0">
-                      <Flame className="w-5 h-5 text-amber-300" />
+                    <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
+                      <Flame className="w-4 h-4 text-amber-300" />
                     </div>
-                    <span className="font-extrabold text-lg tracking-tight">Top 2 Students Get Hired</span>
+                    <span className="font-extrabold text-base tracking-tight">Top 2 Students Get Hired</span>
                   </div>
-                  <p className="text-blue-100 text-[14px] leading-relaxed pl-11">
-                    The two highest-performing graduates will receive a <strong className="text-white">full-time job offer</strong> from Doctor Barns Tech. Prove your skill and walk straight into a career.
+                  <p className="text-blue-100 text-xs leading-relaxed pl-11">
+                    The two highest-performing graduates will receive a full-time job offer from Doctor Barns Tech.
+                    Prove your skill and walk straight into a career.
                   </p>
                 </div>
               </div>
-
-              {/* Mentorship Image */}
-              <div className="relative w-full h-48 md:h-64 rounded-2xl overflow-hidden shadow-inner mt-4 border border-slate-200">
+              <div id="internship" className="relative w-full h-44 rounded-2xl overflow-hidden shadow-inner mt-6 border border-slate-200">
                 <Image
                   src="/internship_mentorship.png"
                   alt="Senior and junior developers collaborating"
@@ -423,210 +550,94 @@ export default function MasterpieceHomepage() {
                 />
               </div>
             </motion.div>
-
           </div>
-        </div>
+        </Container>
       </section>
 
-      {/* ─── FAQ (SEO: Featured Snippets) ─── */}
-      <section id="faq" className="py-16 sm:py-24 bg-slate-50 border-t border-slate-200">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={STAGGER} className="text-center mb-16">
-            <motion.span variants={FADE_UP} className="text-blue-600 font-bold uppercase tracking-widest text-sm mb-3 block">Common Questions</motion.span>
-            <motion.h2 variants={FADE_UP} className="text-2xl sm:text-3xl md:text-5xl font-extrabold tracking-tight text-slate-900 leading-tight mb-4">
-              Frequently Asked Questions
-            </motion.h2>
-            <motion.p variants={FADE_UP} className="text-slate-600 text-lg max-w-2xl mx-auto">
-              Everything you need to know about the masterclass before you apply.
-            </motion.p>
-          </motion.div>
-
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={STAGGER} className="space-y-4">
-            {[
-              {
-                q: "Do I need any prior coding experience?",
-                a: "No. This masterclass is designed for absolute beginners. We take you from zero to building production-ready web applications in 30 days. All you need is a laptop, dedication, and the willingness to learn."
-              },
-              {
-                q: "What exactly will I be able to build after the masterclass?",
-                a: "You will build corporate websites, e-commerce platforms with payment integration, management dashboards (school, hotel, hospital, POS systems), CRM tools, and full SaaS products. These are the exact systems that businesses pay thousands of Cedis for."
-              },
-              {
-                q: "Is the first client really guaranteed?",
-                a: "Yes. We have a dedicated client acquisition module where you learn lead generation, pitching, and closing. We work with every student individually to ensure you sign your first paying web design client before the program ends."
-              },
-              {
-                q: "How does the paid internship work?",
-                a: "After the 30-day masterclass, every student transitions into a 1-month paid internship at Doctor Barns Tech. You'll work on real client projects alongside senior developers, building your portfolio and professional experience."
-              },
-              {
-                q: "What does 'Top 2 Get Hired' mean?",
-                a: "The two highest-performing students in the cohort will receive a full-time job offer from Doctor Barns Tech. Performance is evaluated based on project quality, initiative, and client work during the program."
-              },
-              {
-                q: "Can I pay in installments?",
-                a: "Yes. You can start with a 20% deposit (GHS 200), a 50% payment (GHS 500), or pay the full GHS 1,000 upfront. All payment tiers secure your seat immediately."
-              },
-              {
-                q: "What tech stack will I learn?",
-                a: "You'll master Next.js (React), TypeScript, Tailwind CSS, Supabase (PostgreSQL), authentication systems, payment gateways (Paystack, Moolre), and deployment. This is the same modern stack used by top startups worldwide."
-              },
-              {
-                q: "Is the training online or offline?",
-                a: "The masterclass is fully offline and in-person at our training facility at 111 Newtown RD, Accra Newtown. This ensures hands-on mentorship, peer collaboration, and zero distractions."
-              },
-              {
-                q: "What is the 100K in 2 Weeks Challenge?",
-                a: "It's our client generation challenge where students learn to find, pitch, and close high-paying corporate clients. The goal is to help you generate GHS 100,000 worth of contracts within 2 weeks of completing the program."
-              },
-              {
-                q: "What do I get at the end of the program?",
-                a: "You receive a Diploma Certification in Web Development, a professional portfolio of real projects, your first paying client, a 1-month paid internship, access to our alumni network, and a chance to be hired full-time by Doctor Barns Tech."
-              },
-            ].map((faq, i) => (
-              <motion.details
-                key={i}
-                variants={FADE_UP}
-                className="group bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all overflow-hidden"
-              >
-                <summary className="flex items-center justify-between cursor-pointer p-4 sm:p-6 text-left font-bold text-slate-900 text-[14px] sm:text-[16px] leading-relaxed list-none [&::-webkit-details-marker]:hidden">
-                  <span className="pr-3 sm:pr-4">{faq.q}</span>
-                  <span className="text-blue-600 shrink-0 text-2xl font-light group-open:rotate-45 transition-transform duration-300">+</span>
-                </summary>
-                <div className="px-4 sm:px-6 pb-4 sm:pb-6 pt-0 text-slate-600 text-[13px] sm:text-[15px] leading-relaxed border-t border-slate-100 mt-0 pt-4">
-                  {faq.a}
-                </div>
-              </motion.details>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ─── STRONG FINAL CTA ─── */}
-      <section className="py-16 sm:py-24 bg-blue-600 text-white text-center">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6">
+      {/* ─── FINAL CTA ─── */}
+      <section className="py-16 sm:py-20 bg-white relative">
+        <Container>
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, scale: 0.97 }}
+            whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 0.5 }}
+            className="bg-[#0a192f] rounded-[2.5rem] relative overflow-hidden shadow-2xl"
           >
-            <h2 className="text-3xl sm:text-4xl md:text-6xl font-extrabold tracking-tight mb-4 sm:mb-6">
-              Your Engineering Career Starts <span className="text-amber-300">March 16.</span>
-            </h2>
-            <p className="text-blue-100 text-base sm:text-xl mb-8 sm:mb-10 max-w-2xl mx-auto leading-relaxed">
-              Certification, paid internship, your first paying client, and the chance to get hired — all included. Limited seats per cohort to ensure elite-level training.
-            </p>
+            {/* Decorative glow */}
+            <div className="absolute -top-20 -left-20 w-64 h-64 bg-blue-600/10 rounded-full blur-[80px] pointer-events-none" />
+            <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-amber-500/10 rounded-full blur-[80px] pointer-events-none" />
+            <div className="absolute inset-0 grid-overlay-dark opacity-40" />
 
-            <div className="flex flex-wrap justify-center gap-4 sm:gap-6 mb-8 sm:mb-10 text-white/90 font-medium text-[12px] sm:text-[14px]">
-              <div className="flex items-center gap-2">
-                <MapPin className="w-5 h-5" />
-                Offline (Accra)
+            <div className="relative z-10 flex flex-col lg:flex-row items-stretch">
+              {/* Left: CTA Content */}
+              <div className="flex-1 p-10 md:p-16 lg:p-20 flex flex-col justify-center">
+                <span className="inline-flex w-fit items-center px-4 py-1.5 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-300 text-[10px] font-bold tracking-widest uppercase mb-6">
+                  Application Open Now
+                </span>
+                <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight text-white mb-5 leading-[1.1]">
+                  Your Engineering Career{" "}
+                  <br className="hidden md:block" />
+                  Starts{" "}
+                  <span className="text-amber-400">March 16.</span>
+                </h2>
+                <p className="text-slate-400 text-base leading-relaxed mb-8 max-w-md">
+                  Certification, paid internship, your first paying client, and the chance to get hired —
+                  all included. Limited seats per cohort to ensure elite-level training.
+                </p>
+
+                <div className="flex flex-wrap gap-4 mb-8 text-slate-400 text-sm font-medium">
+                  {[
+                    { icon: MapPin, text: "Offline · Accra" },
+                    { icon: Target, text: "First Client Guaranteed" },
+                    { icon: Flame, text: "Top 2 Get Hired" },
+                    { icon: GraduationCap, text: "Diploma Certified" },
+                  ].map((item) => (
+                    <div key={item.text} className="flex items-center gap-2">
+                      <item.icon className="w-4 h-4 text-blue-400" />
+                      {item.text}
+                    </div>
+                  ))}
+                </div>
+
+                <div className="bg-white/5 border border-white/10 rounded-2xl p-6 max-w-sm flex items-center justify-between gap-6 mb-6">
+                  <div>
+                    <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">One-Time Fee</p>
+                    <p className="text-4xl font-black text-white">GHS 1,000</p>
+                  </div>
+                  <Link href="/apply" className="flex items-center gap-2 h-14 px-7 bg-blue-600 text-white font-bold text-sm rounded-xl hover:bg-blue-700 transition-all hover:-translate-y-0.5 shadow-lg group shrink-0">
+                    Apply Now
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                </div>
+
+                <div className="inline-flex items-center gap-3 px-4 py-2 bg-black/20 rounded-full border border-white/5 w-fit">
+                  <p className="text-xs text-slate-400 font-medium">Share with a friend</p>
+                  <button
+                    type="button"
+                    onClick={() => navigator.clipboard.writeText("https://remoteworkhub.org")}
+                    className="px-3 py-1 rounded-md bg-white/10 hover:bg-white/20 text-white text-xs font-semibold transition-colors"
+                  >
+                    Copy Link
+                  </button>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <Target className="w-5 h-5" />
-                First Client Guaranteed
-              </div>
-              <div className="flex items-center gap-2">
-                <Flame className="w-5 h-5 text-amber-300" />
-                Top 2 Get Hired
+
+              {/* Right: Background Image Panel */}
+              <div className="w-full lg:w-[420px] relative min-h-[300px] lg:min-h-full">
+                <Image
+                  src="/hero_bg_dark.jpg"
+                  alt="Students coding at Doctor Barns Tech"
+                  fill
+                  className="object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-[#0a192f] via-[#0a192f]/60 to-transparent" />
               </div>
             </div>
-
-            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-xl max-w-xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-5 sm:gap-6 text-slate-900 mb-10 sm:mb-12">
-              <div className="text-left">
-                <p className="text-sm text-slate-500 font-bold uppercase tracking-wider mb-1">One-Time Fee</p>
-                <p className="text-4xl font-extrabold text-slate-900">GHS 1,000</p>
-              </div>
-
-              <Link href="/apply" className="w-full md:w-auto">
-                <Button className="w-full h-16 px-10 rounded-xl bg-blue-600 text-white hover:bg-blue-700 font-bold text-lg shadow-md hover:shadow-lg transition-all hover:-translate-y-1 flex items-center justify-center gap-3 group">
-                  Apply Now
-                  <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
-                </Button>
-              </Link>
-            </div>
-
-            <SocialShareButtons />
           </motion.div>
-        </div>
+        </Container>
       </section>
 
-      {/* ─── WELL THOUGHT OUT BEAUTIFUL FOOTER ─── */}
-      <footer className="bg-[#0a192f] text-slate-400 py-12 sm:py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-12 border-b border-[#112240] pb-10 sm:pb-12 mb-8">
-
-            {/* Brand Logo & About */}
-            <div className="sm:col-span-2 lg:col-span-2">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-blue-600/20 text-blue-400">
-                  <ShieldCheck className="w-6 h-6" />
-                </div>
-                <div className="font-extrabold text-xl tracking-tight text-white">
-                  Remote Work Hub
-                </div>
-              </div>
-              <p className="text-[15px] leading-relaxed max-w-md pr-4">
-                The premier Elite Web Development & SaaS Masterclass in Ghana. We engineer beginners into highly capable developers, complete with a paid internship and professional certification.
-              </p>
-            </div>
-
-            {/* Program Links */}
-            <div>
-              <h4 className="text-white font-bold mb-6 text-sm uppercase tracking-wider">The Program</h4>
-              <ul className="space-y-4">
-                {['Curriculum', 'Portfolio Systems', 'Internship Bonus', '100K Challenge'].map(link => (
-                  <li key={link}>
-                    <Link href="/" className="hover:text-blue-400 transition-colors text-sm">{link}</Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Contact Information */}
-            <div>
-              <h4 className="text-white font-bold mb-6 text-sm uppercase tracking-wider">Contact Us</h4>
-              <ul className="space-y-5">
-                <li>
-                  <a href="tel:+233209636158" className="flex items-center gap-3 hover:text-blue-400 transition-colors text-sm">
-                    <Phone className="w-4 h-4 text-blue-500" />
-                    +233 20 963 6158
-                  </a>
-                </li>
-                <li>
-                  <a href="https://remoteworkhub.org" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 hover:text-blue-400 transition-colors text-sm">
-                    <Globe className="w-4 h-4 text-blue-500" />
-                    remoteworkhub.org
-                  </a>
-                </li>
-                <li className="flex items-start gap-3 text-sm">
-                  <MapPin className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
-                  <span>111 Newtown RD,<br /> Accra Newtown</span>
-                </li>
-              </ul>
-            </div>
-
-          </div>
-
-          <div className="flex flex-col md:flex-row items-center justify-between text-sm">
-            <p>&copy; 2026 Remote Work Hub. All rights reserved.</p>
-            <div className="flex items-center gap-4 mt-4 md:mt-0">
-              <Link href="/" className="hover:text-white transition-colors">Privacy Policy</Link>
-              <Link href="/" className="hover:text-white transition-colors">Terms of Service</Link>
-            </div>
-          </div>
-        </div>
-      </footer>
     </div>
   );
-}
-// For Clock icon import
-function Clock(props: React.ComponentProps<"svg">) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-      <circle cx="12" cy="12" r="10" />
-      <polyline points="12 6 12 12 16 14" />
-    </svg>
-  )
 }
