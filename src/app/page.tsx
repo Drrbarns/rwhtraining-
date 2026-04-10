@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { motion, Variants, AnimatePresence } from "framer-motion";
 import {
   ArrowRight, CheckCircle2, Rocket, GraduationCap,
@@ -48,40 +49,105 @@ const weekHighlights = [
 ];
 
 export default function HomePage() {
+  const heroSlides = [
+    {
+      src: "/african_tech_lab_wide_7.png",
+      alt: "Remote Work Hub training environment",
+      position: "object-center",
+    },
+    {
+      src: "/hero-classroom-1.png",
+      alt: "Remote Work Hub classroom setup",
+      position: "object-center",
+    },
+    {
+      src: "/hero-space-1.png",
+      alt: "Remote Work Hub work and collaboration area",
+      position: "object-center",
+    },
+  ];
+  const [activeHeroSlide, setActiveHeroSlide] = useState(0);
+  const [activeStat, setActiveStat] = useState(0);
+  const mobileStats = [
+    { ...stats[0], icon: Target, tone: "from-blue-600 to-indigo-600" },
+    { ...stats[1], icon: Users, tone: "from-indigo-600 to-blue-700" },
+    { ...stats[2], icon: Rocket, tone: "from-blue-700 to-slate-900" },
+    { ...stats[3], icon: Briefcase, tone: "from-indigo-700 to-blue-800" },
+  ];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveStat((prev) => (prev + 1) % mobileStats.length);
+    }, 2800);
+    return () => clearInterval(timer);
+  }, [mobileStats.length]);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveHeroSlide((prev) => (prev + 1) % heroSlides.length);
+    }, 4200);
+    return () => clearInterval(timer);
+  }, [heroSlides.length]);
+
   return (
     <div className="bg-white text-slate-900 overflow-x-hidden">
 
       {/* ─── HERO ─── */}
-      <section className="relative min-h-[93vh] md:min-h-[99vh] bg-[#0a192f] flex items-center pt-20 pb-12 overflow-hidden">
+      <section className="relative min-h-[88vh] md:min-h-[99vh] bg-[#0a192f] flex items-center pt-16 md:pt-20 pb-10 md:pb-12 overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <Image
-            src="/hero_bg_dark.jpg"
-            alt="Young ambitious web developer learning"
-            fill
-            className="object-cover object-center"
-            priority
-          />
-          <div className="absolute inset-0 bg-[#0a192f]/40 mix-blend-multiply" />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0a192f]/80 via-[#0a192f]/60 to-transparent" />
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={heroSlides[activeHeroSlide].src}
+              initial={{ opacity: 0.2, scale: 1.03 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0.2, scale: 1.02 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              className="absolute inset-0"
+            >
+              <Image
+                src={heroSlides[activeHeroSlide].src}
+                alt={heroSlides[activeHeroSlide].alt}
+                fill
+                className={`object-cover ${heroSlides[activeHeroSlide].position}`}
+                priority
+              />
+            </motion.div>
+          </AnimatePresence>
+          <div className="absolute inset-0 bg-[#0a192f]/45 mix-blend-multiply" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0a192f]/90 via-[#0a192f]/70 to-transparent" />
+          <div className="absolute inset-0 md:hidden bg-gradient-to-b from-[#0a192f]/50 via-transparent to-[#0a192f]/75" />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,_var(--tw-gradient-stops))] from-blue-600/20 via-blue-900/5 to-transparent" />
+          <div className="absolute bottom-4 right-4 z-20 flex items-center gap-2">
+            {heroSlides.map((slide, idx) => (
+              <button
+                key={slide.src}
+                type="button"
+                aria-label={`Show hero slide ${idx + 1}`}
+                onClick={() => setActiveHeroSlide(idx)}
+                className={`h-1.5 rounded-full transition-all ${
+                  idx === activeHeroSlide ? "w-8 bg-white" : "w-2 bg-white/45 hover:bg-white/70"
+                }`}
+              />
+            ))}
+          </div>
         </div>
 
         <Container className="relative z-10 w-full flex items-center min-h-[71vh]">
           <div className="w-full max-w-2xl mr-auto">
-            <div className="space-y-6 flex flex-col items-start text-left w-full">
-              <motion.div variants={FADE_UP} className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-blue-500/10 border border-blue-400/20 text-blue-200 text-[11px] font-bold uppercase tracking-wider rounded-full backdrop-blur-md font-sans shadow-[0_0_20px_rgba(59,130,246,0.15)]">
+            <div className="space-y-5 md:space-y-6 flex flex-col items-start text-left w-full">
+              <motion.div variants={FADE_UP} className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-blue-500/10 border border-blue-400/20 text-blue-200 text-[10px] md:text-[11px] font-bold uppercase tracking-wider rounded-full backdrop-blur-md font-sans shadow-[0_0_20px_rgba(59,130,246,0.15)]">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
                 </span>
-                2026 Elite Masterclass · Only 10 Seats
+                2026 Elite Masterclass · Limited Priority Spots
               </motion.div>
 
               <motion.h1
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.1 }}
-                className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-b from-white to-white/80 tracking-tight leading-[1.08] font-sans drop-shadow-sm"
+                className="text-[2.65rem] sm:text-5xl lg:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-b from-white to-white/80 tracking-tight leading-[1.06] font-sans drop-shadow-sm"
               >
                 Become a Professional <br className="hidden md:block" />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-blue-500 to-indigo-400 drop-shadow-md">Web Developer</span>{" "}
@@ -93,20 +159,20 @@ export default function HomePage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.2 }}
-                className="text-base md:text-lg text-slate-300/90 font-light leading-relaxed max-w-xl font-sans"
+                className="text-[1.05rem] md:text-lg text-slate-300/90 font-light leading-relaxed max-w-xl font-sans"
               >
                 This isn&apos;t another tutorial hell. We engineer absolute beginners into high-value developers capable of building the complex systems that corporate clients exactly pay for.
               </motion.p>
 
-              <motion.div variants={FADE_UP} className="flex flex-wrap gap-2.5 pt-1 w-full font-sans">
+              <motion.div variants={FADE_UP} className="grid grid-cols-1 sm:grid-cols-2 md:flex md:flex-wrap gap-2.5 pt-1 w-full max-w-xl font-sans">
                 {[
                   { icon: CheckCircle2, text: "Diploma Certification", color: "text-blue-400" },
                   { icon: Flame, text: "Top 2 Get Hired", color: "text-blue-400" },
                   { icon: CheckCircle2, text: "No Experience Required", color: "text-blue-400" },
                 ].map((item) => (
-                  <div key={item.text} className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-white/20 transition-colors backdrop-blur-md shadow-xl">
+                  <div key={item.text} className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 hover:border-white/20 transition-colors backdrop-blur-md shadow-xl">
                     <item.icon className={`w-4 h-4 ${item.color} shrink-0`} />
-                    <span className="text-[13px] font-medium text-slate-200/90">{item.text}</span>
+                    <span className="text-[13px] font-semibold text-slate-200/90">{item.text}</span>
                   </div>
                 ))}
               </motion.div>
@@ -115,7 +181,7 @@ export default function HomePage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.3 }}
-                className="flex flex-col sm:flex-row items-center justify-start gap-4 pt-5 w-full font-sans"
+                className="flex flex-col sm:flex-row items-stretch sm:items-center justify-start gap-3.5 pt-4 md:pt-5 w-full font-sans"
               >
                 <Link href="/apply" className="group relative h-14 px-8 text-[15px] bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-bold transition-all duration-300 w-full sm:w-auto rounded-xl inline-flex items-center justify-center overflow-hidden shadow-[0_0_40px_rgba(37,99,235,0.3)] hover:shadow-[0_0_60px_rgba(37,99,235,0.5)]">
                   <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out"></div>
@@ -123,9 +189,14 @@ export default function HomePage() {
                     Apply for the Masterclass <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </span>
                 </Link>
-                <div className="flex flex-col justify-center text-left pl-2 sm:pl-6 sm:border-l border-white/10 h-12">
-                  <span className="text-[10px] text-blue-300 font-bold uppercase tracking-widest mb-1">Program Fee</span>
-                  <span className="text-2xl font-black text-white leading-none tracking-tight drop-shadow-md">GHS 2,200</span>
+                <div className="flex items-center justify-between gap-4 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 sm:py-0 sm:bg-transparent sm:border-0 sm:px-0 w-full sm:w-auto sm:pl-6 sm:border-l h-auto sm:h-12">
+                  <div className="flex flex-col justify-center text-left">
+                    <span className="text-[10px] text-blue-300 font-bold uppercase tracking-widest mb-1">Program Fee</span>
+                    <span className="text-2xl font-black text-white leading-none tracking-tight drop-shadow-md">GHS 2,200</span>
+                  </div>
+                  <span className="text-[10px] uppercase tracking-wider font-bold text-emerald-300 bg-emerald-500/10 border border-emerald-400/20 px-2 py-1 rounded-full">
+                    Installments available
+                  </span>
                 </div>
               </motion.div>
             </div>
@@ -134,22 +205,75 @@ export default function HomePage() {
       </section>
 
       {/* ─── STATS BAR ─── */}
-      <section className="py-10 bg-white border-b border-slate-100">
+      <section className="py-8 md:py-10 bg-white border-b border-slate-100">
         <Container>
           <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
             variants={STAGGER}
-            className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-0 divide-y-2 lg:divide-y-0 lg:divide-x divide-slate-100"
+            className="md:hidden"
           >
-            {stats.map((stat) => (
-              <motion.div key={stat.label} variants={FADE_UP} className="text-center px-6 py-2">
-                <div className="text-3xl md:text-4xl font-black text-blue-600 mb-1">{stat.value}</div>
-                <div className="text-sm font-bold text-slate-900 mb-0.5">{stat.label}</div>
-                <div className="text-xs text-slate-500">{stat.desc}</div>
-              </motion.div>
-            ))}
+            <div className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {mobileStats.map((stat, idx) => {
+                const Icon = stat.icon;
+                return (
+                  <motion.div
+                    key={stat.label}
+                    variants={FADE_UP}
+                    className={`snap-start min-w-[82%] rounded-2xl border p-5 transition-all duration-500 ${
+                      idx === activeStat
+                        ? "border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50 shadow-[0_12px_30px_-18px_rgba(37,99,235,0.6)]"
+                        : "border-slate-200 bg-white"
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <div className="text-4xl font-black text-blue-600 mb-1 tracking-tight">{stat.value}</div>
+                        <div className="text-base font-bold text-slate-900 mb-1">{stat.label}</div>
+                        <div className="text-sm text-slate-600 leading-relaxed">{stat.desc}</div>
+                      </div>
+                      <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${stat.tone} text-white flex items-center justify-center shrink-0`}>
+                        <Icon className="w-5 h-5" />
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+            <div className="flex items-center justify-center gap-2 mt-3">
+              {mobileStats.map((stat, idx) => (
+                <button
+                  key={stat.label}
+                  type="button"
+                  aria-label={`Focus ${stat.label}`}
+                  onClick={() => setActiveStat(idx)}
+                  className={`h-1.5 rounded-full transition-all ${idx === activeStat ? "w-7 bg-blue-600" : "w-2 bg-slate-300"}`}
+                />
+              ))}
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={STAGGER}
+            className="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-0 divide-y-2 md:divide-y-0 md:divide-x divide-slate-100"
+          >
+            {mobileStats.map((stat) => {
+              const Icon = stat.icon;
+              return (
+                <motion.div key={stat.label} variants={FADE_UP} className="text-center px-6 py-4 group">
+                  <div className="mx-auto mb-3 w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                    <Icon className="w-5 h-5" />
+                  </div>
+                  <div className="text-3xl md:text-4xl font-black text-blue-600 mb-1">{stat.value}</div>
+                  <div className="text-sm font-bold text-slate-900 mb-0.5">{stat.label}</div>
+                  <div className="text-xs text-slate-500">{stat.desc}</div>
+                </motion.div>
+              );
+            })}
           </motion.div>
         </Container>
       </section>

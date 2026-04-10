@@ -32,7 +32,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         { name: "Marketing", href: "/admin/marketing", icon: Megaphone },
         { name: "Settings", href: "/admin/settings", icon: SettingsIcon },
     ];
-    const cohortScope = searchParams.get("cohort");
+    const sharedQuery = searchParams.toString();
 
     const currentPage = navigation.find(n => n.href === pathname)?.name || "Dashboard";
 
@@ -165,7 +165,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <div className="flex-1 overflow-y-auto py-6 px-3 space-y-1">
                 {navigation.map((item) => {
                     const isActive = pathname === item.href;
-                    const href = cohortScope ? `${item.href}?cohort=${encodeURIComponent(cohortScope)}` : item.href;
+                    const href = sharedQuery ? `${item.href}?${sharedQuery}` : item.href;
                     return (
                         <Link key={item.name} href={href}>
                             <span className={`group relative flex items-center px-4 py-3 text-[13px] font-bold rounded-xl transition-all duration-200 ${

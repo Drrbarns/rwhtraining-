@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Users, AlertCircle, Banknote, ArrowUpRight, TrendingUp, TrendingDown, UserPlus, GraduationCap, CreditCard, Activity, Clock, ArrowRight, Zap, Target, Eye } from "lucide-react";
-import { Progress } from "@/components/ui/progress";
 import { createClient } from "@supabase/supabase-js";
 import { ExportReportButton, OpenRegistrationsButton } from "./ClientButtons";
 import { SendMessageToStudents } from "./components/SendMessageToStudents";
@@ -16,10 +15,18 @@ import {
     type CohortFilterValue,
 } from "@/lib/admin-cohort";
 import { CohortScopePicker } from "@/components/admin/CohortScopePicker";
+import { VisitorRangePicker } from "@/components/admin/VisitorRangePicker";
 
 export const revalidate = 0;
 
-async function getAdminData(cohortFilter: CohortFilterValue) {
+type VisitorRange = "day" | "week" | "month";
+
+function normalizeVisitorRange(raw?: string): VisitorRange {
+    if (raw === "day" || raw === "week" || raw === "month") return raw;
+    return "week";
+}
+
+async function getAdminData(cohortFilter: CohortFilterValue, visitorRange: VisitorRange) {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseServiceKey = process.env.NEXT_PUBLIC_SUPABASE_SERVICE_KEY;
 
@@ -53,7 +60,7 @@ async function getAdminData(cohortFilter: CohortFilterValue) {
     const realEnrollments = filterRealEnrollments(enrollments);
     const enrollmentMoney = computeEnrollmentMoneyStats(realEnrollments);
     const filledSeats = enrollmentMoney.enrolledCount;
-    const totalCapacity = cohort?.capacity || 40;
+    const totalCapacity = cohort?.capacity || 15;
     const totalWhoStarted = applications.length + unfinishedApps.length;
 
     const conversionRate = totalWhoStarted > 0 ? ((realEnrollments.length / totalWhoStarted) * 100).toFixed(1) : "0";
@@ -120,18 +127,25 @@ async function getAdminData(cohortFilter: CohortFilterValue) {
 
     // Page view analytics
     const now = new Date();
-    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
-    const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
+    const periodStartMap: Record<VisitorRange, Date> = {
+        day: new Date(now.getTime() - 24 * 60 * 60 * 1000),
+        week: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000),
+        month: new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000),
+    };
+    const periodLabelMap: Record<VisitorRange, string> = {
+        day: "last 24 hours",
+        week: "last 7 days",
+        month: "last 30 days",
+    };
+    const periodStart = periodStartMap[visitorRange].toISOString();
 
-    const [todayViewsRes, weekViewsRes, totalViewsRes, topPagesRes] = await Promise.all([
-        supabase.from("page_views").select("id", { count: "exact", head: true }).gte("created_at", todayStart),
-        supabase.from("page_views").select("id", { count: "exact", head: true }).gte("created_at", weekAgo),
+    const [periodViewsRes, totalViewsRes, topPagesRes] = await Promise.all([
+        supabase.from("page_views").select("id", { count: "exact", head: true }).gte("created_at", periodStart),
         supabase.from("page_views").select("id", { count: "exact", head: true }),
-        supabase.from("page_views").select("path").gte("created_at", weekAgo),
+        supabase.from("page_views").select("path").gte("created_at", periodStart),
     ]);
 
-    const todayViews = todayViewsRes.count || 0;
-    const weekViews = weekViewsRes.count || 0;
+    const periodViews = periodViewsRes.count || 0;
     const totalViews = totalViewsRes.count || 0;
 
     const pathCounts = new Map<string, number>();
@@ -149,25 +163,28 @@ async function getAdminData(cohortFilter: CohortFilterValue) {
         conversionRate, completionRate, outstandingBalance,
         revenueByDay, tierBreakdown, gatewayBreakdown, funnelData, recentActivity,
         paidCount: enrollmentMoney.enrolledCount, cohort, cohorts, activeCohortId, scopeCohortId,
-        analytics: { todayViews, weekViews, totalViews, topPages },
+        analytics: { periodViews, totalViews, topPages, periodLabel: periodLabelMap[visitorRange] },
     };
 }
 
 export default async function AdminDashboardPage({
     searchParams,
 }: {
-    searchParams?: Promise<{ cohort?: string }>;
+    searchParams?: Promise<{ cohort?: string; visitors?: string }>;
 }) {
     const params = (await searchParams) || {};
-    const data = await getAdminData(normalizeCohortFilter(params.cohort));
+    const data = await getAdminData(
+        normalizeCohortFilter(params.cohort),
+        normalizeVisitorRange(params.visitors)
+    );
 
     if (!data) return <div className="p-10 text-slate-900 font-bold">Error: Supabase config missing.</div>;
 
     const kpis = [
-        { title: "Site Visitors", value: data.analytics.totalViews.toLocaleString(), desc: `${data.analytics.todayViews} today · ${data.analytics.weekViews} this week`, icon: Eye, color: "text-violet-600", bg: "bg-violet-50/50", border: "border-violet-100/50", trend: "up" },
+        { title: "Site Visitors", value: data.analytics.periodViews.toLocaleString(), desc: `${data.analytics.periodLabel} · ${data.analytics.totalViews.toLocaleString()} all-time`, icon: Eye, color: "text-violet-600", bg: "bg-violet-50/50", border: "border-violet-100/50", trend: "up" },
         { title: "Total Leads", value: data.totalWhoStarted.toString(), desc: "All who started", icon: Users, color: "text-blue-600", bg: "bg-blue-50/50", border: "border-blue-100/50", trend: null },
         { title: "Completed", value: data.applications.length.toString(), desc: `${data.completionRate}% completion rate`, icon: Target, color: "text-indigo-600", bg: "bg-indigo-50/50", border: "border-indigo-100/50", trend: "up" },
-        { title: "Enrolled", value: `${data.filledSeats} / ${data.totalCapacity}`, desc: `${data.totalCapacity - data.filledSeats} seats left`, icon: GraduationCap, color: "text-amber-600", bg: "bg-amber-50/50", border: "border-amber-100/50", trend: "up" },
+        { title: "Enrolled", value: `${data.filledSeats}`, desc: "Open enrollment (no hard cap)", icon: GraduationCap, color: "text-amber-600", bg: "bg-amber-50/50", border: "border-amber-100/50", trend: "up" },
         { title: "Revenue", value: `GHS ${data.totalRevenue.toLocaleString()}`, desc: `${data.paidCount} enrollments (enrollment-based)`, icon: Banknote, color: "text-emerald-600", bg: "bg-emerald-50/50", border: "border-emerald-100/50", trend: "up" },
     ];
 
@@ -187,6 +204,7 @@ export default async function AdminDashboardPage({
                     <p className="text-slate-500 text-[15px] font-medium max-w-lg">Real-time analytics, student pipeline, and revenue intelligence.</p>
                 </div>
                 <div className="flex items-center gap-3 flex-wrap">
+                    <VisitorRangePicker />
                     <CohortScopePicker cohorts={data.cohorts} activeCohortId={data.activeCohortId} />
                     <ExportReportButton applications={data.applications} />
                     <OpenRegistrationsButton />
@@ -307,28 +325,22 @@ export default async function AdminDashboardPage({
                     <CardHeader className="px-6 pt-6 pb-4">
                         <CardTitle className="text-[15px] font-extrabold text-slate-900 flex items-center gap-2">
                             <div className="p-1.5 rounded-lg bg-amber-50 text-amber-600"><UserPlus className="w-4 h-4" /></div>
-                            Cohort Capacity
+                            Enrollment Snapshot
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="px-6 pb-6">
-                        <div className="flex justify-between text-[13px] font-bold text-slate-900 mb-3">
-                            <span className="text-slate-400">0</span>
-                            <span className="text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md">{Math.round((data.filledSeats / data.totalCapacity) * 100)}% Full</span>
-                            <span className="text-slate-400">{data.totalCapacity}</span>
-                        </div>
-                        <Progress value={(data.filledSeats / data.totalCapacity) * 100} className="h-4 bg-slate-100 [&>div]:bg-gradient-to-r [&>div]:from-amber-500 [&>div]:to-orange-500 rounded-full" />
                         <div className="mt-6 space-y-3">
                             <div className="flex justify-between items-center text-[13px] border-b border-slate-100 pb-3">
-                                <span className="text-slate-500 font-medium">Confirmed</span>
+                                <span className="text-slate-500 font-medium">Enrolled now</span>
                                 <span className="font-extrabold text-slate-900">{data.filledSeats}</span>
                             </div>
                             <div className="flex justify-between items-center text-[13px] border-b border-slate-100 pb-3">
-                                <span className="text-slate-500 font-medium">Remaining</span>
-                                <span className="font-extrabold text-amber-600">{data.totalCapacity - data.filledSeats}</span>
+                                <span className="text-slate-500 font-medium">Marketing seat target</span>
+                                <span className="font-extrabold text-amber-600">{data.totalCapacity}</span>
                             </div>
                             <div className="flex justify-between items-center text-[13px]">
-                                <span className="text-slate-500 font-medium">Capacity</span>
-                                <span className="font-extrabold text-slate-900">{data.totalCapacity}</span>
+                                <span className="text-slate-500 font-medium">Enrollment mode</span>
+                                <span className="font-extrabold text-emerald-600">Open (no hard cap)</span>
                             </div>
                         </div>
                     </CardContent>
@@ -403,14 +415,14 @@ export default async function AdminDashboardPage({
                     </CardContent>
                 </Card>
 
-                {/* Top Pages This Week */}
+                {/* Top Pages (Selected Range) */}
                 <Card className="border-slate-200/60 bg-white shadow-[0_2px_10px_-3px_rgba(0,0,0,0.02)] rounded-2xl overflow-hidden h-fit">
                     <CardHeader className="px-6 pt-6 pb-4 border-b border-slate-100 bg-violet-50/50">
                         <CardTitle className="text-[15px] font-extrabold text-slate-900 flex items-center gap-2">
                             <div className="p-1.5 rounded-lg bg-violet-50 text-violet-600"><Eye className="w-4 h-4" /></div>
-                            Top Pages This Week
+                            Top Pages ({data.analytics.periodLabel})
                         </CardTitle>
-                        <CardDescription className="text-[12px] text-slate-500 font-medium">{data.analytics.weekViews.toLocaleString()} total views · {data.analytics.todayViews} today</CardDescription>
+                        <CardDescription className="text-[12px] text-slate-500 font-medium">{data.analytics.periodViews.toLocaleString()} views in {data.analytics.periodLabel}</CardDescription>
                     </CardHeader>
                     <CardContent className="p-0">
                         <div className="divide-y divide-slate-100/80">
