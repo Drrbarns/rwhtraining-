@@ -39,10 +39,25 @@ export function ApplicationsListWithDetail({
       const matchesSearch = !search || [app.first_name, app.last_name, app.email, app.phone, app.city]
         .some(f => f?.toLowerCase().includes(search.toLowerCase()));
       const matchesStatus = statusFilter === "ALL" || app.status === statusFilter;
-      const matchesPayment = paymentFilter === "ALL" || app.payment_status === paymentFilter;
+
+      let matchesPayment = true;
+      if (paymentFilter === "FULLY_PAID") {
+        const balanceDue = app.id ? (balanceDueByApplicationId?.[app.id] ?? null) : null;
+        const tierIsPartial = app.tier === "20" || app.tier === "50";
+        const hasBalance = balanceDue != null ? balanceDue > 0 : tierIsPartial;
+        matchesPayment = app.payment_status === "PAID" && !hasBalance;
+      } else if (paymentFilter === "PART_PAYMENT") {
+        const balanceDue = app.id ? (balanceDueByApplicationId?.[app.id] ?? null) : null;
+        const tierIsPartial = app.tier === "20" || app.tier === "50";
+        const hasBalance = balanceDue != null ? balanceDue > 0 : tierIsPartial;
+        matchesPayment = app.payment_status === "PAID" && hasBalance;
+      } else if (paymentFilter !== "ALL") {
+        matchesPayment = app.payment_status === paymentFilter;
+      }
+
       return matchesSearch && matchesStatus && matchesPayment;
     });
-  }, [applications, search, statusFilter, paymentFilter]);
+  }, [applications, search, statusFilter, paymentFilter, balanceDueByApplicationId]);
 
   const filteredDrafts = useMemo(() => {
     return unfinishedApps.filter((app) => {
@@ -100,15 +115,20 @@ export function ApplicationsListWithDetail({
                 </button>
               ))}
               <span className="w-px h-6 bg-slate-200 mx-1" />
-              {["ALL", "PAID", "PENDING"].map(p => (
+              {[
+                { key: "ALL", label: "All Payments" },
+                { key: "FULLY_PAID", label: "Fully Paid" },
+                { key: "PART_PAYMENT", label: "Part Payment" },
+                { key: "PENDING", label: "Pending" },
+              ].map(p => (
                 <button
-                  key={p}
-                  onClick={() => { setPaymentFilter(p); setPage(1); }}
+                  key={p.key}
+                  onClick={() => { setPaymentFilter(p.key); setPage(1); }}
                   className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-colors ${
-                    paymentFilter === p ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-500 hover:bg-slate-200"
+                    paymentFilter === p.key ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-500 hover:bg-slate-200"
                   }`}
                 >
-                  {p === "ALL" ? "All Payments" : p}
+                  {p.label}
                 </button>
               ))}
             </div>
@@ -169,25 +189,29 @@ export function ApplicationsListWithDetail({
                         {(() => {
                           const balanceDue = app.id ? (balanceDueByApplicationId?.[app.id] ?? null) : null;
                           const isPaid = app.payment_status === "PAID";
-                          const isFullyPaid = isPaid && (balanceDue === null || balanceDue === 0);
-                          const isPartial = isPaid && balanceDue != null && balanceDue > 0;
-                          if (isPartial) {
+                          const tierIsPartial = app.tier === "20" || app.tier === "50";
+
+                          if (!isPaid) {
                             return (
-                              <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-600" title={`GHS ${balanceDue} still due`}>
-                                Partially paid — GHS {balanceDue} due
+                              <span className={`text-[11px] font-extrabold uppercase tracking-wider ${paymentColor(app.payment_status)}`}>
+                                {app.payment_status || "—"}
                               </span>
                             );
                           }
-                          if (isFullyPaid) {
+
+                          const hasBalance = balanceDue != null ? balanceDue > 0 : tierIsPartial;
+
+                          if (hasBalance) {
                             return (
-                              <span className="text-[11px] font-extrabold uppercase tracking-wider text-emerald-600">
-                                Fully paid
+                              <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-600" title={balanceDue != null ? `GHS ${balanceDue} still due` : `Tier: ${app.tier}%`}>
+                                Part Payment
                               </span>
                             );
                           }
+
                           return (
-                            <span className={`text-[11px] font-extrabold uppercase tracking-wider ${paymentColor(app.payment_status)}`}>
-                              {app.payment_status || "—"}
+                            <span className="text-[11px] font-extrabold uppercase tracking-wider text-emerald-600">
+                              Fully Paid
                             </span>
                           );
                         })()}
