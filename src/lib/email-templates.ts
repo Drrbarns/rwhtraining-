@@ -645,15 +645,15 @@ export const EMAIL_TEMPLATES = {
   },
 };
 
-/** Cohort WhatsApp group invite - included in payment & welcome SMS */
-export const COHORT_WHATSAPP_LINK = "https://chat.whatsapp.com/HI1MK05kBGA2wqxz3TA1s9?mode=gi_t";
+/** Cohort WhatsApp group invite — ONLY include in post-payment messages */
+export const COHORT_WHATSAPP_LINK = "https://chat.whatsapp.com/JSZ2FL5X6VDHDuAXZ5vw8t";
 
 export const SMS_TEMPLATES = {
   payment_confirmation: {
     name: "Payment Confirmation SMS",
     category: "payment",
-    variables: ["first_name", "amount", "tier"],
-    body: `Hi {{first_name}}! Your payment of GHS {{amount}} ({{tier}}% tier) for the Remote Work Hub Masterclass has been confirmed. Your seat is secured! Check your email for login details. - Remote Work Hub`,
+    variables: ["first_name", "amount", "tier", "whatsapp_link"],
+    body: `Hi {{first_name}}! Your payment of GHS {{amount}} ({{tier}}% tier) for the Remote Work Hub Masterclass has been confirmed. Your seat is secured! Check your email for login details.\n\nJoin the Cohort WhatsApp Group: {{whatsapp_link}}\n- Remote Work Hub`,
   },
   balance_reminder: {
     name: "Balance Reminder SMS",
@@ -676,8 +676,8 @@ export const SMS_TEMPLATES = {
   welcome_sms: {
     name: "Welcome SMS",
     category: "welcome",
-    variables: ["first_name", "email", "password", "login_url"],
-    body: `Welcome to the RWH Masterclass, {{first_name}}! Your account is ready.\nLogin: {{login_url}}\nEmail: {{email}}\nPassword: {{password}}\nChange your password after logging in. - Remote Work Hub`,
+    variables: ["first_name", "email", "password", "login_url", "whatsapp_link"],
+    body: `Welcome to the RWH Masterclass, {{first_name}}! Your account is ready.\nLogin: {{login_url}}\nEmail: {{email}}\nPassword: {{password}}\nChange your password after logging in.\n\nJoin the Cohort WhatsApp Group: {{whatsapp_link}}\n- Remote Work Hub`,
   },
   general_announcement: {
     name: "General Announcement SMS",
