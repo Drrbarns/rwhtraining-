@@ -40,7 +40,7 @@ const courseSchema = {
   "@id": `${APP_URL}/#course`,
   name: "2026 Elite Web Development & SaaS Masterclass",
   description:
-    "An intensive 6-week offline web development masterclass in Accra, Ghana. Learn to build production-ready web applications, e-commerce platforms, dashboards, and SaaS products. Includes a 1-month paid internship at Doctor Barns Tech. Top 2 students get hired. Every student lands their first paying client before graduation.",
+    "An intensive 6-week hybrid web development masterclass in Accra, Ghana with 1 onsite and 2 online meetings weekly. Learn to build production-ready web applications, e-commerce platforms, dashboards, and SaaS products. Includes a 1-month internship at Doctor Barns Tech.",
   url: `${APP_URL}/apply`,
   provider: { "@id": `${APP_URL}/#organization` },
   courseCode: "RWH-2026-ELITE",
@@ -56,14 +56,14 @@ const courseSchema = {
     "Agency branding and pricing",
   ],
   numberOfCredits: 1,
-  occupationalCredentialAwarded: "Diploma Certification in Web Development",
+  occupationalCredentialAwarded: "Professional Diploma in Web Development",
   timeRequired: "P6W",
   hasCourseInstance: {
     "@type": "CourseInstance",
     name: "April 2026 Cohort",
     startDate: "2026-04-20",
     endDate: "2026-06-01",
-    courseMode: "Offline",
+    courseMode: "Hybrid",
     courseWorkload: "PT8H",
     instructor: {
       "@type": "Person",
@@ -128,7 +128,7 @@ const faqSchema = {
       name: "Is the first client really guaranteed?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Yes. We have a dedicated client acquisition module where you learn lead generation, pitching, and closing. We work with every student individually to ensure you sign your first paying web design client before the program ends.",
+        text: "Our first-client guarantee depends on student seriousness and strict adherence to instructions. We provide direct coaching and a dedicated client acquisition process to support students who execute fully.",
       },
     },
     {
@@ -141,10 +141,10 @@ const faqSchema = {
     },
     {
       "@type": "Question",
-      name: "How does the paid internship work?",
+      name: "How does the 1-month internship work?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "After the 6-week masterclass, every student transitions into a 1-month paid internship at Doctor Barns Tech. You'll work on real client projects alongside senior developers, building your portfolio and professional experience.",
+        text: "After the 6-week masterclass, every student transitions into a 1-month internship at Doctor Barns Tech. You'll work on real client projects alongside senior developers, building your portfolio and professional experience.",
       },
     },
     {
@@ -176,7 +176,7 @@ const faqSchema = {
       name: "Is the training online or offline?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "The masterclass is fully offline and in-person at our training facility at 111 Newtown RD, Accra Newtown. This ensures hands-on mentorship, peer collaboration, and zero distractions.",
+        text: "The masterclass is hybrid: one onsite session in Accra and two online sessions each week. This format blends hands-on accountability with flexible follow-up sessions.",
       },
     },
     {
@@ -184,7 +184,7 @@ const faqSchema = {
       name: "What do I get at the end of the program?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "You receive a Diploma Certification in Web Development, a professional portfolio of real projects, your first paying client, a 1-month paid internship, access to our alumni network, and a chance to be hired full-time by Doctor Barns Tech.",
+        text: "You receive a Professional Diploma in Web Development, a professional portfolio of real projects, your first paying client, a 1-month internship, access to our alumni network, and a chance to be hired full-time by Doctor Barns Tech.",
       },
     },
   ],
@@ -220,11 +220,11 @@ const eventSchema = {
   "@type": "EducationEvent",
   name: "2026 Elite Web Development & SaaS Masterclass",
   description:
-    "6-week intensive offline web development training in Accra. Learn to build real business applications, get a 1-month paid internship, and land your first client.",
+    "6-week intensive hybrid web development training in Accra. Learn to build real business applications, complete a 1-month internship, and pursue your first client with guided support.",
   startDate: "2026-04-20T09:00:00+00:00",
   endDate: "2026-06-01T17:00:00+00:00",
   eventStatus: "https://schema.org/EventScheduled",
-  eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+  eventAttendanceMode: "https://schema.org/MixedEventAttendanceMode",
   location: {
     "@type": "Place",
     name: "Doctor Barns Tech HQ",

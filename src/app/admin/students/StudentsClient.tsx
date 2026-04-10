@@ -71,11 +71,13 @@ export function StudentsTable({
     enrollments,
     payments,
     lastSignInMap,
+    perStudentPaid,
 }: {
     students: Student[];
     enrollments: Enrollment[];
     payments: Payment[];
     lastSignInMap: Record<string, string | null>;
+    perStudentPaid?: Record<string, { paid: number; balance: number }>;
 }) {
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const selected = students.find((s) => s.id === selectedId);
@@ -110,8 +112,10 @@ export function StudentsTable({
                                     {students.map((student, i) => {
                                         const enrollment = enrollments.find((e) => e.user_id === student.id);
                                         const app = enrollment?.applications;
-                                        const balance = Number(enrollment?.balance_due || 0);
-                                        const paid = Number(enrollment?.total_paid || 0);
+                                        const appId = app?.id || enrollment?.applications?.id || "";
+                                        const paymentDerived = appId && perStudentPaid ? perStudentPaid[appId] : null;
+                                        const paid = paymentDerived ? paymentDerived.paid : Number(enrollment?.total_paid || 0);
+                                        const balance = paymentDerived ? paymentDerived.balance : Number(enrollment?.balance_due || 0);
                                         const active = enrollment?.is_active !== false;
                                         const lastLogin = lastSignInMap[student.id];
 

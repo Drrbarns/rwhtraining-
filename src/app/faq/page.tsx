@@ -151,8 +151,8 @@ export default function FAQPage() {
               { icon: MapPin, label: "Location", value: "Accra, Ghana" },
               { icon: Users, label: "Class Size", value: "10 Students" },
               { icon: CreditCard, label: "Fee", value: brand.cohort.fee },
-              { icon: Award, label: "Certificate", value: "Diploma" },
-              { icon: Code2, label: "Format", value: "Offline" },
+              { icon: Award, label: "Award", value: "Professional Diploma" },
+              { icon: Code2, label: "Format", value: "Hybrid" },
             ].map((fact) => (
               <motion.div key={fact.label} variants={FADE_UP} className="text-center p-4 bg-slate-50 rounded-xl border border-slate-200">
                 <fact.icon className="w-5 h-5 text-blue-600 mx-auto mb-2" />

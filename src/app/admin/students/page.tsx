@@ -3,7 +3,7 @@ import { ExportRosterButton } from "../ClientButtons";
 import { Card, CardContent } from "@/components/ui/card";
 import { GraduationCap, Banknote, CreditCard, Users } from "lucide-react";
 import { StudentsTable } from "./StudentsClient";
-import { computeEnrollmentMoneyStats, filterRealEnrollments } from "@/lib/admin-metrics";
+import { computePaymentBasedMoneyStats, computePerStudentPaid, filterRealEnrollments } from "@/lib/admin-metrics";
 import {
     filterByCohortId,
     getActiveCohortId,
@@ -23,9 +23,9 @@ async function getStudentsData(cohortFilter: CohortFilterValue) {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     const [enrollmentsRes, profilesRes, paymentsRes, cohortsRes, appsRes] = await Promise.all([
-        supabase.from("enrollments").select("*, applications(*)"),
+        supabase.from("enrollments").select("*, applications(id, email, phone, city, first_name, last_name, tier, amount_ghs, occupation, experience, reason, payment_status, payment_reference, created_at)"),
         supabase.from("profiles").select("*").eq("role", "STUDENT"),
-        supabase.from("payments").select("*").in("status", ["PAID", "SUCCESS", "REVERSED"]).order("created_at", { ascending: false }),
+        supabase.from("payments").select("*").order("created_at", { ascending: false }),
         supabase.from("cohorts").select("*").order("start_date", { ascending: false }),
         supabase.from("applications").select("id, cohort_id, payment_reference"),
     ]);
@@ -40,16 +40,17 @@ async function getStudentsData(cohortFilter: CohortFilterValue) {
     const enrollments = filterByCohortId(allEnrollments, scopeCohortId);
     const appIds = new Set(applications.map((app: any) => app.id));
     const paymentRefs = new Set(applications.map((app: any) => app.payment_reference).filter(Boolean));
+
     const payments = allPayments.filter((payment: any) => {
         if (payment.application_id && appIds.has(payment.application_id)) return true;
         if (payment.reference && paymentRefs.has(payment.reference)) return true;
         return false;
     });
+
     const students = allStudents.filter((student: any) =>
         enrollments.some((enrollment: any) => enrollment.user_id === student.id)
     );
 
-    // Get last sign-in times from auth users
     const lastSignInMap: Record<string, string | null> = {};
     try {
         const { data: authData } = await supabase.auth.admin.listUsers({ perPage: 500 });
@@ -61,9 +62,10 @@ async function getStudentsData(cohortFilter: CohortFilterValue) {
     } catch {}
 
     const realEnrollments = filterRealEnrollments(enrollments);
-    const money = computeEnrollmentMoneyStats(realEnrollments);
+    const money = computePaymentBasedMoneyStats(realEnrollments, payments);
+    const perStudentPaid = computePerStudentPaid(realEnrollments, payments);
 
-    return { enrollments: realEnrollments, students, payments, lastSignInMap, money, cohorts, activeCohortId };
+    return { enrollments: realEnrollments, students, payments, lastSignInMap, money, perStudentPaid: Object.fromEntries(perStudentPaid), cohorts, activeCohortId };
 }
 
 export default async function ActiveStudentsPage({
@@ -113,8 +115,13 @@ export default async function ActiveStudentsPage({
                 ))}
             </div>
 
-            {/* Students Table (interactive) */}
-            <StudentsTable students={data.students} enrollments={data.enrollments} payments={data.payments} lastSignInMap={data.lastSignInMap} />
+            <StudentsTable
+                students={data.students}
+                enrollments={data.enrollments}
+                payments={data.payments}
+                lastSignInMap={data.lastSignInMap}
+                perStudentPaid={data.perStudentPaid}
+            />
         </div>
     );
 }

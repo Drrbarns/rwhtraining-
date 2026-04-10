@@ -66,10 +66,10 @@ const techStack = [
 ];
 
 const programFeatures = [
-  { icon: Clock, label: "6 Weeks Intensive", sub: "Mon–Sat, in-person training" },
+  { icon: Clock, label: "6 Weeks Intensive", sub: "Hybrid weekly schedule" },
   { icon: Users, label: "Max 10 Students", sub: "Elite, personalized mentorship" },
-  { icon: Award, label: "Diploma Issued", sub: "Doctor Barns Tech certification" },
-  { icon: GraduationCap, label: "Internship Included", sub: "1 month paid at DBT" },
+  { icon: Award, label: "Professional Diploma", sub: "Doctor Barns Tech award" },
+  { icon: GraduationCap, label: "Internship Included", sub: "1-month at DBT" },
   { icon: Calendar, label: "Starts April 20", sub: "2026 cohort" },
   { icon: Download, label: "All Materials Included", sub: "Code, resources & templates" },
 ];
@@ -272,9 +272,9 @@ export default function CurriculumPage() {
               </motion.h2>
               <motion.div variants={FADE_UP} className="space-y-5 text-slate-600 text-base leading-relaxed">
                 <p>
-                  Remote Work Hub runs Monday to Saturday, fully in-person at our Accra Newtown facility.
-                  The offline format is intentional — no distractions, maximum accountability, and the kind
-                  of mentorship that&apos;s impossible to replicate on a video call.
+                  Remote Work Hub runs in a hybrid format with one onsite meeting in Accra and two
+                  online meetings every week. This balance keeps accountability high while giving
+                  students flexible follow-through between sessions.
                 </p>
                 <p>
                   Each week follows a structured rhythm: new concepts introduced Monday, deep-dive sessions
@@ -290,11 +290,11 @@ export default function CurriculumPage() {
 
               <motion.div variants={FADE_UP} className="mt-8 space-y-3">
                 {[
-                  { label: "Daily Sessions", value: "8am – 5pm, Mon to Sat" },
+                  { label: "Weekly Structure", value: "1 onsite + 2 online meetings" },
                   { label: "Location", value: "111 Newtown RD, Accra Newtown" },
                   { label: "Cohort Start", value: brand.cohort.startDate },
                   { label: "Program End", value: "May 31, 2026 (approx.)" },
-                  { label: "Internship", value: "June 2026 — 6 Weeks Paid" },
+                  { label: "Internship", value: "June 2026 — 1 Month" },
                 ].map((item) => (
                   <div key={item.label} className="flex items-center justify-between p-4 rounded-xl bg-slate-50 border border-slate-200">
                     <span className="text-slate-600 text-sm font-medium">{item.label}</span>
@@ -318,7 +318,7 @@ export default function CurriculumPage() {
                   {
                     num: "01",
                     title: "Diploma in Web Development",
-                    desc: "A Doctor Barns Tech-issued professional certification recognized in the industry.",
+                    desc: "A Doctor Barns Tech-issued Professional Diploma recognized in the industry.",
                     color: "bg-blue-50 border-blue-200",
                     numColor: "text-blue-600",
                   },
@@ -338,7 +338,7 @@ export default function CurriculumPage() {
                   },
                   {
                     num: "04",
-                    title: "1-Month Paid Internship",
+                    title: "1-Month Internship",
                     desc: "Hands-on experience on live client projects at Doctor Barns Tech.",
                     color: "bg-blue-50 border-blue-200",
                     numColor: "text-blue-600",

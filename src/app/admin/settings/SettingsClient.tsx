@@ -15,6 +15,7 @@ import {
     promoteToAdminAction,
     demoteFromAdminAction,
     manualEnrollStudentAction,
+    reconcileEnrollmentFinancialsAction,
 } from "@/app/actions/admin-control";
 
 type Cohort = { id: string; name: string; start_date: string; capacity: number; is_active: boolean };
@@ -26,7 +27,51 @@ export function SettingsClient({ cohorts, admins, activeCohort }: { cohorts: Coh
             <CohortManager cohorts={cohorts} activeCohort={activeCohort} />
             <AdminManager admins={admins} />
             <WalkInEnrollment />
+            <ReconcileFinancials />
         </div>
+    );
+}
+
+function ReconcileFinancials() {
+    const router = useRouter();
+    const [running, setRunning] = useState(false);
+
+    async function handleReconcile() {
+        if (!confirm("This will recompute all enrollment totals from actual payment records. Proceed?")) return;
+        setRunning(true);
+        const res = await reconcileEnrollmentFinancialsAction();
+        setRunning(false);
+        if (res.success) {
+            toast.success(`Reconciliation complete: checked ${res.checked} enrollments, fixed ${res.fixed}`);
+            router.refresh();
+        } else {
+            toast.error(res.error || "Reconciliation failed");
+        }
+    }
+
+    return (
+        <Card className="border-slate-200/60 bg-white rounded-2xl shadow-[0_2px_10px_-3px_rgba(0,0,0,0.02)]">
+            <CardHeader className="px-6 pt-6 pb-3">
+                <CardTitle className="text-[15px] font-extrabold text-slate-900 flex items-center gap-2">
+                    <Shield className="w-4 h-4 text-amber-600" /> Reconcile Enrollment Financials
+                </CardTitle>
+                <CardDescription className="text-[12px] text-slate-500 font-medium">
+                    Recomputes all enrollment total_paid and balance_due values from actual payment records.
+                    Use this if financial stats appear inconsistent across pages.
+                </CardDescription>
+            </CardHeader>
+            <CardContent className="px-6 pb-6">
+                <Button
+                    onClick={handleReconcile}
+                    disabled={running}
+                    variant="outline"
+                    className="rounded-xl text-[12px] font-bold h-9 border-amber-200/80 bg-amber-50/80 text-amber-800 hover:bg-amber-100/80"
+                >
+                    {running ? <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" /> : <Shield className="w-3.5 h-3.5 mr-1.5" />}
+                    {running ? "Reconciling..." : "Run Reconciliation"}
+                </Button>
+            </CardContent>
+        </Card>
     );
 }
 

@@ -20,8 +20,54 @@ export type ApplicationRow = {
 };
 
 /**
+ * Computes the actual total paid for an application by summing all
+ * PAID/SUCCESS payments linked to it. Uses both `application_id` and
+ * `payment_reference` to find all associated payments (de-duplicated by ID).
+ */
+async function computeActualPaidForApplication(
+    supabase: SupabaseClient,
+    applicationId: string
+): Promise<number> {
+    const paymentsMap = new Map<string, number>();
+
+    const { data: byAppId } = await supabase
+        .from("payments")
+        .select("id, amount_ghs")
+        .eq("application_id", applicationId)
+        .in("status", ["PAID", "SUCCESS"]);
+
+    if (byAppId) {
+        for (const p of byAppId) {
+            paymentsMap.set(p.id, Number(p.amount_ghs || 0));
+        }
+    }
+
+    const { data: app } = await supabase
+        .from("applications")
+        .select("payment_reference")
+        .eq("id", applicationId)
+        .single();
+
+    if (app?.payment_reference) {
+        const { data: refPayment } = await supabase
+            .from("payments")
+            .select("id, amount_ghs")
+            .eq("reference", app.payment_reference)
+            .in("status", ["PAID", "SUCCESS"])
+            .maybeSingle();
+
+        if (refPayment) {
+            paymentsMap.set(refPayment.id, Number(refPayment.amount_ghs || 0));
+        }
+    }
+
+    return Array.from(paymentsMap.values()).reduce((sum, v) => sum + v, 0);
+}
+
+/**
  * Creates auth user, profile, enrollment, and sends credentials email.
- * Idempotent: skips creation if user already exists for this application.
+ * Idempotent: recomputes enrollment financials from actual payment records
+ * on every call, preventing double-counting from duplicate webhook/verify calls.
  */
 export async function onboardPaidStudent(
     supabase: SupabaseClient,
@@ -34,18 +80,24 @@ export async function onboardPaidStudent(
             .eq("application_id", appData.id)
             .single();
 
-        if (existingEnrollment && appData.user_id) {
-            // Balance payment: update enrollment financials if there's still a balance
-            if (appData.amount_ghs > 0 && Number(existingEnrollment.balance_due) > 0) {
-                const newTotalPaid = Number(existingEnrollment.total_paid) + appData.amount_ghs;
-                const newBalanceDue = Math.max(0, Number(existingEnrollment.balance_due) - appData.amount_ghs);
+        if (existingEnrollment) {
+            const actualPaid = await computeActualPaidForApplication(supabase, appData.id);
+            const correctBalance = Math.max(0, COURSE_TOTAL_GHS - actualPaid);
+
+            if (
+                actualPaid !== Number(existingEnrollment.total_paid) ||
+                correctBalance !== Number(existingEnrollment.balance_due)
+            ) {
                 await supabase.from("enrollments").update({
-                    total_paid: newTotalPaid,
-                    balance_due: newBalanceDue,
+                    total_paid: actualPaid,
+                    balance_due: correctBalance,
                     updated_at: new Date().toISOString(),
                 }).eq("id", existingEnrollment.id);
-                console.log(`[Onboard] Updated enrollment balance: paid=${newTotalPaid}, due=${newBalanceDue}`);
+                console.log(`[Onboard] Reconciled enrollment ${existingEnrollment.id}: paid=${actualPaid}, due=${correctBalance}`);
+            } else {
+                console.log(`[Onboard] Enrollment ${existingEnrollment.id} already correct: paid=${actualPaid}, due=${correctBalance}`);
             }
+
             return { ok: true };
         }
 
@@ -83,13 +135,16 @@ export async function onboardPaidStudent(
             city: appData.city || "",
         });
 
+        const actualPaid = await computeActualPaidForApplication(supabase, appData.id);
+        const balanceDue = Math.max(0, COURSE_TOTAL_GHS - actualPaid);
+
         await supabase.from("enrollments").insert({
             user_id: authData.user.id,
             cohort_id: appData.cohort_id,
             application_id: appData.id,
             is_active: true,
-            total_paid: appData.amount_ghs,
-            balance_due: COURSE_TOTAL_GHS - appData.amount_ghs,
+            total_paid: actualPaid,
+            balance_due: balanceDue,
         });
 
         await supabase.from("applications").update({ user_id: authData.user.id }).eq("id", appData.id);
@@ -126,19 +181,33 @@ async function ensureProfileAndEnrollment(
     }
     const { data: enroll } = await supabase
         .from("enrollments")
-        .select("id")
+        .select("id, total_paid, balance_due")
         .eq("application_id", appData.id)
         .single();
+
     if (!enroll) {
+        const actualPaid = await computeActualPaidForApplication(supabase, appData.id);
+        const balanceDue = Math.max(0, COURSE_TOTAL_GHS - actualPaid);
         await supabase.from("enrollments").insert({
             user_id: userId,
             cohort_id: appData.cohort_id,
             application_id: appData.id,
             is_active: true,
-            total_paid: appData.amount_ghs,
-            balance_due: COURSE_TOTAL_GHS - appData.amount_ghs,
+            total_paid: actualPaid,
+            balance_due: balanceDue,
         });
+    } else {
+        const actualPaid = await computeActualPaidForApplication(supabase, appData.id);
+        const correctBalance = Math.max(0, COURSE_TOTAL_GHS - actualPaid);
+        if (actualPaid !== Number(enroll.total_paid) || correctBalance !== Number(enroll.balance_due)) {
+            await supabase.from("enrollments").update({
+                total_paid: actualPaid,
+                balance_due: correctBalance,
+                updated_at: new Date().toISOString(),
+            }).eq("id", enroll.id);
+        }
     }
+
     await supabase.from("applications").update({ user_id: userId }).eq("id", appData.id);
 }
 

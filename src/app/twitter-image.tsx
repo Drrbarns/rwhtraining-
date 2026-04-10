@@ -84,7 +84,7 @@ export default function TwitterImage() {
             Web Developer
           </span>
           <span style={{ color: "#94a3b8", fontSize: 20, fontWeight: 600, maxWidth: 700 }}>
-            First client guaranteed. Paid internship. Top 2 get hired by Doctor Barns Tech.
+            Professional Diploma. 1-month internship. Hybrid format. Top 2 get hired by Doctor Barns Tech.
           </span>
 
           <div style={{ display: "flex", gap: 28, marginTop: 36 }}>

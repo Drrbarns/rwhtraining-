@@ -436,7 +436,7 @@ export const EMAIL_TEMPLATES = {
           <td style="padding: 12px 0; border-bottom: 1px solid #f1f5f9; vertical-align: top; width: 40px;">
             <div style="width: 26px; height: 26px; background: #ecfdf5; border-radius: 50%; text-align: center; line-height: 26px; color: #059669; font-size: 14px;">&#10003;</div>
           </td>
-          <td style="padding: 12px 0 12px 14px; border-bottom: 1px solid #f1f5f9; font-size: 15px; color: #334155;">Get a 1-month <strong>paid internship</strong> at Doctor Barns Tech</td>
+          <td style="padding: 12px 0 12px 14px; border-bottom: 1px solid #f1f5f9; font-size: 15px; color: #334155;">Get a 1-month <strong>internship</strong> at Doctor Barns Tech</td>
         </tr>
         <tr>
           <td style="padding: 12px 0; vertical-align: top; width: 40px;">
@@ -563,7 +563,7 @@ export const EMAIL_TEMPLATES = {
           <td style="padding: 12px 0; border-bottom: 1px solid #f1f5f9; vertical-align: top; width: 42px;">
             <div style="width: 30px; height: 30px; background: ${BRAND_COLOR}; border-radius: 50%; text-align: center; line-height: 30px; color: #fff; font-size: 13px; font-weight: 800;">1</div>
           </td>
-          <td style="padding: 12px 0 12px 14px; border-bottom: 1px solid #f1f5f9; font-size: 15px; color: #334155;">Start your <strong>1-month paid internship</strong></td>
+          <td style="padding: 12px 0 12px 14px; border-bottom: 1px solid #f1f5f9; font-size: 15px; color: #334155;">Start your <strong>1-month internship</strong></td>
         </tr>
         <tr>
           <td style="padding: 12px 0; border-bottom: 1px solid #f1f5f9; vertical-align: top; width: 42px;">

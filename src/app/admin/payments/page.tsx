@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { CreditCard, Banknote, Clock, AlertTriangle, CheckCircle2, XCircle } from "lucide-react";
 import { PaymentsClient } from "./PaymentsClient";
 import { RecordCashPayment } from "./RecordCashPayment";
-import { computeEnrollmentMoneyStats, filterRealEnrollments } from "@/lib/admin-metrics";
+import { computePaymentBasedMoneyStats, filterRealEnrollments } from "@/lib/admin-metrics";
 import {
     filterByCohortId,
     getActiveCohortId,
@@ -24,7 +24,7 @@ async function getPaymentsData(cohortFilter: CohortFilterValue) {
 
     const [paymentsRes, enrollmentsRes, appsRes, cohortsRes] = await Promise.all([
         supabase.from("payments").select("*").order("created_at", { ascending: false }),
-        supabase.from("enrollments").select("*, applications(*)"),
+        supabase.from("enrollments").select("*, applications(id, email, payment_reference)"),
         supabase.from("applications").select("id, cohort_id, payment_reference"),
         supabase.from("cohorts").select("*").order("start_date", { ascending: false }),
     ]);
@@ -46,12 +46,11 @@ async function getPaymentsData(cohortFilter: CohortFilterValue) {
         return false;
     });
 
-    // Only count initial (not balance) PENDING payments — balance PENDING are abandoned button clicks
     const pending = scopedPayments.filter((p: any) => p.status === "PENDING" && (!p.payment_type || p.payment_type === "initial"));
     const failed = scopedPayments.filter((p: any) => p.status === "FAILED" || p.status === "CANCELLED");
 
     const realEnrollments = filterRealEnrollments(enrollments);
-    const money = computeEnrollmentMoneyStats(realEnrollments);
+    const money = computePaymentBasedMoneyStats(realEnrollments, scopedPayments);
     const totalPending = pending.reduce((acc: number, p: any) => acc + Number(p.amount_ghs || 0), 0);
 
     return {
@@ -84,9 +83,9 @@ export default async function PaymentsPage({
     }
 
     const statCards = [
-        { title: "Total Collected", value: `GHS ${data.stats.totalCollected.toLocaleString()}`, desc: `${data.stats.paidCount} enrolled records (enrollment-based)`, icon: Banknote, color: "emerald" },
+        { title: "Total Collected", value: `GHS ${data.stats.totalCollected.toLocaleString()}`, desc: `From ${data.stats.paidCount} enrolled student(s) — derived from payment records`, icon: Banknote, color: "emerald" },
         { title: "Pending Checkouts", value: `GHS ${data.stats.totalPending.toLocaleString()}`, desc: `${data.stats.pendingCount} initial checkout attempts`, icon: Clock, color: "amber" },
-        { title: "Outstanding Balance", value: `GHS ${data.stats.outstandingBalance.toLocaleString()}`, desc: "Enrollment balances still due", icon: AlertTriangle, color: "orange" },
+        { title: "Outstanding Balance", value: `GHS ${data.stats.outstandingBalance.toLocaleString()}`, desc: "Remaining balance across all enrolled students", icon: AlertTriangle, color: "orange" },
         { title: "Failed", value: data.stats.failedCount.toString(), desc: "Failed or cancelled", icon: XCircle, color: "red" },
     ];
 

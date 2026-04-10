@@ -5,7 +5,7 @@ import { createClient } from "@supabase/supabase-js";
 import { ExportReportButton, OpenRegistrationsButton } from "./ClientButtons";
 import { SendMessageToStudents } from "./components/SendMessageToStudents";
 import { RevenueChart, TierPieChart, GatewayPieChart, FunnelChart } from "./components/DashboardCharts";
-import { computeEnrollmentMoneyStats, filterRealEnrollments } from "@/lib/admin-metrics";
+import { computePaymentBasedMoneyStats, filterRealEnrollments } from "@/lib/admin-metrics";
 import { splitApplicationsForAdmin } from "@/lib/admin-applications";
 import {
     filterByCohortId,
@@ -58,7 +58,18 @@ async function getAdminData(cohortFilter: CohortFilterValue, visitorRange: Visit
     const paidApps = applications.filter((a: any) => a.payment_status === "PAID");
     const pendingPayments = applications.filter((a: any) => a.payment_status === "PENDING").length;
     const realEnrollments = filterRealEnrollments(enrollments);
-    const enrollmentMoney = computeEnrollmentMoneyStats(realEnrollments);
+
+    const appIds = new Set(scopedApps.map((app: any) => app.id));
+    const paymentRefs = new Set(
+        scopedApps.map((app: any) => app.payment_reference).filter(Boolean)
+    );
+    const scopedPayments = payments.filter((payment: any) => {
+        if (payment.application_id && appIds.has(payment.application_id)) return true;
+        if (payment.reference && paymentRefs.has(payment.reference)) return true;
+        return false;
+    });
+
+    const enrollmentMoney = computePaymentBasedMoneyStats(realEnrollments, scopedPayments);
     const filledSeats = enrollmentMoney.enrolledCount;
     const totalCapacity = cohort?.capacity || 15;
     const totalWhoStarted = applications.length + unfinishedApps.length;
@@ -70,15 +81,6 @@ async function getAdminData(cohortFilter: CohortFilterValue, visitorRange: Visit
     const outstandingBalance = enrollmentMoney.outstandingBalance;
 
     const revenueByDay: { date: string; amount: number }[] = [];
-    const appIds = new Set(scopedApps.map((app: any) => app.id));
-    const paymentRefs = new Set(
-        scopedApps.map((app: any) => app.payment_reference).filter(Boolean)
-    );
-    const scopedPayments = payments.filter((payment: any) => {
-        if (payment.application_id && appIds.has(payment.application_id)) return true;
-        if (payment.reference && paymentRefs.has(payment.reference)) return true;
-        return false;
-    });
 
     const paidPayments = scopedPayments.filter(
         (p: any) =>
@@ -185,7 +187,7 @@ export default async function AdminDashboardPage({
         { title: "Total Leads", value: data.totalWhoStarted.toString(), desc: "All who started", icon: Users, color: "text-blue-600", bg: "bg-blue-50/50", border: "border-blue-100/50", trend: null },
         { title: "Completed", value: data.applications.length.toString(), desc: `${data.completionRate}% completion rate`, icon: Target, color: "text-indigo-600", bg: "bg-indigo-50/50", border: "border-indigo-100/50", trend: "up" },
         { title: "Enrolled", value: `${data.filledSeats}`, desc: "Open enrollment (no hard cap)", icon: GraduationCap, color: "text-amber-600", bg: "bg-amber-50/50", border: "border-amber-100/50", trend: "up" },
-        { title: "Revenue", value: `GHS ${data.totalRevenue.toLocaleString()}`, desc: `${data.paidCount} enrollments (enrollment-based)`, icon: Banknote, color: "text-emerald-600", bg: "bg-emerald-50/50", border: "border-emerald-100/50", trend: "up" },
+        { title: "Revenue", value: `GHS ${data.totalRevenue.toLocaleString()}`, desc: `${data.paidCount} enrollments — from payment records`, icon: Banknote, color: "text-emerald-600", bg: "bg-emerald-50/50", border: "border-emerald-100/50", trend: "up" },
     ];
 
     return (

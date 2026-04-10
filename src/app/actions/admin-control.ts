@@ -317,6 +317,79 @@ export async function manualEnrollStudentAction(input: {
     return { success: true };
 }
 
+// --- Reconcile enrollment financials from payments (fixes double-counted data) ---
+
+export async function reconcileEnrollmentFinancialsAction() {
+    const { supabase, error } = await getServiceAndAdminId();
+    if (error || !supabase) return { success: false, error: error || "Unauthorized" };
+
+    const { data: enrollments, error: eErr } = await supabase
+        .from("enrollments")
+        .select("id, application_id, total_paid, balance_due");
+    if (eErr || !enrollments) return { success: false, error: eErr?.message || "Failed to fetch enrollments" };
+
+    let fixed = 0;
+    let checked = 0;
+
+    for (const enrollment of enrollments) {
+        checked++;
+        const appId = enrollment.application_id;
+        if (!appId) continue;
+
+        const paymentsMap = new Map<string, number>();
+
+        const { data: byAppId } = await supabase
+            .from("payments")
+            .select("id, amount_ghs")
+            .eq("application_id", appId)
+            .in("status", ["PAID", "SUCCESS"]);
+
+        if (byAppId) {
+            for (const p of byAppId) {
+                paymentsMap.set(p.id, Number(p.amount_ghs || 0));
+            }
+        }
+
+        const { data: app } = await supabase
+            .from("applications")
+            .select("payment_reference")
+            .eq("id", appId)
+            .single();
+
+        if (app?.payment_reference) {
+            const { data: refPayment } = await supabase
+                .from("payments")
+                .select("id, amount_ghs")
+                .eq("reference", app.payment_reference)
+                .in("status", ["PAID", "SUCCESS"])
+                .maybeSingle();
+
+            if (refPayment) {
+                paymentsMap.set(refPayment.id, Number(refPayment.amount_ghs || 0));
+            }
+        }
+
+        const actualPaid = Array.from(paymentsMap.values()).reduce((sum, v) => sum + v, 0);
+        const correctBalance = Math.max(0, COURSE_TOTAL_GHS - actualPaid);
+
+        if (
+            actualPaid !== Number(enrollment.total_paid) ||
+            correctBalance !== Number(enrollment.balance_due)
+        ) {
+            await supabase.from("enrollments").update({
+                total_paid: actualPaid,
+                balance_due: correctBalance,
+                updated_at: new Date().toISOString(),
+            }).eq("id", enrollment.id);
+            fixed++;
+            console.log(`[Reconcile] Fixed enrollment ${enrollment.id}: was paid=${enrollment.total_paid}/due=${enrollment.balance_due}, now paid=${actualPaid}/due=${correctBalance}`);
+        }
+    }
+
+    revalidateAdmin();
+    return { success: true, checked, fixed };
+}
+
 // --- Void manual / cash payment ---
 
 export async function voidManualPaymentAction(paymentId: string) {

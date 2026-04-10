@@ -2,6 +2,7 @@ import { createClient } from "@supabase/supabase-js";
 import { ApplicationsListWithDetail } from "../components/ApplicationsListWithDetail";
 import { ExportReportButton, ExportUnfinishedButton } from "../ClientButtons";
 import { splitApplicationsForAdmin } from "@/lib/admin-applications";
+import { COURSE_TOTAL_GHS } from "@/lib/pricing";
 import {
     filterByCohortId,
     getActiveCohortId,
@@ -20,10 +21,11 @@ async function getApplicationsData(cohortFilter: CohortFilterValue) {
     if (!supabaseUrl || !supabaseServiceKey) return null;
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
-    const [appsRes, enrollmentsRes, cohortsRes] = await Promise.all([
+    const [appsRes, enrollmentsRes, cohortsRes, paymentsRes] = await Promise.all([
         supabase.from("applications").select("*").order("created_at", { ascending: false }),
-        supabase.from("enrollments").select("cohort_id, application_id, balance_due, applications(email)"),
+        supabase.from("enrollments").select("cohort_id, application_id, balance_due, applications(email, payment_reference)"),
         supabase.from("cohorts").select("*").order("start_date", { ascending: false }),
+        supabase.from("payments").select("id, application_id, reference, amount_ghs, status").in("status", ["PAID", "SUCCESS"]),
     ]);
 
     if (appsRes.error) return null;
@@ -33,10 +35,30 @@ async function getApplicationsData(cohortFilter: CohortFilterValue) {
     const scopeCohortId = resolveCohortScopeId(cohortFilter, activeCohortId);
     const all = filterByCohortId(appsRes.data ?? [], scopeCohortId);
     const enrollments = filterByCohortId(enrollmentsRes.data ?? [], scopeCohortId);
+    const paidPayments = paymentsRes.data ?? [];
     const grouped = splitApplicationsForAdmin(all, enrollments);
+
     const balanceDueByApplicationId: Record<string, number> = {};
     enrollments.forEach((e: any) => {
-        if (e.application_id) balanceDueByApplicationId[e.application_id] = Number(e.balance_due || 0);
+        const appId = e.application_id;
+        if (!appId) return;
+
+        const paymentRef = e.applications?.payment_reference;
+        const seen = new Set<string>();
+        let paid = 0;
+
+        for (const p of paidPayments) {
+            if (seen.has(p.id)) continue;
+            if (p.application_id === appId) {
+                seen.add(p.id);
+                paid += Number(p.amount_ghs || 0);
+            } else if (paymentRef && p.reference === paymentRef) {
+                seen.add(p.id);
+                paid += Number(p.amount_ghs || 0);
+            }
+        }
+
+        balanceDueByApplicationId[appId] = Math.max(0, COURSE_TOTAL_GHS - paid);
     });
 
     return {

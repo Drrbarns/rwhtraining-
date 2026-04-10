@@ -129,15 +129,15 @@ export default function OGImage() {
               Web Developer
             </span>
             <span style={{ color: "#94a3b8", fontSize: 22, fontWeight: 600, lineHeight: 1.4 }}>
-              Get your first paying client in 6 weeks. Paid internship included. Top 2 get hired.
+              Professional Diploma. 1-month internship. Hybrid format with weekly onsite and online sessions.
             </span>
           </div>
 
           {/* Bottom row: Features */}
           <div style={{ display: "flex", gap: 32, alignItems: "center" }}>
             {[
-              { label: "First Client Guaranteed", color: "#22c55e" },
-              { label: "Paid Internship", color: "#3b82f6" },
+              { label: "Professional Diploma", color: "#22c55e" },
+              { label: "1-Month Internship", color: "#3b82f6" },
               { label: "Top 2 Get Hired", color: "#f59e0b" },
               { label: "GHS 2,200", color: "#ffffff" },
             ].map((item) => (

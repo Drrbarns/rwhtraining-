@@ -19,7 +19,7 @@ function getReminderSms(daysLeft: number, timeOfDay: "morning" | "evening", firs
     if (timeOfDay === "morning") {
       return `Good morning ${name}! The Remote Work Hub Elite Web Dev Masterclass starts in just ${daysLeft} days (Monday April 20). Seats are filling fast! Complete your application & secure your spot: remoteworkhub.org/apply` + SMS_SUFFIX;
     }
-    return `Hey ${name}, only ${daysLeft} days until the Remote Work Hub Masterclass begins! This is your chance to learn web development, get a paid internship & land your first client. Don't miss out - apply now: remoteworkhub.org/apply` + SMS_SUFFIX;
+    return `Hey ${name}, only ${daysLeft} days until the Remote Work Hub Masterclass begins! This is your chance to learn web development, complete a 1-month internship & land your first client. Don't miss out - apply now: remoteworkhub.org/apply` + SMS_SUFFIX;
   }
 
   if (daysLeft === 3) {
@@ -61,7 +61,7 @@ function getReminderEmail(daysLeft: number, timeOfDay: "morning" | "evening", fi
     urgencyColor = "#2563EB";
     bodyContent = timeOfDay === "morning"
       ? `<p>Good morning! Just a friendly reminder that the <strong>Elite Web Development & SaaS Masterclass</strong> starts on <strong>Monday, April 20</strong>.</p><p>Seats are filling up fast. If you haven't completed your application and payment yet, now is the perfect time.</p>`
-      : `<p>The clock is ticking! In just ${daysLeft} days, the Masterclass begins. This is your opportunity to learn web development, earn a paid internship, and land your first client.</p><p>Don't let this chance pass you by.</p>`;
+      : `<p>The clock is ticking! In just ${daysLeft} days, the Masterclass begins. This is your opportunity to learn web development, complete a 1-month internship, and land your first client.</p><p>Don't let this chance pass you by.</p>`;
   } else if (daysLeft === 3) {
     subject = `Only 3 days left, ${name}!`;
     urgencyBadge = "3 DAYS LEFT";
@@ -74,7 +74,7 @@ function getReminderEmail(daysLeft: number, timeOfDay: "morning" | "evening", fi
     urgencyBadge = "2 DAYS LEFT";
     urgencyColor = "#ea580c";
     bodyContent = timeOfDay === "morning"
-      ? `<p>Good morning! The Masterclass is <strong>2 days away</strong>. Monday is almost here.</p><p>This isn't just another course — it's 6 weeks of building real products, with a <strong>paid internship</strong> at Doctor Barns Tech waiting for you at the end.</p>`
+      ? `<p>Good morning! The Masterclass is <strong>2 days away</strong>. Monday is almost here.</p><p>This isn't just another course — it's 6 weeks of building real products, with a <strong>1-month internship</strong> at Doctor Barns Tech waiting for you at the end.</p>`
       : `<p><strong>Only 2 days remain.</strong> The Elite Web Dev Masterclass kicks off Monday morning and seats are almost full.</p><p>If you've been on the fence, this is your sign. The investment starts at just GHS 440.</p>`;
   } else if (daysLeft === 1) {
     subject = timeOfDay === "morning"

@@ -22,7 +22,7 @@ export const brand = {
     fee: "GHS 2,200",
     seats: 10,
     location: "Accra, Ghana",
-    mode: "Offline (In-Person)",
+    mode: "Hybrid (1 Onsite + 2 Online Weekly)",
   },
 };
 
@@ -210,8 +210,8 @@ export const portfolioSystems = [
 
 export const guarantees = [
   {
-    title: "First Client Guaranteed",
-    desc: "Every single student will sign their first paying web design client before the training ends. We work individually with each student to make sure of it — not a maybe, a guarantee.",
+    title: "First Client Pathway",
+    desc: "Our first-client guarantee depends on student seriousness and strict adherence to instructions. We coach each student closely to execute the process and close real opportunities.",
     icon: "Target",
     color: "emerald" as const,
     stat: "100%",
@@ -226,7 +226,7 @@ export const guarantees = [
     statLabel: "Job Offers Per Cohort",
   },
   {
-    title: "Diploma Certification",
+    title: "Professional Diploma",
     desc: "Graduate with a professional Diploma in Web Development issued by Doctor Barns Tech. A credential that signals real-world capability — not just course completion.",
     icon: "Award",
     color: "blue" as const,
@@ -234,8 +234,8 @@ export const guarantees = [
     statLabel: "Industry Recognized",
   },
   {
-    title: "1-Month Paid Internship",
-    desc: "After 6 weeks of training, every student transitions into a 1-month paid internship at Doctor Barns Tech — working on live client projects alongside senior developers.",
+    title: "1-Month Internship",
+    desc: "After 6 weeks of training, every student transitions into a 1-month internship at Doctor Barns Tech — working on live client projects alongside senior developers.",
     icon: "Briefcase",
     color: "blue" as const,
     stat: "1 Month",
@@ -315,8 +315,8 @@ export const faqs = [
     a: "Yes. We have a dedicated Client Acquisition module in Week 6 where you learn lead generation, pitching, proposal writing, and closing. We work individually with every student to ensure you sign your first paying web design contract before the program ends. No exceptions.",
   },
   {
-    q: "How does the paid internship work?",
-    a: "After the 6-week masterclass, every graduate transitions directly into a 1-month paid internship at Doctor Barns Tech. You'll work on real live client projects alongside senior developers, building your professional portfolio and getting real work experience on your CV.",
+    q: "How does the 1-month internship work?",
+    a: "After the 6-week masterclass, every graduate transitions directly into a 1-month internship at Doctor Barns Tech. You'll work on live client projects alongside senior developers, building your portfolio and professional experience.",
   },
   {
     q: "What does 'Top 2 Get Hired' mean exactly?",
@@ -332,7 +332,7 @@ export const faqs = [
   },
   {
     q: "Is the training online or offline?",
-    a: "The masterclass is 100% offline and in-person at 111 Newtown RD, Accra Newtown. We made this deliberate choice — offline immersion produces faster, deeper learning. No distractions. Hands-on mentorship. Peer accountability. It works.",
+    a: "The masterclass is hybrid: 1 onsite meeting in Accra plus 2 online meetings each week. This structure combines live accountability, practical coaching, and flexible follow-through.",
   },
   {
     q: "What is the 100K in 2 Weeks Challenge?",
@@ -344,11 +344,11 @@ export const faqs = [
   },
   {
     q: "What do I receive at the end of the program?",
-    a: "You receive: (1) A Diploma Certification in Web Development from Doctor Barns Tech, (2) A professional portfolio of real production projects, (3) Your first signed paying client contract, (4) A 1-month paid internship placement, (5) Lifetime access to the RWH Alumni Network, and (6) A chance at full-time employment.",
+    a: "You receive: (1) A Professional Diploma in Web Development from Doctor Barns Tech, (2) A professional portfolio of real production projects, (3) Your first signed paying client contract, (4) A 1-month internship placement, (5) Lifetime access to the RWH Alumni Network, and (6) A chance at full-time employment.",
   },
   {
     q: "What is the total program fee?",
-    a: "The full fee is GHS 2,200 for the complete 6-week program. This covers all training, materials, certification, the paid internship placement, and the 100K Challenge client acquisition module. Every cedi is an investment in a skill set that pays you back for life.",
+    a: "The full fee is GHS 2,200 for the complete 6-week program. This covers all training, materials, your Professional Diploma, the 1-month internship placement, and the 100K Challenge client acquisition module. Every cedi is an investment in a skill set that pays you back for life.",
   },
 ];
 

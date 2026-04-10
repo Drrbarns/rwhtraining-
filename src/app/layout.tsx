@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     template: "%s | Remote Work Hub",
   },
   description:
-    "Become a Professional Web Developer in 6 Weeks. First client guaranteed. Paid internship at Doctor Barns Tech. Top 2 students get hired. Starts April 20, 2026 in Accra, Ghana.",
+    "Become a Professional Web Developer in 6 Weeks. Professional Diploma, 1-month internship, and hybrid delivery (1 onsite + 2 online meetings weekly). Starts April 20, 2026 in Accra, Ghana.",
   metadataBase: new URL(APP_URL),
   applicationName: "Remote Work Hub Masterclass",
   generator: "Next.js",
@@ -32,14 +32,14 @@ export const metadata: Metadata = {
     "Doctor Barns Tech",
     "Remote Work Hub",
     "SaaS masterclass",
-    "paid internship Ghana",
+    "web development internship Ghana",
     "web developer training",
     "learn to code Accra",
     "web design training Ghana",
     "Next.js course Ghana",
     "React training Accra",
     "full stack developer course",
-    "web development certificate Ghana",
+    "professional diploma web development Ghana",
     "coding school Accra Ghana",
     "tech training West Africa",
     "freelance web developer Ghana",
@@ -64,7 +64,7 @@ export const metadata: Metadata = {
     siteName: "Remote Work Hub",
     title: "2026 Elite Web Development Masterclass — Remote Work Hub",
     description:
-      "Become a professional web developer in 6 weeks. First client guaranteed. Paid internship included. Top 2 get hired by Doctor Barns Tech. GHS 2,200 — Accra, Ghana.",
+      "Become a professional web developer in 6 weeks. Professional Diploma + 1-month internship. Hybrid format in Accra with online sessions. GHS 2,200.",
     countryName: "Ghana",
   },
   twitter: {
@@ -73,7 +73,7 @@ export const metadata: Metadata = {
     creator: "@remoteworkhub",
     title: "2026 Elite Web Development Masterclass — Remote Work Hub",
     description:
-      "Become a professional web developer in 6 weeks. First client guaranteed. Paid internship. Top 2 get hired. GHS 2,200. Starts April 20, 2026.",
+      "Become a professional web developer in 6 weeks. Professional Diploma + 1-month internship. Hybrid format. GHS 2,200. Starts April 20, 2026.",
   },
   robots: {
     index: true,

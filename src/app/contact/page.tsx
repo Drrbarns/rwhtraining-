@@ -58,7 +58,7 @@ const faqs = [
   { q: "When does the April cohort start?", a: `April 20, 2026. Training runs Mon–Sat, 8am–5pm, for 6 weeks.` },
   { q: "How do I secure my seat?", a: "Apply via the application form. Upon review, we'll reach out to confirm your spot and provide payment details." },
   { q: "Is there a payment plan?", a: `Yes. Contact us on WhatsApp (${brand.phone}) to arrange a deposit and installment structure.` },
-  { q: "Where is the training held?", a: `In-person at ${brand.address}. Fully offline — no online option.` },
+  { q: "Where is the training held?", a: `Hybrid format: one onsite session at ${brand.address} plus two online sessions each week.` },
 ];
 
 type FormState = "idle" | "sending" | "sent" | "error";

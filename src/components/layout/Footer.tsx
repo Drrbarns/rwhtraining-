@@ -26,7 +26,7 @@ export function Footer() {
                 />
               </Link>
               <p className="text-slate-400 font-light text-base max-w-sm leading-relaxed">
-                The premier Elite Web Development &amp; SaaS Masterclass in Ghana. We engineer beginners into highly capable developers, complete with a paid internship and professional certification.
+                The premier Elite Web Development &amp; SaaS Masterclass in Ghana. We engineer beginners into highly capable developers with a Professional Diploma and 1-month internship pathway.
               </p>
             </div>
 

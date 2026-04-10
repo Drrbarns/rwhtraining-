@@ -61,7 +61,7 @@ export default function HomePage() {
       position: "object-center",
     },
     {
-      src: "/african_tech_lab_wide_7.png",
+      src: "/african_tech_lab_wide_7.jpg",
       alt: "Remote Work Hub training environment",
       position: "object-center",
     },
@@ -109,6 +109,7 @@ export default function HomePage() {
                 alt={heroSlides[activeHeroSlide].alt}
                 fill
                 className={`object-cover ${heroSlides[activeHeroSlide].position}`}
+                sizes="100vw"
                 priority
               />
             </motion.div>
@@ -166,7 +167,7 @@ export default function HomePage() {
 
               <motion.div variants={FADE_UP} className="grid grid-cols-1 sm:grid-cols-2 md:flex md:flex-wrap gap-2.5 pt-1 w-full max-w-xl font-sans">
                 {[
-                  { icon: CheckCircle2, text: "Diploma Certification", color: "text-blue-400" },
+                  { icon: CheckCircle2, text: "Professional Diploma", color: "text-blue-400" },
                   { icon: Flame, text: "Top 2 Get Hired", color: "text-blue-400" },
                   { icon: CheckCircle2, text: "No Experience Required", color: "text-blue-400" },
                 ].map((item) => (
@@ -304,7 +305,7 @@ export default function HomePage() {
                   </strong>
                 </p>
                 <p>
-                  Our masterclass is a rigid, offline immersion specifically designed to strip away the fluff.
+                  Our masterclass is a high-accountability hybrid program specifically designed to strip away the fluff.
                   We focus on high-value, production-grade systems — the exact software Ghanaian companies
                   are actively paying GHS 5,000 to GHS 15,000 to acquire.
                 </p>
@@ -325,7 +326,7 @@ export default function HomePage() {
               className="grid sm:grid-cols-2 gap-4"
             >
               {[
-                { icon: Terminal, title: "Offline Immersion", desc: "Hands-on, in-person mentorship to enforce focus and accelerate learning." },
+                { icon: Terminal, title: "Hybrid Delivery", desc: "1 onsite session + 2 online sessions each week for structure and flexibility." },
                 { icon: Target, title: "Client Acquisition", desc: "Learn the exact psychology of finding, pitching & closing real corporate deals." },
                 { icon: Cpu, title: "Real Architecture", desc: "Build scalable databases, strict authentication, and enterprise business logic." },
                 { icon: Award, title: "Premium Positioning", desc: "Position yourself as a high-value agency — not a cheap, disposable freelancer." },
@@ -395,7 +396,7 @@ export default function HomePage() {
               { title: "Engineer Complex Dashboards", desc: "Create the internal management software that companies rely on to run their daily operations." },
               { title: "Start Your Web Dev Agency", desc: "Structure your own web development company — from legal basics to service packaging and premium pricing." },
               { title: "Land Your First Client — Guaranteed", desc: "We don't let you leave without a paying contract. Every student signs their first web design deal before the program ends." },
-              { title: "Become Internship-Ready", desc: "Build delivery discipline, technical confidence, and communication standards to thrive in paid internship environments." },
+              { title: "Become Internship-Ready", desc: "Build delivery discipline, technical confidence, and communication standards to thrive in real internship environments." },
             ].map((item, i) => (
               <motion.div
                 key={item.title}
@@ -507,7 +508,7 @@ export default function HomePage() {
               {
                 icon: Target,
                 title: "First Client Guaranteed",
-                desc: "Every single student will sign their first paying web design client before the training ends. We make sure of it.",
+                desc: "Our first-client guarantee is tied to student seriousness and strict execution of instructions throughout the program.",
               },
               {
                 icon: Flame,
@@ -585,14 +586,14 @@ export default function HomePage() {
                 </div>
                 <h3 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-2 leading-tight">
                   1-Month{" "}
-                  <span className="text-blue-600">Paid Internship</span>
+                  <span className="text-blue-600">Internship</span>
                 </h3>
                 <p className="text-slate-900 font-bold text-lg mb-5 flex items-center gap-2">
                   <Briefcase className="w-5 h-5 text-blue-600" />
                   With Doctor Barns Tech
                 </p>
                 <p className="text-slate-600 text-sm leading-relaxed mb-6">
-                  After your 6 weeks of training, transition directly into an offline, paid internship role.
+                  After your 6 weeks of training, transition directly into a 1-month internship role.
                   Work elbow-to-elbow with senior developers on actual live client projects — supercharging
                   your portfolio and professional experience instantly.
                 </p>
@@ -652,7 +653,7 @@ export default function HomePage() {
                 {[
                   { label: "Replies", value: "< 10min" },
                   { label: "Seats Left", value: "10 Only" },
-                  { label: "Format", value: "Offline" },
+                  { label: "Format", value: "Hybrid" },
                 ].map((meta) => (
                   <div key={meta.label} className="rounded-xl border border-white/10 bg-white/5 px-3 py-3">
                     <p className="text-[10px] uppercase tracking-wider text-slate-400 font-bold">{meta.label}</p>
@@ -758,16 +759,16 @@ export default function HomePage() {
                   <span className="text-amber-400">April 20.</span>
                 </h2>
                 <p className="text-slate-400 text-base leading-relaxed mb-6 max-w-md">
-                  Certification, paid internship, your first paying client, and the chance to get hired —
+                  Professional Diploma, 1-month internship, your first paying client, and the chance to get hired —
                   all included. Limited seats per cohort to ensure elite-level training.
                 </p>
 
                 <div className="flex flex-wrap gap-4 mb-6 text-slate-400 text-sm font-medium">
                   {[
-                    { icon: MapPin, text: "Offline · Accra" },
-                    { icon: Target, text: "First Client Guaranteed" },
+                    { icon: MapPin, text: "Hybrid · Accra + Online" },
+                    { icon: Target, text: "First Client (with strict execution)" },
                     { icon: Flame, text: "Top 2 Get Hired" },
-                    { icon: GraduationCap, text: "Diploma Certified" },
+                    { icon: GraduationCap, text: "Professional Diploma" },
                   ].map((item) => (
                     <div key={item.text} className="flex items-center gap-2">
                       <item.icon className="w-4 h-4 text-blue-400" />
