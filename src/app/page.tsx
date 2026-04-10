@@ -51,13 +51,13 @@ const weekHighlights = [
 export default function HomePage() {
   const heroSlides = [
     {
-      src: "/hero-classroom-1.png",
-      alt: "Remote Work Hub classroom setup",
+      src: "/hero-space-1.png",
+      alt: "Remote Work Hub work and collaboration area",
       position: "object-center",
     },
     {
-      src: "/hero-space-1.png",
-      alt: "Remote Work Hub work and collaboration area",
+      src: "/hero-classroom-1.png",
+      alt: "Remote Work Hub classroom setup",
       position: "object-center",
     },
     {
@@ -113,9 +113,9 @@ export default function HomePage() {
               />
             </motion.div>
           </AnimatePresence>
-          <div className="absolute inset-0 bg-[#0a192f]/30 mix-blend-multiply" />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0a192f]/78 via-[#0a192f]/58 to-transparent" />
-          <div className="absolute inset-0 md:hidden bg-gradient-to-b from-[#0a192f]/40 via-transparent to-[#0a192f]/62" />
+          <div className="absolute inset-0 bg-[#0a192f]/36 mix-blend-multiply" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0a192f]/82 via-[#0a192f]/62 to-transparent" />
+          <div className="absolute inset-0 md:hidden bg-gradient-to-b from-[#0a192f]/50 via-transparent to-[#0a192f]/75" />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,_var(--tw-gradient-stops))] from-blue-600/20 via-blue-900/5 to-transparent" />
           <div className="absolute bottom-4 right-4 z-20 flex items-center gap-2">
             {heroSlides.map((slide, idx) => (
