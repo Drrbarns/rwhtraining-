@@ -52,7 +52,7 @@ const milestones = [
   { year: "2022", title: "Cohort 2 — Top 2 Hired", desc: "Introduced the hiring program. Two graduates joined Doctor Barns Tech full-time after demonstrating outstanding performance." },
   { year: "2023", title: "Alumni Network Established", desc: "100+ graduates connected across a professional network spanning freelance, agencies, and tech employment." },
   { year: "2024", title: "Enterprise Client Growth", desc: "Doctor Barns Tech systems deployed at schools, hospitals, hotels, and corporations across Ghana." },
-  { year: "2026", title: "Next Evolution — April 20", desc: "A refined, 6-week curriculum. GHS 2,200. 10 seats. The most comprehensive edition of Remote Work Hub yet." },
+  { year: "2026", title: "Next Evolution — June 1", desc: "A refined, 4-week intensive curriculum. GHS 1,000 promotional price. 10 seats. The most focused, practical edition of Remote Work Hub yet." },
 ];
 
 const doctorBarnsCredentials = [
@@ -436,7 +436,7 @@ export default function AboutPage() {
               Ready to Build Something Real?
             </h2>
             <p className="text-blue-100 text-lg mb-10 max-w-2xl mx-auto leading-relaxed">
-              Apply for the April 20 cohort. 10 seats. {brand.cohort.fee}. Six weeks that will change your
+              Apply for the June 1 cohort. 10 seats. {brand.cohort.fee}. Four weeks that will change your
               career trajectory permanently.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">

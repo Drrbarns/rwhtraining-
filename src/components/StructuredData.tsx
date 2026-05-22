@@ -40,7 +40,7 @@ const courseSchema = {
   "@id": `${APP_URL}/#course`,
   name: "2026 Elite Web Development & SaaS Masterclass",
   description:
-    "An intensive 6-week hybrid web development masterclass in Accra, Ghana with 1 onsite and 2 online meetings weekly. Learn to build production-ready web applications, e-commerce platforms, dashboards, and SaaS products. Includes a 1-month internship at Doctor Barns Tech.",
+    "An intensive 4-week hybrid web development masterclass in Accra, Ghana with 1 onsite and 2 online meetings weekly. Learn to build production-ready web applications, e-commerce platforms, dashboards, and SaaS products. Includes a 1-month internship at Doctor Barns Tech.",
   url: `${APP_URL}/apply`,
   provider: { "@id": `${APP_URL}/#organization` },
   courseCode: "RWH-2026-ELITE",
@@ -57,12 +57,12 @@ const courseSchema = {
   ],
   numberOfCredits: 1,
   occupationalCredentialAwarded: "Professional Diploma in Web Development",
-  timeRequired: "P6W",
+  timeRequired: "P4W",
   hasCourseInstance: {
     "@type": "CourseInstance",
-    name: "April 2026 Cohort",
-    startDate: "2026-04-20",
-    endDate: "2026-06-01",
+    name: "June 2026 Cohort",
+    startDate: "2026-06-01",
+    endDate: "2026-06-28",
     courseMode: "Hybrid",
     courseWorkload: "PT8H",
     instructor: {
@@ -88,7 +88,7 @@ const courseSchema = {
       availability: "https://schema.org/LimitedAvailability",
       url: `${APP_URL}/apply`,
       validFrom: "2026-01-01",
-      validThrough: "2026-04-20",
+      validThrough: "2026-06-01",
       category: "Web Development Training",
     },
   },
@@ -112,7 +112,7 @@ const faqSchema = {
       name: "Do I need any prior coding experience?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "No. This masterclass is designed for absolute beginners. We take you from zero to building production-ready web applications in 6 weeks. All you need is a laptop, dedication, and the willingness to learn.",
+        text: "No. This masterclass is designed for absolute beginners. We take you from zero to building production-ready web applications in 4 weeks. All you need is a laptop, dedication, and the willingness to learn.",
       },
     },
     {
@@ -144,7 +144,7 @@ const faqSchema = {
       name: "How does the 1-month internship work?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "After the 6-week masterclass, every student transitions into a 1-month internship at Doctor Barns Tech. You'll work on real client projects alongside senior developers, building your portfolio and professional experience.",
+        text: "After the 4-week masterclass, every student transitions into a 1-month internship at Doctor Barns Tech. You'll work on real client projects alongside senior developers, building your portfolio and professional experience.",
       },
     },
     {
@@ -160,7 +160,7 @@ const faqSchema = {
       name: "Can I pay in installments?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Yes. You can start with a 20% deposit (GHS 440), a 50% payment (GHS 1,100), or pay the full GHS 2,200 upfront. All payment tiers secure your seat immediately.",
+        text: "Yes. You can start with a 20% deposit (GHS 200), a 50% payment (GHS 500), or pay the full GHS 1,000 upfront. All payment tiers secure your seat immediately.",
       },
     },
     {
@@ -220,9 +220,9 @@ const eventSchema = {
   "@type": "EducationEvent",
   name: "2026 Elite Web Development & SaaS Masterclass",
   description:
-    "6-week intensive hybrid web development training in Accra. Learn to build real business applications, complete a 1-month internship, and pursue your first client with guided support.",
-  startDate: "2026-04-20T09:00:00+00:00",
-  endDate: "2026-06-01T17:00:00+00:00",
+    "4-week intensive hybrid web development training in Accra. Learn to build real business applications, complete a 1-month internship, and pursue your first client with guided support.",
+startDate: "2026-06-01T09:00:00+00:00",
+    endDate: "2026-06-28T17:00:00+00:00",
   eventStatus: "https://schema.org/EventScheduled",
   eventAttendanceMode: "https://schema.org/MixedEventAttendanceMode",
   location: {

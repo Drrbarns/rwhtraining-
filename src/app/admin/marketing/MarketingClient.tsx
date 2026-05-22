@@ -31,7 +31,7 @@ const SMS_PRESETS = [
         name: "New Cohort Announcement",
         body: `Hi {{first_name}}! Doctor Barns here. We're launching a brand new cohort of the RWH Elite Web Dev & SaaS Masterclass and I thought of you.
 
-This time: 6 weeks of hands-on building, a paid internship at Doctor Barns Tech, and we help you land your first paying client.
+This time: 4 weeks of hands-on building, a paid internship at Doctor Barns Tech, and we help you land your first paying client.
 
 Seats are strictly limited. Secure yours now: https://remoteworkhub.org/apply
 
@@ -42,7 +42,7 @@ Questions? WhatsApp: 0209636158
         name: "Urgency / Last Chance",
         body: `{{first_name}}, the new RWH Masterclass cohort is filling up fast. Only a few seats left.
 
-You showed interest before — this is your chance to actually make it happen. Start with just GHS 440 (20% deposit).
+You showed interest before — this is your chance to actually make it happen. Start with just GHS 200 (20% deposit).
 
 Apply now: https://remoteworkhub.org/apply
 

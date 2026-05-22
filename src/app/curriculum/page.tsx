@@ -66,11 +66,11 @@ const techStack = [
 ];
 
 const programFeatures = [
-  { icon: Clock, label: "6 Weeks Intensive", sub: "Hybrid weekly schedule" },
+  { icon: Clock, label: "4 Weeks Intensive", sub: "Hybrid weekly schedule" },
   { icon: Users, label: "Max 10 Students", sub: "Elite, personalized mentorship" },
   { icon: Award, label: "Professional Diploma", sub: "Doctor Barns Tech award" },
   { icon: GraduationCap, label: "Internship Included", sub: "1-month at DBT" },
-  { icon: Calendar, label: "Starts April 20", sub: "2026 cohort" },
+  { icon: Calendar, label: "Starts June 1", sub: "2026 cohort" },
   { icon: Download, label: "All Materials Included", sub: "Code, resources & templates" },
 ];
 
@@ -92,7 +92,7 @@ export default function CurriculumPage() {
             className="max-w-3xl"
           >
             <motion.span variants={FADE_UP} className="eyebrow text-blue-400 mb-4 block">
-              The 6-Week Curriculum
+              The 4-Week Curriculum
             </motion.span>
             <motion.h1 variants={FADE_UP} className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-white leading-[1.05] mb-6">
               No Padding. No Filler.{" "}
@@ -100,7 +100,7 @@ export default function CurriculumPage() {
               <span className="text-blue-400">Only High-Value Skills.</span>
             </motion.h1>
             <motion.p variants={FADE_UP} className="text-slate-400 text-xl leading-relaxed max-w-2xl mb-8">
-              Six weeks of relentless, structured immersion. Every topic chosen because it earns money.
+              Four weeks of relentless, structured immersion. Every topic chosen because it earns money.
               Every project built for a real-world portfolio. Every week ending with you knowing how to
               build something a client will pay for.
             </motion.p>
@@ -268,7 +268,7 @@ export default function CurriculumPage() {
             >
               <motion.span variants={FADE_UP} className="eyebrow mb-4 block">Program Structure</motion.span>
               <motion.h2 variants={FADE_UP} className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 leading-tight mb-6">
-                How the 6 Weeks Are Structured
+                How the 4 Weeks Are Structured
               </motion.h2>
               <motion.div variants={FADE_UP} className="space-y-5 text-slate-600 text-base leading-relaxed">
                 <p>
@@ -391,7 +391,7 @@ export default function CurriculumPage() {
             <div className="absolute inset-0 grid-overlay-dark opacity-40" />
             <div className="relative z-10">
               <span className="inline-flex items-center px-4 py-1.5 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-300 text-[10px] font-bold tracking-widest uppercase mb-6">
-                Enroll for April 2026
+                Enroll for June 2026
               </span>
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white mb-4">
                 Program Fee: <span className="text-amber-400">{brand.cohort.fee}</span>

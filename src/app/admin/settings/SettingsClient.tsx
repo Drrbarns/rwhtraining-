@@ -319,7 +319,7 @@ function WalkInEnrollment() {
     const router = useRouter();
     const [open, setOpen] = useState(false);
     const [submitting, setSubmitting] = useState(false);
-    const [form, setForm] = useState({ first_name: "", last_name: "", email: "", phone: "", city: "", tier: "50", amount_ghs: "1100" });
+    const [form, setForm] = useState({ first_name: "", last_name: "", email: "", phone: "", city: "", tier: "50", amount_ghs: "500" });
 
     const tierAmounts: Record<string, string> = { "20": "440", "50": "1100", "100": "2200" };
 
@@ -343,7 +343,7 @@ function WalkInEnrollment() {
         setSubmitting(false);
         if (res.success) {
             toast.success("Student enrolled! Credentials sent.");
-            setForm({ first_name: "", last_name: "", email: "", phone: "", city: "", tier: "50", amount_ghs: "1100" });
+            setForm({ first_name: "", last_name: "", email: "", phone: "", city: "", tier: "50", amount_ghs: "500" });
             setOpen(false);
             router.refresh();
         } else {
@@ -397,9 +397,9 @@ function WalkInEnrollment() {
                                     onChange={(e) => updateField("tier", e.target.value)}
                                     className="flex h-9 w-full mt-1 rounded-lg border border-slate-200 bg-white px-3 py-1 text-[13px] font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500"
                                 >
-                                    <option value="20">20% — GHS 440</option>
-                                    <option value="50">50% — GHS 1,100</option>
-                                    <option value="100">100% — GHS 2,200</option>
+                                    <option value="20">20% — GHS 200</option>
+                                    <option value="50">50% — GHS 500</option>
+                                    <option value="100">100% — GHS 1,000</option>
                                 </select>
                             </div>
                             <div>

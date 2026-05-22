@@ -139,7 +139,7 @@ export default function OGImage() {
               { label: "Professional Diploma", color: "#22c55e" },
               { label: "1-Month Internship", color: "#3b82f6" },
               { label: "Top 2 Get Hired", color: "#f59e0b" },
-              { label: "GHS 2,200", color: "#ffffff" },
+              { label: "GHS 1,000", color: "#ffffff" },
             ].map((item) => (
               <div key={item.label} style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <div style={{ width: 10, height: 10, borderRadius: "50%", background: item.color, display: "flex" }} />

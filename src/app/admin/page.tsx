@@ -99,9 +99,9 @@ async function getAdminData(cohortFilter: CohortFilterValue, visitorRange: Visit
     const tier50 = paidApps.filter((a: any) => a.tier === "50");
     const tier100 = paidApps.filter((a: any) => a.tier === "100");
     const tierBreakdown = [
-        { name: "20% Deposit (GHS 440)", value: tier20.length, amount: tier20.reduce((s: number, a: any) => s + Number(a.amount_ghs || 0), 0) },
-        { name: "50% Deposit (GHS 1,100)", value: tier50.length, amount: tier50.reduce((s: number, a: any) => s + Number(a.amount_ghs || 0), 0) },
-        { name: "Full Payment (GHS 2,200)", value: tier100.length, amount: tier100.reduce((s: number, a: any) => s + Number(a.amount_ghs || 0), 0) },
+        { name: "20% Deposit (GHS 200)", value: tier20.length, amount: tier20.reduce((s: number, a: any) => s + Number(a.amount_ghs || 0), 0) },
+        { name: "50% Deposit (GHS 500)", value: tier50.length, amount: tier50.reduce((s: number, a: any) => s + Number(a.amount_ghs || 0), 0) },
+        { name: "Full Payment (GHS 1,000)", value: tier100.length, amount: tier100.reduce((s: number, a: any) => s + Number(a.amount_ghs || 0), 0) },
     ];
 
     const moolrePayments = paidPayments.filter((p: any) => p.gateway === "moolre").length;

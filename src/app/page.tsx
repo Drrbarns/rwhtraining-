@@ -153,7 +153,7 @@ export default function HomePage() {
                 Become a Professional <br className="hidden md:block" />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-blue-500 to-indigo-400 drop-shadow-md">Web Developer</span>{" "}
                 <br className="hidden lg:block" />
-                &amp; Secure Your First Client in <span className="text-white drop-shadow-md">6 Weeks.</span>
+                &amp; Secure Your First Client in <span className="text-white drop-shadow-md">4 Weeks.</span>
               </motion.h1>
 
               <motion.p
@@ -193,7 +193,7 @@ export default function HomePage() {
                 <div className="flex items-center justify-between gap-4 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 sm:py-0 sm:bg-transparent sm:border-0 sm:px-0 w-full sm:w-auto sm:pl-6 sm:border-l h-auto sm:h-12">
                   <div className="flex flex-col justify-center text-left">
                     <span className="text-[10px] text-blue-300 font-bold uppercase tracking-widest mb-1">Program Fee</span>
-                    <span className="text-2xl font-black text-white leading-none tracking-tight drop-shadow-md">GHS 2,200</span>
+                    <span className="text-2xl font-black text-white leading-none tracking-tight drop-shadow-md">GHS 1,000</span>
                   </div>
                   <span className="text-[10px] uppercase tracking-wider font-bold text-emerald-300 bg-emerald-500/10 border border-emerald-400/20 px-2 py-1 rounded-full">
                     Installments available
@@ -366,7 +366,7 @@ export default function HomePage() {
               <motion.h2 variants={FADE_UP} className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-slate-950">
                 What You Will Achieve
                 <br className="hidden sm:block" />
-                <span className="font-serif italic text-slate-500 font-medium">in 6 Weeks</span>
+                <span className="font-serif italic text-slate-500 font-medium">in 4 Weeks</span>
               </motion.h2>
             </motion.div>
             <motion.div
@@ -593,7 +593,7 @@ export default function HomePage() {
                   With Doctor Barns Tech
                 </p>
                 <p className="text-slate-600 text-sm leading-relaxed mb-6">
-                  After your 6 weeks of training, transition directly into a 1-month internship role.
+                  After your 4 weeks of training, transition directly into a 1-month internship role.
                   Work elbow-to-elbow with senior developers on actual live client projects — supercharging
                   your portfolio and professional experience instantly.
                 </p>
@@ -756,7 +756,7 @@ export default function HomePage() {
                   Your Engineering Career{" "}
                   <br className="hidden md:block" />
                   Starts{" "}
-                  <span className="text-amber-400">April 20.</span>
+                  <span className="text-amber-400">June 1.</span>
                 </h2>
                 <p className="text-slate-400 text-base leading-relaxed mb-6 max-w-md">
                   Professional Diploma, 1-month internship, your first paying client, and the chance to get hired —
@@ -780,7 +780,7 @@ export default function HomePage() {
                 <div className="bg-white/5 border border-white/10 rounded-2xl p-5 max-w-sm flex items-center justify-between gap-5 mb-4">
                   <div>
                     <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">One-Time Fee</p>
-                    <p className="text-3xl font-black text-white">GHS 2,200</p>
+                    <p className="text-3xl font-black text-white">GHS 1,000</p>
                   </div>
                   <Link href="/apply" className="flex items-center gap-2 h-12 px-6 bg-blue-600 text-white font-bold text-sm rounded-xl hover:bg-blue-700 transition-all hover:-translate-y-0.5 shadow-lg group shrink-0">
                     Apply Now

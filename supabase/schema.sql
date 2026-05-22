@@ -47,7 +47,7 @@ CREATE TABLE public.applications (
   
   -- Payment Tracking
   tier text NOT NULL DEFAULT '50',
-  amount_ghs numeric NOT NULL DEFAULT 1100,
+  amount_ghs numeric NOT NULL DEFAULT 500,
   payment_reference text UNIQUE,
   payment_status text NOT NULL DEFAULT 'PENDING',
   
@@ -92,7 +92,7 @@ CREATE TABLE public.enrollments (
   application_id uuid REFERENCES public.applications(id) ON DELETE CASCADE,
   
   is_active boolean DEFAULT false NOT NULL,
-  balance_due numeric(10, 2) DEFAULT 2200.00 NOT NULL,
+  balance_due numeric(10, 2) DEFAULT 1000.00 NOT NULL,
   total_paid numeric(10, 2) DEFAULT 0.00 NOT NULL,
   
   created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,

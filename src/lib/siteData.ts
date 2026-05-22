@@ -4,7 +4,7 @@ export const brand = {
   name: "Remote Work Hub",
   company: "Doctor Barns Tech",
   tagline: "Engineer Your Future. Build Real Systems. Land Real Clients.",
-  shortTagline: "From Zero to Professional Developer in 6 Weeks.",
+  shortTagline: "From Zero to Professional Developer in 4 Weeks.",
   phone: "+233 20 963 6158",
   whatsapp: "+233209636158",
   email: "info@remoteworkhub.org",
@@ -17,9 +17,9 @@ export const brand = {
     linkedin: "https://linkedin.com/company/remoteworkhub",
   },
   cohort: {
-    startDate: "April 20, 2026",
-    duration: "6 Weeks",
-    fee: "GHS 2,200",
+    startDate: "June 1, 2026",
+    duration: "4 Weeks",
+    fee: "GHS 1,000",
     seats: 10,
     location: "Accra, Ghana",
     mode: "Hybrid (1 Onsite + 2 Online Weekly)",
@@ -37,38 +37,26 @@ export const navLinks = [
 export const curriculum = [
   {
     week: 1,
-    title: "Foundations & Environment Setup",
-    subtitle: "From Zero to Functional",
+    title: "Foundations, Frontend & UI Systems",
+    subtitle: "From Zero to Building Professional Interfaces",
     color: "blue" as const,
     topics: [
       "HTML5 semantic structure & accessibility principles",
-      "CSS3 mastery — layouts, flexbox, grid & variables",
-      "Responsive web design for all screen sizes",
+      "CSS3 mastery — layouts, flexbox, grid & responsive design",
       "Git version control & GitHub collaboration workflow",
       "VS Code environment setup & productivity tools",
-      "Introduction to Next.js project structure & React fundamentals",
-    ],
-    project: "Fully responsive personal portfolio website with mobile-first design",
-    outcome: "You'll have a live portfolio site deployed on Vercel by end of Week 1.",
-  },
-  {
-    week: 2,
-    title: "Advanced Frontend & UI Systems",
-    subtitle: "Build Like a Senior Developer",
-    color: "blue" as const,
-    topics: [
+      "Next.js project structure & React fundamentals",
       "Tailwind CSS utility-first design system mastery",
-      "Component architecture, reusability & prop systems",
-      "React hooks — useState, useEffect, useContext, useMemo",
-      "TypeScript for type safety & professional codebases",
+      "Component architecture, reusability & TypeScript",
+      "React hooks — useState, useEffect, useContext",
       "Animations & micro-interactions with Framer Motion",
       "UI libraries (Shadcn/ui) & design system integration",
     ],
-    project: "Animated corporate landing page with dynamic content & CMS-style data",
-    outcome: "You'll build frontend UIs indistinguishable from senior developer work.",
+    project: "Fully responsive corporate website with animations, dynamic content & mobile-first design",
+    outcome: "You'll build frontend UIs indistinguishable from senior developer work — live on Vercel by end of Week 1.",
   },
   {
-    week: 3,
+    week: 2,
     title: "Backend, Databases & Authentication",
     subtitle: "Full-Stack Engineering Power",
     color: "indigo" as const,
@@ -79,44 +67,35 @@ export const curriculum = [
       "Role-Based Access Control (RBAC) for multi-role systems",
       "File uploads, image storage & Supabase Storage buckets",
       "Data validation, error handling & security best practices",
-    ],
-    project: "Full-stack school management system with student, teacher & admin portals",
-    outcome: "You'll build secure, production-grade backends with real user authentication.",
-  },
-  {
-    week: 4,
-    title: "E-Commerce & Payment Systems",
-    subtitle: "Build Revenue-Generating Platforms",
-    color: "blue" as const,
-    topics: [
       "E-commerce architecture — product catalogs & variants",
-      "Shopping cart logic, state persistence & checkout flows",
-      "Paystack payment gateway integration & webhooks",
-      "Moolre fintech payment system integration",
-      "Order management, invoice generation & status tracking",
+      "Shopping cart logic, checkout flows & order management",
+      "Paystack & Moolre payment gateway integration",
       "Email notifications with Resend & transactional templates",
     ],
-    project: "Complete multi-vendor e-commerce platform with live payment processing",
-    outcome: "You'll have a fully functioning online store processing real payments.",
+    project: "Full-stack e-commerce platform with authentication, payment processing & admin dashboard",
+    outcome: "You'll build secure, production-grade backends with real user authentication and live payments.",
   },
   {
-    week: 5,
+    week: 3,
     title: "Enterprise Systems & Complex Dashboards",
     subtitle: "Corporate-Grade Software Architecture",
     color: "blue" as const,
     topics: [
       "Complex dashboard architecture with data visualization (Recharts)",
       "Point-of-Sale (POS) system with real-time inventory",
+      "School management — student portals, teacher dashboards & admin controls",
       "CRM systems — lead pipelines & client relationship management",
       "Hotel/hostel booking systems with room allocation logic",
       "Hospital management — appointments, patient records & billing",
       "Real-time data subscriptions with Supabase Realtime",
+      "Deployment, custom domains, SSL & production hosting",
+      "VPS setup, CyberPanel & Coolify for client projects",
     ],
-    project: "Hospital management system with appointment booking, patient records & billing",
+    project: "Enterprise management system (school, hospital or hotel) with full CRUD, roles & reporting",
     outcome: "You'll build the exact enterprise tools businesses pay GHS 10,000+ to acquire.",
   },
   {
-    week: 6,
+    week: 4,
     title: "Client Acquisition, Branding & Launch",
     subtitle: "From Developer to Agency Owner",
     color: "amber" as const,
@@ -126,7 +105,8 @@ export const curriculum = [
       "Proposal writing, contract templates & project scoping",
       "The 100K in 2 Weeks Challenge — live client acquisition",
       "Personal branding, portfolio presentation & LinkedIn optimization",
-      "Deployment, custom domains, SSL & production hosting on Vercel",
+      "SaaS fundamentals — subscription models & multi-tenant architecture",
+      "Final portfolio assembly & professional project showcase",
     ],
     project: "Your own professional agency website + first signed client contract",
     outcome: "You leave with a paying client. Not a maybe — a guarantee.",
@@ -235,7 +215,7 @@ export const guarantees = [
   },
   {
     title: "1-Month Internship",
-    desc: "After 6 weeks of training, every student transitions into a 1-month internship at Doctor Barns Tech — working on live client projects alongside senior developers.",
+    desc: "After 4 weeks of training, every student transitions into a 1-month internship at Doctor Barns Tech — working on live client projects alongside senior developers.",
     icon: "Briefcase",
     color: "blue" as const,
     stat: "1 Month",
@@ -304,7 +284,7 @@ export const testimonials = [
 export const faqs = [
   {
     q: "Do I need any prior coding experience?",
-    a: "No. This masterclass is designed from the ground up for absolute beginners. We take you from zero to building production-ready web applications across 6 structured weeks. All you need is a laptop, dedication, and the willingness to be challenged.",
+    a: "No. This masterclass is designed from the ground up for absolute beginners. We take you from zero to building production-ready web applications across 4 intensive weeks. All you need is a laptop, dedication, and the willingness to be challenged.",
   },
   {
     q: "What exactly will I be able to build after the masterclass?",
@@ -312,11 +292,11 @@ export const faqs = [
   },
   {
     q: "Is the first client really guaranteed?",
-    a: "Yes. We have a dedicated Client Acquisition module in Week 6 where you learn lead generation, pitching, proposal writing, and closing. We work individually with every student to ensure you sign your first paying web design contract before the program ends. No exceptions.",
+    a: "Yes. We have a dedicated Client Acquisition module in Week 4 where you learn lead generation, pitching, proposal writing, and closing. We work individually with every student to ensure you sign your first paying web design contract before the program ends. No exceptions.",
   },
   {
     q: "How does the 1-month internship work?",
-    a: "After the 6-week masterclass, every graduate transitions directly into a 1-month internship at Doctor Barns Tech. You'll work on live client projects alongside senior developers, building your portfolio and professional experience.",
+    a: "After the 4-week masterclass, every graduate transitions directly into a 1-month internship at Doctor Barns Tech. You'll work on live client projects alongside senior developers, building your portfolio and professional experience.",
   },
   {
     q: "What does 'Top 2 Get Hired' mean exactly?",
@@ -324,7 +304,7 @@ export const faqs = [
   },
   {
     q: "Can I pay in installments?",
-    a: "Yes. We understand that GHS 2,200 is a significant investment. You can secure your seat with a deposit and pay the balance in agreed installments before the cohort starts. WhatsApp us directly on +233209636158 to work out a plan that fits your situation.",
+    a: "Yes. You can secure your seat with a 20% deposit (GHS 200) and pay the balance before the cohort starts. We also accept 50% upfront. WhatsApp us directly on +233209636158 to work out a plan that fits your situation.",
   },
   {
     q: "What tech stack will I learn?",
@@ -336,7 +316,7 @@ export const faqs = [
   },
   {
     q: "What is the 100K in 2 Weeks Challenge?",
-    a: "It's our client generation challenge in Week 6 where you learn to find, pitch, and close high-paying corporate clients. The target is GHS 100,000 worth of web development contracts within 2 weeks of graduating. Students who execute fully consistently exceed this.",
+    a: "It's our client generation challenge in Week 4 where you learn to find, pitch, and close high-paying corporate clients. The target is GHS 100,000 worth of web development contracts within 2 weeks of graduating. Students who execute fully consistently exceed this.",
   },
   {
     q: "How many students are in each cohort?",
@@ -348,14 +328,14 @@ export const faqs = [
   },
   {
     q: "What is the total program fee?",
-    a: "The full fee is GHS 2,200 for the complete 6-week program. This covers all training, materials, your Professional Diploma, the 1-month internship placement, and the 100K Challenge client acquisition module. Every cedi is an investment in a skill set that pays you back for life.",
+    a: "The full fee is GHS 1,000 for the complete 4-week program. This is a special promotional price for the June 2026 cohort. It covers all training, materials, your Professional Diploma, the 1-month internship placement, and the 100K Challenge client acquisition module. Every cedi is an investment in a skill set that pays you back for life.",
   },
 ];
 
 export const stats = [
   { value: "100%", label: "First Client Rate", desc: "Every graduate lands a paying client" },
   { value: "10", label: "Students Per Cohort", desc: "Elite-level, personalized mentorship" },
-  { value: "6 Wks", label: "Program Duration", desc: "From zero to professional developer" },
+  { value: "4 Wks", label: "Program Duration", desc: "From zero to professional developer" },
   { value: "2", label: "Students Get Hired", desc: "Full-time job at Doctor Barns Tech" },
 ];
 

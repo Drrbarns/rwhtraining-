@@ -418,11 +418,11 @@ export default function SuccessPage() {
             transition={{ duration: 0.7 }}
           >
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight mb-4">
-              Your Story Starts April 20.
+              Your Story Starts June 1.
             </h2>
             <p className="text-blue-100 text-lg mb-10 max-w-2xl mx-auto leading-relaxed">
               Every graduate on this page started exactly where you are right now. Ten seats.
-              Six weeks. One decision that changes everything.
+              Four weeks. One decision that changes everything.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link href="/apply" className="inline-flex items-center gap-2 h-14 px-10 bg-white text-blue-600 font-bold text-base rounded-xl hover:bg-blue-50 transition-all shadow-lg group">
