@@ -1,6 +1,10 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY || "");
+let _resend: Resend | null = null;
+function getResend(): Resend {
+  if (!_resend) _resend = new Resend(process.env.RESEND_API_KEY || "");
+  return _resend;
+}
 
 const DEFAULT_FROM_NAME = "Remote Work Hub";
 
@@ -28,7 +32,7 @@ export async function sendEmail(opts: SendEmailOptions): Promise<{ success: bool
       ? `${opts.fromName} <${process.env.EMAIL_FROM || "onboarding@resend.dev"}>`
       : getFromAddress();
 
-    const { data, error } = await resend.emails.send({
+    const { data, error } = await getResend().emails.send({
       from,
       to: opts.to,
       subject: opts.subject,
